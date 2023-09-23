@@ -1,0 +1,12 @@
+[Unit]
+Description=Display system information directly on the framebuffer.
+
+[Service]
+Type=forking
+PIDFile=/var/run/info%i.pid
+ExecStart=/usr/local/bin/info --daemon --device /dev/fb%i --pidfile /var/run/info%i.pid
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

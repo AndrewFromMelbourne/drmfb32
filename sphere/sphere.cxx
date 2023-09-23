@@ -1,0 +1,118 @@
+//-------------------------------------------------------------------------
+//
+// The MIT License (MIT)
+//
+// Copyright (c) 2022 Andrew Duncan
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+//-------------------------------------------------------------------------
+
+#include <array>
+#include <cmath>
+#include <cstring>
+#include <functional>
+#include <iostream>
+
+#include "sphere.h"
+
+//-------------------------------------------------------------------------
+
+using namespace fb32;
+
+//-------------------------------------------------------------------------
+
+double dot(vector3 a, vector3 b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+//-------------------------------------------------------------------------
+
+Sphere::Sphere(int size)
+:
+    m_size{size},
+    m_image(size, size),
+    m_ambient{ 0.3 },
+    m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) }
+{
+}
+
+//-------------------------------------------------------------------------
+
+void
+Sphere::init()
+{
+    m_image.clear(0);
+}
+
+//-------------------------------------------------------------------------
+
+void
+Sphere::update()
+{
+    auto radius = m_size / 2;
+
+    for (int16_t j = 0 ; j < m_size ; ++j)
+    {
+        double y = double(radius - j) / radius;
+        for (int16_t i = 0 ; i < m_size ; ++i)
+        {
+            uint8_t grey = 0;
+
+            double x = double(i - radius) / radius;
+            double sum = x * x + y * y;
+
+            if (sum <= 1.0)
+            {
+                double z = std::sqrt(1.0 - sum);
+                vector3 v{x, y, z};
+                double intensity = dot(v, m_light);
+
+                if (intensity < 0.0)
+                {
+                    intensity = 0.0;
+                }
+
+                intensity *= intensity;
+                intensity *= (1.0 - m_ambient);
+
+                grey = (uint8_t)std::ceil(255.0 * (intensity + m_ambient));
+            }
+
+            Image8880Point p{i, j};
+            m_image.setPixelRGB(p, RGB8880(grey, grey, grey));
+        }
+    }
+
+}
+
+//-------------------------------------------------------------------------
+
+void
+Sphere::draw(
+    fb32::FrameBuffer8880& fb)
+{
+    const int xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
+    const int yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
+
+    fb.putImage(fb32::FB8880Point(xOffset, yOffset), m_image);
+}
+
