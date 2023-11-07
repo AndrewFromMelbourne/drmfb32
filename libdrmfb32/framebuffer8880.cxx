@@ -87,8 +87,11 @@ findDrmResources(
                     {
                         crtcId = resources->crtcs[k];
                         auto crtc = drm::drmModeGetCrtc(fd, crtcId);
-                        mode = crtc->mode;
-                        resourcesFound = true;
+                        if ((crtc->mode.hdisplay > 0) and (crtc->mode.vdisplay > 0))
+                        {
+                            mode = crtc->mode;
+                            resourcesFound = true;
+                        }
                     }
                 }
             }
