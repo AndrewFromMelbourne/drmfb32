@@ -33,6 +33,7 @@
 #include <string>
 #include <utility>
 
+#include "drmMode.h"
 #include "point.h"
 #include "fileDescriptor.h"
 #include "rgb8880.h"
@@ -116,6 +117,9 @@ private:
     uint32_t* m_fbp;
     uint32_t m_fbId;
     uint32_t m_fbHandle;
+
+    uint32_t m_savedConnectorId;
+    drm::drmModeCrtc_ptr m_savedCrtc;
 };
 
 //-------------------------------------------------------------------------

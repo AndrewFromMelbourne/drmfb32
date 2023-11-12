@@ -117,7 +117,9 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
     m_fd{::open(device.c_str(), O_RDWR)},
     m_fbp{nullptr},
     m_fbId{0},
-    m_fbHandle{0}
+    m_fbHandle{0},
+    m_savedConnectorId{0},
+    m_savedCrtc(nullptr, [](drmModeCrtc*){})
 {
     if (m_fd.fd() == -1)
     {
@@ -223,6 +225,9 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
+    m_savedConnectorId = connectorId;
+    m_savedCrtc = drm::drmModeGetCrtc(m_fd, crtcId);
+
     if (drmModeSetCrtc(m_fd.fd(), crtcId, m_fbId, 0, 0, &connectorId, 1, &mode) < 0)
     {
         throw std::system_error(errno,
@@ -244,6 +249,15 @@ fb32::FrameBuffer8880:: ~FrameBuffer8880()
     };
 
     drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_DESTROY_DUMB, &dmdd);
+
+    drmModeSetCrtc(m_fd.fd(),
+                   m_savedCrtc->crtc_id,
+                   m_savedCrtc->buffer_id,
+                   m_savedCrtc->x,
+                   m_savedCrtc->y,
+                   &m_savedConnectorId,
+                   1,
+                   &(m_savedCrtc->mode));
 }
 
 //-------------------------------------------------------------------------
@@ -406,5 +420,5 @@ size_t
 fb32::FrameBuffer8880:: offset(
     const FB8880Point& p) const
 {
-    return p.x() + p.y() * m_lineLengthPixels; 
+    return p.x() + p.y() * m_lineLengthPixels;
 }

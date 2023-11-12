@@ -29,6 +29,7 @@
 #include <libgen.h>
 
 #include <csignal>
+#include <cstring>
 #include <iostream>
 
 #include "framebuffer8880.h"
@@ -44,6 +45,22 @@ namespace
 {
 volatile static std::sig_atomic_t run = 1;
 const char* defaultDevice = "/dev/dri/card0";
+}
+
+//-------------------------------------------------------------------------
+
+static void
+signalHandler(
+    int signalNumber)
+{
+    switch (signalNumber)
+    {
+    case SIGINT:
+    case SIGTERM:
+
+        run = 0;
+        break;
+    };
 }
 
 //-------------------------------------------------------------------------
@@ -75,7 +92,7 @@ main(
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:h";
-    static struct option lopts[] = 
+    static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
@@ -110,6 +127,20 @@ main(
         }
     }
 
+    //---------------------------------------------------------------------
+
+    for (auto signal : { SIGINT, SIGTERM })
+    {
+        if (std::signal(signal, signalHandler) == SIG_ERR)
+        {
+            std::string message {"installing "};
+            message += strsignal(signal);
+            message += " signal handler";
+
+            perror(message.c_str());
+            ::exit(EXIT_FAILURE);
+        }
+    }
     //---------------------------------------------------------------------
 
     try
