@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2023 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,18 +25,15 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef JOYSTICK_H
-#define JOYSTICK_H
+#pragma once
 
 //-------------------------------------------------------------------------
 
-#include <linux/joystick.h>
-
 #include <cstdint>
-#include <string>
-#include <vector>
+#include <utility>
 
-#include "fileDescriptor.h"
+#include "point.h"
+#include "rgb8880.h"
 
 //-------------------------------------------------------------------------
 
@@ -45,74 +42,34 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-struct JoystickAxes
-{
-    int x;
-    int y;
-};
+using FB8880Point = Point<int>;
 
 //-------------------------------------------------------------------------
 
-struct ButtonState
-{
-    bool pressed;
-    bool down;
-};
-
-//-------------------------------------------------------------------------
-
-class Joystick
+class Interface8880
 {
 public:
 
-    enum Buttons
-    {
-        BUTTON_X = 0,
-        BUTTON_A = 1,
-        BUTTON_B = 2,
-        BUTTON_Y = 3,
-        BUTTON_LEFT_SHOULDER = 4,
-        BUTTON_RIGHT_SHOULDER = 5,
-        BUTTON_DPAD_UP = 6,
-        BUTTON_DPAD_DOWN = 7,
-        BUTTON_SELECT = 8,
-        BUTTON_START = 9,
-        BUTTON_DPAD_LEFT = 10,
-        BUTTON_DPAD_RIGHT = 11
-    };
+    virtual ~Interface8880() = 0;
 
-    explicit Joystick(bool blocking = false);
-    Joystick(const std::string& device, bool blocking = false);
+    virtual int getWidth() const = 0;
+    virtual int getHeight() const = 0;
 
-    int numberOfButtons() const;
-    int numberOfAxes() const;
+    virtual void clear(const RGB8880& rgb) = 0;
+    virtual void clear(uint32_t rgb = 0) = 0;
 
-    bool buttonPressed(int button);
-    bool buttonDown(int button) const;
-    JoystickAxes getAxes(int joystickNumber) const;
+    virtual bool
+    setPixelRGB(
+        const FB8880Point& p,
+        const RGB8880& rgb) = 0;
 
-    void read();
+    virtual bool setPixel(const FB8880Point& p, uint32_t rgb) = 0;
 
-private:
-
-    void init();
-    void process(const struct js_event& event);
-
-    FileDescriptor m_joystickFd;
-
-    bool m_blocking;
-
-    int m_buttonCount;
-    int m_joystickCount;
-
-    std::vector<ButtonState> m_buttons;
-    std::vector<JoystickAxes> m_joysticks;
+    virtual std::pair<bool, RGB8880> getPixelRGB(const FB8880Point& p) const = 0;
+    virtual std::pair<bool, uint32_t> getPixel(const FB8880Point& p) const = 0;
 };
 
 //-------------------------------------------------------------------------
 
 } // namespace fb32
 
-//-------------------------------------------------------------------------
-
-#endif

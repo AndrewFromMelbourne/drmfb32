@@ -22,6 +22,7 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/image8880.cxx
                            libdrmfb32/image8880Font.cxx
                            libdrmfb32/image8880Graphics.cxx
+                           libdrmfb32/interface8880.cxx
                            libdrmfb32/joystick.cxx
                            libdrmfb32/rgb8880.cxx)
 

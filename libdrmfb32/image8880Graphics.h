@@ -45,14 +45,14 @@ namespace fb32
 
 void
 box(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     uint32_t rgb);
 
 inline void
 box(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     const RGB8880& rgb)
@@ -64,14 +64,14 @@ box(
 
 void
 boxFilled(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     uint32_t rgb);
 
 inline void
 boxFilled(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     const RGB8880& rgb)
@@ -83,14 +83,14 @@ boxFilled(
 
 void
 line(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     uint32_t rgb);
 
 inline void
 line(
-    Image8880& image,
+    Interface8880& image,
     const Image8880Point& p1,
     const Image8880Point& p2,
     const RGB8880& rgb)
@@ -102,18 +102,18 @@ line(
 
 void
 horizontalLine(
-    Image8880& image,
-    int16_t x1,
-    int16_t x2,
-    int16_t y,
+    Interface8880& image,
+    int x1,
+    int x2,
+    int y,
     uint32_t rgb);
 
 inline void
 horizontalLine(
-    Image8880& image,
-    int16_t x1,
-    int16_t x2,
-    int16_t y,
+    Interface8880& image,
+    int x1,
+    int x2,
+    int y,
     const RGB8880& rgb)
 {
     horizontalLine(image, x1, x2, y, rgb.get8880());
@@ -123,18 +123,18 @@ horizontalLine(
 
 void
 verticalLine(
-    Image8880& image,
-    int16_t x,
-    int16_t y1,
-    int16_t y2,
+    Interface8880& image,
+    int x,
+    int y1,
+    int y2,
     uint32_t rgb);
 
 inline void
 verticalLine(
-    Image8880& image,
-    int16_t x,
-    int16_t y1,
-    int16_t y2,
+    Interface8880& image,
+    int x,
+    int y1,
+    int y2,
     const RGB8880& rgb)
 {
     verticalLine(image, x, y1, y2, rgb.get8880());

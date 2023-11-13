@@ -56,6 +56,7 @@ namespace
 
 //-------------------------------------------------------------------------
 
+
 bool
 findDrmResources(
     fb32::FileDescriptor& fd,
@@ -74,9 +75,9 @@ findDrmResources(
 
         if (connected and (connector->count_modes > 0))
         {
-            for (int j = 0 ; (j < resources->count_encoders) and not resourcesFound ; ++j)
+            for (int j = 0 ; j < connector->count_encoders ; ++j)
             {
-                uint32_t encoderId = resources->encoders[j];
+                auto encoderId = connector->encoders[j];
                 auto encoder = drm::drmModeGetEncoder(fd, encoderId);
 
                 for (int k = 0 ; (k < resources->count_crtcs) and not resourcesFound ; ++k)
@@ -103,6 +104,43 @@ findDrmResources(
 
 //-------------------------------------------------------------------------
 
+std::string
+findDrmDevice(
+    const std::string& device)
+{
+    if (not device.empty())
+    {
+        return device;
+    }
+
+    //---------------------------------------------------------------------
+
+    drm::DrmDevices devices;
+
+    if (devices.getDeviceCount() < 0)
+    {
+        return "";
+    }
+
+    for (auto i = 0 ; i < devices.getDeviceCount() ; ++i)
+    {
+        auto device = devices.getDevice(i);
+
+        if (device->available_nodes & (1 << DRM_NODE_PRIMARY))
+        {
+            if (drm::drmDeviceHasDumbBuffer(device->nodes[DRM_NODE_PRIMARY]))
+            {
+                return device->nodes[DRM_NODE_PRIMARY];
+            }
+
+        }
+    }
+
+    return "";
+}
+
+//-------------------------------------------------------------------------
+
 }
 
 //=========================================================================
@@ -114,12 +152,12 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
     m_height{0},
     m_length{0},
     m_lineLengthPixels{0},
-    m_fd{::open(device.c_str(), O_RDWR)},
+    m_fd{::open(findDrmDevice(device).c_str(), O_RDWR)},
     m_fbp{nullptr},
     m_fbId{0},
     m_fbHandle{0},
-    m_savedConnectorId{0},
-    m_savedCrtc(nullptr, [](drmModeCrtc*){})
+    m_connectorId{0},
+    m_originalCrtc(nullptr, [](drmModeCrtc*){})
 {
     if (m_fd.fd() == -1)
     {
@@ -225,8 +263,8 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
-    m_savedConnectorId = connectorId;
-    m_savedCrtc = drm::drmModeGetCrtc(m_fd, crtcId);
+    m_connectorId = connectorId;
+    m_originalCrtc = drm::drmModeGetCrtc(m_fd, crtcId);
 
     if (drmModeSetCrtc(m_fd.fd(), crtcId, m_fbId, 0, 0, &connectorId, 1, &mode) < 0)
     {
@@ -251,20 +289,20 @@ fb32::FrameBuffer8880:: ~FrameBuffer8880()
     drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_DESTROY_DUMB, &dmdd);
 
     drmModeSetCrtc(m_fd.fd(),
-                   m_savedCrtc->crtc_id,
-                   m_savedCrtc->buffer_id,
-                   m_savedCrtc->x,
-                   m_savedCrtc->y,
-                   &m_savedConnectorId,
+                   m_originalCrtc->crtc_id,
+                   m_originalCrtc->buffer_id,
+                   m_originalCrtc->x,
+                   m_originalCrtc->y,
+                   &m_connectorId,
                    1,
-                   &(m_savedCrtc->mode));
+                   &(m_originalCrtc->mode));
 }
 
 //-------------------------------------------------------------------------
 
 void
 fb32::FrameBuffer8880:: clear(
-    uint32_t rgb) const
+    uint32_t rgb)
 {
     std::fill(m_fbp, m_fbp + (m_length / bytesPerPixel), rgb);
 }
@@ -274,7 +312,7 @@ fb32::FrameBuffer8880:: clear(
 bool
 fb32::FrameBuffer8880:: setPixel(
     const FB8880Point& p,
-    uint32_t rgb) const
+    uint32_t rgb)
 {
     bool isValid{validPixel(p)};
 
@@ -341,7 +379,7 @@ fb32::FrameBuffer8880:: putImage(
         return putImagePartial(p, image);
     }
 
-    for (int32_t j = 0 ; j < image.getHeight() ; ++j)
+    for (int j = 0 ; j < image.getHeight() ; ++j)
     {
         auto start = image.getRow(j);
 

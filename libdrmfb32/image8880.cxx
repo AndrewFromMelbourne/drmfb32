@@ -50,8 +50,8 @@ fb32::Image8880:: Image8880()
 //-------------------------------------------------------------------------
 
 fb32::Image8880:: Image8880(
-    int16_t width,
-    int16_t height,
+    int width,
+    int height,
     uint8_t numberOfFrames)
 :
     m_width{width},
@@ -65,8 +65,8 @@ fb32::Image8880:: Image8880(
 //-------------------------------------------------------------------------
 
 fb32::Image8880:: Image8880(
-    int16_t width,
-    int16_t height,
+    int width,
+    int height,
     const std::vector<uint32_t>& buffer,
     uint8_t numberOfFrames)
 :
@@ -160,7 +160,7 @@ fb32::Image8880:: getPixel(
 
 const uint32_t*
 fb32::Image8880:: getRow(
-    int16_t y) const
+    int y) const
 {
     if (validPixel(Image8880Point{0, y}))
     {
@@ -180,3 +180,4 @@ fb32::Image8880:: offset(
 {
     return p.x() + (p.y() * m_width) + (m_width * m_height * m_frame);
 }
+

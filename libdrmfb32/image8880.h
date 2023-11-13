@@ -34,6 +34,7 @@
 #include <utility>
 #include <vector>
 
+#include "interface8880.h"
 #include "rgb8880.h"
 #include "point.h"
 
@@ -44,48 +45,50 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Image8880Point = Point<int16_t>;
+using Image8880Point = Point<int>;
 
 //-------------------------------------------------------------------------
 
 class Image8880
+:
+    public Interface8880
 {
 public:
 
     Image8880();
-    Image8880(int16_t width, int16_t height, uint8_t numberOfFrames = 1);
-    Image8880(int16_t width,
-              int16_t height,
+    Image8880(int width, int height, uint8_t numberOfFrames = 1);
+    Image8880(int width,
+              int height,
               const std::vector<uint32_t>& buffer,
               uint8_t numberOfFrames = 1);
 
     Image8880(const Image8880&) = default;
     Image8880& operator=(const Image8880&) = default;
 
-    int16_t getWidth() const { return m_width; }
-    int16_t getHeight() const { return m_height; }
+    int getWidth() const override { return m_width; }
+    int getHeight() const override { return m_height; }
 
     uint8_t getFrame() const { return m_frame; }
     uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
     void setFrame(uint8_t frame);
 
-    void clear(const RGB8880& rgb) { clear(rgb.get8880()); }
-    void clear(uint32_t rgb);
+    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
+    void clear(uint32_t rgb) override;
 
     bool
     setPixelRGB(
         const Image8880Point& p,
-        const RGB8880& rgb)
+        const RGB8880& rgb) override
     {
         return setPixel(p, rgb.get8880());
     }
 
-    bool setPixel(const Image8880Point& p, uint32_t rgb);
+    bool setPixel(const Image8880Point& p, uint32_t rgb) override;
 
-    std::pair<bool, RGB8880> getPixelRGB(const Image8880Point& p) const;
-    std::pair<bool, uint32_t> getPixel(const Image8880Point& p) const;
+    std::pair<bool, RGB8880> getPixelRGB(const Image8880Point& p) const override;
+    std::pair<bool, uint32_t> getPixel(const Image8880Point& p) const override;
 
-    const uint32_t* getRow(int16_t y) const;
+    const uint32_t* getRow(int y) const;
 
 private:
 
@@ -100,8 +103,8 @@ private:
 
     size_t offset(const Image8880Point& p) const;
 
-    int16_t m_width;
-    int16_t m_height;
+    int m_width;
+    int m_height;
 
     uint8_t m_frame;
     uint8_t m_numberOfFrames;

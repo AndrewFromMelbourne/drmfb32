@@ -26,6 +26,34 @@
 //-------------------------------------------------------------------------
 
 #include "drmMode.h"
+#include "fileDescriptor.h"
+
+#include <fcntl.h>
+#include <sys/stat.h>
+
+//-------------------------------------------------------------------------
+
+bool
+drm::drmDeviceHasDumbBuffer(
+    const std::string& device)
+{
+    fb32::FileDescriptor fd{::open(device.c_str(), O_RDWR)};
+
+    if (fd.fd() == -1)
+    {
+        return false;
+    }
+
+    //---------------------------------------------------------------------
+
+    uint64_t hasDumb;
+    if ((drmGetCap(fd.fd(), DRM_CAP_DUMB_BUFFER, &hasDumb) < 0) or not hasDumb)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 //-------------------------------------------------------------------------
 

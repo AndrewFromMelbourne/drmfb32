@@ -43,7 +43,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using FontPoint = Point<int16_t>;
+using FontPoint = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -51,45 +51,45 @@ class RGB8880;
 
 //-------------------------------------------------------------------------
 
-constexpr int16_t sc_fontWidth{8};
-constexpr int16_t sc_fontHeight{16};
+constexpr int sc_fontWidth{8};
+constexpr int sc_fontHeight{16};
 
 //-------------------------------------------------------------------------
 
 FontPoint
 drawBattery(
     const Image8880Point& p,
-    uint16_t percent,
+    int percent,
     uint32_t rgb,
-    Image8880& image);
+    Interface8880& image);
 
 FontPoint
 drawChar(
     const Image8880Point& p,
     uint8_t c,
     const RGB8880& rgb,
-    Image8880& image);
+    Interface8880& image);
 
 FontPoint
 drawChar(
     const Image8880Point& p,
     uint8_t c,
     uint32_t rgb,
-    Image8880& image);
+    Interface8880& image);
 
 FontPoint
 drawString(
     const Image8880Point& p,
     const char* string,
     const RGB8880& rgb,
-    Image8880& image);
+    Interface8880& image);
 
 FontPoint
 drawString(
     const Image8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
-    Image8880& image);
+    Interface8880& image);
 
 //-------------------------------------------------------------------------
 

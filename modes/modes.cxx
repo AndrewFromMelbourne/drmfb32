@@ -27,7 +27,63 @@
 
 #include "drmMode.h"
 
+#include <fcntl.h>
+#include <sys/stat.h>
+
 #include <iostream>
+
+//-------------------------------------------------------------------------
+
+void
+findConnectedConnectors(
+    const std::string& device)
+{
+    fb32::FileDescriptor fd{::open(device.c_str(), O_RDWR)};
+
+    if (fd.fd() == -1)
+    {
+        return;
+    }
+
+    auto resources = drm::drmModeGetResources(fd);
+
+    for (int i = 0 ; i < resources->count_connectors ; ++i)
+    {
+        auto connectorId = resources->connectors[i];
+        auto connector = drm::drmModeGetConnector(fd, connectorId);
+        const bool connected = (connector->connection == DRM_MODE_CONNECTED);
+
+        if (connected and (connector->count_modes > 0))
+        {
+            for (int j = 0 ; j < connector->count_encoders ; ++j)
+            {
+                auto encoderId = connector->encoders[j];
+                auto encoder = drm::drmModeGetEncoder(fd, encoderId);
+
+                for (int k = 0 ; k < resources->count_crtcs ; ++k)
+                {
+                    uint32_t currentCrtc = 1 << k;
+
+                    if (encoder->possible_crtcs & currentCrtc)
+                    {
+                        auto crtcId = resources->crtcs[k];
+                        auto crtc = drm::drmModeGetCrtc(fd, crtcId);
+                        if ((crtc->mode.hdisplay > 0) and (crtc->mode.vdisplay > 0))
+                        {
+                            std::cout
+                                << "device = " << device
+                                << ", connector = " << connectorId
+                                << ", encoder = " << encoderId
+                                << ", ctrc = " << crtcId
+                                << ", mode = " << crtc->mode.hdisplay << "x" << crtc->mode.vdisplay
+                                << '\n';
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 //-------------------------------------------------------------------------
 
@@ -45,22 +101,14 @@ main()
     {
         auto device = devices.getDevice(i);
 
-        std::cout << i;
-
         if (device->available_nodes & (1 << DRM_NODE_PRIMARY))
         {
-            std::cout << " Primary(" << device->nodes[DRM_NODE_PRIMARY] << ')';
+            const std::string card = device->nodes[DRM_NODE_PRIMARY];
+            if (drm::drmDeviceHasDumbBuffer(card))
+            {
+                findConnectedConnectors(card);
+            }
         }
-        if (device->available_nodes & (1 << DRM_NODE_CONTROL))
-        {
-            std::cout << " Control(" << device->nodes[DRM_NODE_CONTROL] << ')';
-        }
-        if (device->available_nodes & (1 << DRM_NODE_RENDER))
-        {
-            std::cout << " Render(" << device->nodes[DRM_NODE_RENDER] << ')';
-        }
-
-        std::cout << '\n';
     }
 
     return 0;

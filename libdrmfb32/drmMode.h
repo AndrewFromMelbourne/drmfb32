@@ -57,6 +57,10 @@ using drmModeRes_ptr = std::unique_ptr<drmModeRes, decltype(&drmModeFreeResource
 
  //-------------------------------------------------------------------------
 
+bool drmDeviceHasDumbBuffer(const std::string& device);
+
+//-------------------------------------------------------------------------
+
 class DrmDevices
 {
 public:

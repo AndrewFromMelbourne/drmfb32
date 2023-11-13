@@ -91,16 +91,16 @@ fb32::RGB8880:: blend(
     const RGB8880& a,
     const RGB8880& b)
 {
-    auto red = (((int16_t)(a.getRed()) * alpha)
-             + ((int16_t)(b.getRed()) * (255 - alpha)))
+    auto red = (((int)(a.getRed()) * alpha)
+             + ((int)(b.getRed()) * (255 - alpha)))
              / 255;
 
-    auto green = (((int16_t)(a.getGreen()) * alpha)
-               + ((int16_t)(b.getGreen()) * (255 - alpha)))
+    auto green = (((int)(a.getGreen()) * alpha)
+               + ((int)(b.getGreen()) * (255 - alpha)))
                / 255;
 
-    auto blue = (((int16_t)(a.getBlue()) * alpha)
-              + ((int16_t)(b.getBlue()) * (255 - alpha)))
+    auto blue = (((int)(a.getBlue()) * alpha)
+              + ((int)(b.getBlue()) * (255 - alpha)))
               / 255;
 
     return RGB8880(red, green, blue);

@@ -36,6 +36,7 @@
 #include "drmMode.h"
 #include "point.h"
 #include "fileDescriptor.h"
+#include "interface8880.h"
 #include "rgb8880.h"
 
 //-------------------------------------------------------------------------
@@ -54,14 +55,16 @@ class Image8880;
 //-------------------------------------------------------------------------
 
 class FrameBuffer8880
+:
+    public Interface8880
 {
 public:
 
     static constexpr size_t bytesPerPixel{4};
 
-    explicit FrameBuffer8880(const std::string& device);
+    explicit FrameBuffer8880(const std::string& device = "");
 
-    ~FrameBuffer8880();
+    ~FrameBuffer8880() override;
 
     FrameBuffer8880(const FrameBuffer8880& fb) = delete;
     FrameBuffer8880& operator=(const FrameBuffer8880& fb) = delete;
@@ -69,24 +72,24 @@ public:
     FrameBuffer8880(FrameBuffer8880&& fb) = delete;
     FrameBuffer8880& operator=(FrameBuffer8880&& fb) = delete;
 
-    int32_t getWidth() const { return m_width; }
-    int32_t getHeight() const { return m_height; }
+    int getWidth() const override { return m_width; }
+    int getHeight() const override { return m_height; }
 
-    void clear(const RGB8880& rgb) const { clear(rgb.get8880()); }
-    void clear(uint32_t rgb = 0) const;
+    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
+    void clear(uint32_t rgb = 0) override;
 
     bool
     setPixelRGB(
         const FB8880Point& p,
-        const RGB8880& rgb) const
+        const RGB8880& rgb) override
     {
         return setPixel(p, rgb.get8880());
     }
 
-    bool setPixel(const FB8880Point& p, uint32_t rgb) const;
+    bool setPixel(const FB8880Point& p, uint32_t rgb) override;
 
-    std::pair<bool, RGB8880> getPixelRGB(const FB8880Point& p) const;
-    std::pair<bool, uint32_t> getPixel(const FB8880Point& p) const;
+    std::pair<bool, RGB8880> getPixelRGB(const FB8880Point& p) const override;
+    std::pair<bool, uint32_t> getPixel(const FB8880Point& p) const override;
 
     bool putImage(const FB8880Point& p, const Image8880& image) const;
 
@@ -108,18 +111,18 @@ private:
 
     size_t offset(const FB8880Point& p) const;
 
-    uint32_t m_width;
-    uint32_t m_height;
-    uint32_t m_length;
-    int32_t m_lineLengthPixels;
+    int m_width;
+    int m_height;
+    int m_length;
+    int m_lineLengthPixels;
 
     FileDescriptor m_fd;
     uint32_t* m_fbp;
     uint32_t m_fbId;
     uint32_t m_fbHandle;
 
-    uint32_t m_savedConnectorId;
-    drm::drmModeCrtc_ptr m_savedCrtc;
+    uint32_t m_connectorId;
+    drm::drmModeCrtc_ptr m_originalCrtc;
 };
 
 //-------------------------------------------------------------------------

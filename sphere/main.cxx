@@ -44,7 +44,6 @@ using namespace fb32;
 namespace
 {
 volatile static std::sig_atomic_t run = 1;
-const char* defaultDevice = "/dev/dri/card0";
 }
 
 //-------------------------------------------------------------------------
@@ -73,8 +72,7 @@ printUsage(
     os << "\n";
     os << "Usage: " << name << " <options>\n";
     os << "\n";
-    os << "    --device,-d - framebuffer device to use";
-    os << " (default is " << defaultDevice << ")\n";
+    os << "    --device,-d - dri device to use\n";
     os << "    --help,-h - print usage and exit\n";
     os << "\n";
 }
@@ -86,7 +84,7 @@ main(
     int argc,
     char *argv[])
 {
-    const char* device = defaultDevice;
+    const char* device = "";
     char* program = basename(argv[0]);
 
     //---------------------------------------------------------------------

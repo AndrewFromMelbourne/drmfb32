@@ -4846,19 +4846,19 @@ constexpr uint8_t battery[11][sc_fontHeight] =
 fb32::FontPoint
 fb32::drawBattery(
     const Image8880Point& p,
-    uint16_t percent,
+    int percent,
     uint32_t rgb,
-    Image8880& image)
+    Interface8880& image)
 {
     auto index = std::min(9, (percent / 10));
 
-    for (int16_t j = 0 ; j < sc_fontHeight ; ++j)
+    for (int j = 0 ; j < sc_fontHeight ; ++j)
     {
         uint8_t byte = battery[index][j];
 
         if (byte != 0)
         {
-            for (int16_t i = 0 ; i < sc_fontWidth ; ++i)
+            for (int i = 0 ; i < sc_fontWidth ; ++i)
             {
                 if ((byte >> (sc_fontWidth - i - 1)) & 1 )
                 {
@@ -4880,7 +4880,7 @@ fb32::drawChar(
     const Image8880Point& p,
     uint8_t c,
     const RGB8880& rgb,
-    Image8880& image)
+    Interface8880& image)
 {
     return drawChar(p, c, rgb.get8880(), image);
 }
@@ -4892,15 +4892,15 @@ fb32::drawChar(
     const Image8880Point& p,
     uint8_t c,
     uint32_t rgb,
-    Image8880& image)
+    Interface8880& image)
 {
-    for (int16_t j = 0 ; j < sc_fontHeight ; ++j)
+    for (int j = 0 ; j < sc_fontHeight ; ++j)
     {
         uint8_t byte = font[c][j];
 
         if (byte != 0)
         {
-            for (int16_t i = 0 ; i < sc_fontWidth ; ++i)
+            for (int i = 0 ; i < sc_fontWidth ; ++i)
             {
                 if ((byte >> (sc_fontWidth - i - 1)) & 1 )
                 {
@@ -4922,7 +4922,7 @@ fb32::drawString(
     const Image8880Point& p,
     const char* string,
     const RGB8880& rgb,
-    Image8880& image)
+    Interface8880& image)
 {
     return drawString(p, std::string(string), rgb, image);
 }
@@ -4934,7 +4934,7 @@ fb32::drawString(
     const Image8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
-    Image8880& image)
+    Interface8880& image)
 {
     FontPoint position{p};
     FontPoint start{p};
