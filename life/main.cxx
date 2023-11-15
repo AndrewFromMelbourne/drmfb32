@@ -44,6 +44,7 @@ using namespace fb32;
 namespace
 {
 volatile static std::sig_atomic_t run = 1;
+const char* defaultJoystick = "/dev/input/js0";
 }
 
 //-------------------------------------------------------------------------
@@ -58,6 +59,7 @@ printUsage(
     os << "\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --help,-h - print usage and exit\n";
+    os << "    --joystick,-j - joystick device\n";
     os << "\n";
 }
 
@@ -68,16 +70,18 @@ main(
     int argc,
     char *argv[])
 {
-    const char* device = "";
-    char* program = basename(argv[0]);
+    std::string device = "";
+    std::string program = basename(argv[0]);
+    std::string joystick = defaultJoystick;
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:h";
-    static struct option lopts[] = 
+    static const char* sopts = "d:hj:";
+    static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
+        { "joystick", required_argument, nullptr, 'j' },
         { nullptr, no_argument, nullptr, 0 }
     };
 
@@ -100,6 +104,12 @@ main(
 
             break;
 
+        case 'j':
+
+            joystick = optarg;
+
+            break;
+
         default:
 
             printUsage(std::cerr, program);
@@ -113,7 +123,7 @@ main(
 
     try
     {
-        Joystick js;
+        Joystick js(joystick);
         FrameBuffer8880 fb(device);
         fb.clear(RGB8880{0, 0, 0});
 

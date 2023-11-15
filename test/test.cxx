@@ -77,13 +77,13 @@ main(
     int argc,
     char *argv[])
 {
-    const char* device = "";
-    char* program = basename(argv[0]);
+    std::string device = "";
+    std::string program = basename(argv[0]);
 
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:h";
-    static struct option lopts[] = 
+    static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
@@ -150,7 +150,7 @@ main(
 
         FB8880Point imageLocation
         {
-            (fb.getWidth() - image.getWidth()) / 2, 
+            (fb.getWidth() - image.getWidth()) / 2,
             (fb.getHeight() - image.getHeight()) / 2
         };
 
@@ -174,7 +174,7 @@ main(
 
         FB8880Point textLocation
         {
-            (fb.getWidth() - textImage.getWidth()) / 2, 
+            (fb.getWidth() - textImage.getWidth()) / 2,
             (fb.getHeight() - textImage.getHeight()) / 3
         };
 

@@ -180,15 +180,15 @@ main(
     int argc,
     char *argv[])
 {
-    const char* device = "";
-    char* program = basename(argv[0]);
+    std::string device = "";
+    std::string program = basename(argv[0]);
     char* pidfile = nullptr;
     bool isDaemon =  false;
 
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:hp:D";
-    static struct option lopts[] = 
+    static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
@@ -259,7 +259,7 @@ main(
                 ::exit(EXIT_FAILURE);
             }
         }
-        
+
         if (::daemon(0, 0) == -1)
         {
             std::cerr << "Cannot daemonize\n";
@@ -277,7 +277,7 @@ main(
             ::pidfile_write(pfh);
         }
 
-        ::openlog(program, LOG_PID, LOG_USER);
+        ::openlog(program.c_str(), LOG_PID, LOG_USER);
     }
 
     //---------------------------------------------------------------------

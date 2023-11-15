@@ -84,8 +84,8 @@ main(
     int argc,
     char *argv[])
 {
-    const char* device = "";
-    char* program = basename(argv[0]);
+    std::string device = "";
+    std::string program = basename(argv[0]);
 
     //---------------------------------------------------------------------
 

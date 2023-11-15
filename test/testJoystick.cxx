@@ -25,6 +25,8 @@
 //
 //-------------------------------------------------------------------------
 
+#include <getopt.h>
+#include <libgen.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -34,16 +36,83 @@
 
 //-------------------------------------------------------------------------
 
+namespace
+{
+const char* defaultJoystick = "/dev/input/js0";
+}
+
+//-------------------------------------------------------------------------
+
 using namespace fb32;
 
 //-------------------------------------------------------------------------
 
-int
-main()
+void
+printUsage(
+    std::ostream& os,
+    const std::string& name)
 {
+    os << "\n";
+    os << "Usage: " << name << " <options>\n";
+    os << "\n";
+    os << "    --help,-h - print usage and exit\n";
+    os << "    --joystick,-j - joystick device\n";
+    os << "\n";
+}
+
+//-------------------------------------------------------------------------
+
+int
+main(
+    int argc,
+    char *argv[])
+{
+    std::string program = basename(argv[0]);
+    std::string joystick = defaultJoystick;
+
+    //---------------------------------------------------------------------
+
+    static const char* sopts = "hj:";
+    static struct option lopts[] =
+    {
+        { "help", no_argument, nullptr, 'h' },
+        { "joystick", required_argument, nullptr, 'j' },
+        { nullptr, no_argument, nullptr, 0 }
+    };
+
+    int opt = 0;
+
+    while ((opt = ::getopt_long(argc, argv, sopts, lopts, nullptr)) != -1)
+    {
+        switch (opt)
+        {
+        case 'h':
+
+            printUsage(std::cout, program);
+            ::exit(EXIT_SUCCESS);
+
+            break;
+
+        case 'j':
+
+            joystick = optarg;
+
+            break;
+
+        default:
+
+            printUsage(std::cerr, program);
+            ::exit(EXIT_FAILURE);
+
+            break;
+        }
+    }
+
+    //---------------------------------------------------------------------
+
     try
     {
-        Joystick js(true);
+        Joystick js(joystick, true);
 
         while (1)
         {

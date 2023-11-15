@@ -25,8 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
-#ifndef FILE_DESCRIPTOR_H
-#define FILE_DESCRIPTOR_H
+#pragma once
 
 //-------------------------------------------------------------------------
 
@@ -47,6 +46,8 @@ class FileDescriptor
 {
 public:
 
+    FileDescriptor();
+
     explicit FileDescriptor(
         int fd,
         CloseIfFunction close_if = [](int fd) { return fd != -1; });
@@ -63,6 +64,8 @@ public:
 
 private:
 
+    void closeFd();
+
     int m_fd;
     CloseIfFunction m_close_if;
 };
@@ -72,6 +75,4 @@ private:
 } // namespace fb32
 
 //-------------------------------------------------------------------------
-
-#endif
 

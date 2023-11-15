@@ -105,16 +105,8 @@ findDrmResources(
 //-------------------------------------------------------------------------
 
 std::string
-findDrmDevice(
-    const std::string& device)
+findDrmDevice()
 {
-    if (not device.empty())
-    {
-        return device;
-    }
-
-    //---------------------------------------------------------------------
-
     drm::DrmDevices devices;
 
     if (devices.getDeviceCount() < 0)
@@ -152,13 +144,31 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
     m_height{0},
     m_length{0},
     m_lineLengthPixels{0},
-    m_fd{::open(findDrmDevice(device).c_str(), O_RDWR)},
+    m_fd{},
     m_fbp{nullptr},
     m_fbId{0},
     m_fbHandle{0},
     m_connectorId{0},
     m_originalCrtc(nullptr, [](drmModeCrtc*){})
 {
+    std::string card{device};
+
+    if (card.empty())
+    {
+        card = findDrmDevice();
+    }
+
+    if (card.empty())
+    {
+        throw std::system_error{errno,
+                                std::system_category(),
+                                "cannot find a dri device "};
+    }
+
+    m_fd = FileDescriptor{::open(card.c_str(), O_RDWR)};
+
+    //---------------------------------------------------------------------
+
     if (m_fd.fd() == -1)
     {
         throw std::system_error{errno,

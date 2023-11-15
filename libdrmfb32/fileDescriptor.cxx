@@ -31,6 +31,15 @@
 
 //-------------------------------------------------------------------------
 
+fb32::FileDescriptor:: FileDescriptor()
+:
+    m_fd{-1},
+    m_close_if{[](int){ return false; }}
+{
+}
+
+//-------------------------------------------------------------------------
+
 fb32::FileDescriptor:: FileDescriptor(
     int fd,
     CloseIfFunction close_if)
@@ -44,10 +53,7 @@ fb32::FileDescriptor:: FileDescriptor(
 
 fb32::FileDescriptor:: ~FileDescriptor()
 {
-    if (m_close_if(m_fd))
-    {
-        ::close(m_fd);
-    }
+    closeFd();
 }
 
 //-------------------------------------------------------------------------
@@ -68,12 +74,27 @@ fb32::FileDescriptor&
 fb32::FileDescriptor::operator= (
     fb32::FileDescriptor&& rhs)
 {
-    m_fd = rhs.m_fd;
-    m_close_if = std::move(rhs.m_close_if);
+    if (this != &rhs)
+    {
+        closeFd();
 
-    rhs.m_fd = -1;
-    rhs.m_close_if = [](int) { return false; };
+        m_fd = rhs.m_fd;
+        m_close_if = std::move(rhs.m_close_if);
+
+        rhs.m_fd = -1;
+        rhs.m_close_if = [](int) { return false; };
+    }
 
     return *this;
 }
 
+//-------------------------------------------------------------------------
+
+void
+fb32::FileDescriptor::closeFd()
+{
+    if (m_close_if(m_fd))
+    {
+        ::close(m_fd);
+    }
+}
