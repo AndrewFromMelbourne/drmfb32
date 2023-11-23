@@ -456,7 +456,7 @@ fb32::FrameBuffer8880:: putImagePartial(
 
         std::copy(start,
                   start + (xEnd - xStart + 1),
-                  m_fbp + ((j+y) * m_lineLengthPixels) + x);
+                  m_fbp + ((j - yStart) * m_lineLengthPixels) + x);
     }
 
     return true;
