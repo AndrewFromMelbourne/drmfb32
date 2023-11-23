@@ -25,9 +25,11 @@
 //
 //-------------------------------------------------------------------------
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <system_error>
+#include <thread>
 
 #include <getopt.h>
 #include <libgen.h>
@@ -42,6 +44,7 @@
 //-------------------------------------------------------------------------
 
 using namespace fb32;
+using namespace std::chrono_literals;
 
 //-------------------------------------------------------------------------
 
@@ -188,7 +191,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        sleep(10);
+        std::this_thread::sleep_for(10s);
 
         fb.clear();
     }

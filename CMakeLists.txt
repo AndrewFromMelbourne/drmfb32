@@ -22,6 +22,7 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/image8880.cxx
                            libdrmfb32/image8880Font.cxx
                            libdrmfb32/image8880Graphics.cxx
+                           libdrmfb32/image8880Qoi.cxx
                            libdrmfb32/interface8880.cxx
                            libdrmfb32/joystick.cxx
                            libdrmfb32/rgb8880.cxx)
@@ -80,6 +81,10 @@ target_link_libraries(modes drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(showqoi showqoi/showqoi.cxx)
+target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
 
 add_executable(sphere sphere/main.cxx
                       sphere/sphere.cxx)

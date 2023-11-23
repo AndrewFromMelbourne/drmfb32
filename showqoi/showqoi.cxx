@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2023 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@
 #include <thread>
 
 #include "framebuffer8880.h"
-#include "sphere.h"
+#include "image8880Qoi.h"
 
 //-------------------------------------------------------------------------
 
@@ -77,6 +77,7 @@ printUsage(
     os << "\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --help,-h - print usage and exit\n";
+    os << "    --qoi,-q - qoi file to display\n";
     os << "\n";
 }
 
@@ -89,14 +90,16 @@ main(
 {
     std::string device = "";
     std::string program = basename(argv[0]);
+    std::string qoi;
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:h";
+    static const char* sopts = "d:hq:";
     static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
+        { "qoi", required_argument, nullptr, 'q' },
         { nullptr, no_argument, nullptr, 0 }
     };
 
@@ -116,6 +119,12 @@ main(
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
+
+            break;
+
+        case 'q':
+
+            qoi = optarg;
 
             break;
 
@@ -149,17 +158,11 @@ main(
         FrameBuffer8880 fb(device);
         fb.clear(RGB8880{0, 0, 0});
 
-        std::cout
-            << "width = "
-            << fb.getWidth()
-            << " height = "
-            << fb.getHeight()
-            << "\n";
-
-        Sphere sphere(fb.getHeight() - 10);
-        sphere.init();
-        sphere.update();
-        sphere.draw(fb);
+        auto image = readQoi(qoi);
+        const FB8880Point center{
+            (fb.getWidth() - image.getWidth()) / 2,
+            (fb.getHeight() - image.getHeight()) / 2};
+        fb.putImage(center, image);
 
         //-----------------------------------------------------------------
 
