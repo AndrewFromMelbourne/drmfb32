@@ -54,12 +54,12 @@ MemoryStats()
                                 "unable to open /proc/meminfo"};
     }
 
-    uint32_t free{0};
+    uint64_t free{0};
 
     while (ifs.eof() == false)
     {
         std::string name;
-        uint32_t value;
+        uint64_t value;
         std::string unit;
 
         ifs >> name >> value >> unit;
