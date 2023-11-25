@@ -56,6 +56,47 @@ namespace
 
 //-------------------------------------------------------------------------
 
+bool
+findDrmResourcesForConnector(
+    fb32::FileDescriptor& fd,
+    uint32_t connectorId,
+    const drm::drmModeRes_ptr& resources,
+    uint32_t& crtcId,
+    drmModeModeInfo& mode)
+{
+    bool resourcesFound = false;
+    auto connector = drm::drmModeGetConnector(fd, connectorId);
+    const bool connected = (connector->connection == DRM_MODE_CONNECTED);
+
+    if (connected and (connector->count_modes > 0))
+    {
+        for (int j = 0 ; j < connector->count_encoders ; ++j)
+        {
+            auto encoderId = connector->encoders[j];
+            auto encoder = drm::drmModeGetEncoder(fd, encoderId);
+
+            for (int k = 0 ; (k < resources->count_crtcs) and not resourcesFound ; ++k)
+            {
+                uint32_t currentCrtc = 1 << k;
+
+                if (encoder->possible_crtcs & currentCrtc)
+                {
+                    crtcId = resources->crtcs[k];
+                    auto crtc = drm::drmModeGetCrtc(fd, crtcId);
+                    if ((crtc->mode.hdisplay > 0) and (crtc->mode.vdisplay > 0))
+                    {
+                        mode = crtc->mode;
+                        resourcesFound = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return resourcesFound;
+}
+
+//-------------------------------------------------------------------------
 
 bool
 findDrmResources(
@@ -70,33 +111,7 @@ findDrmResources(
     for (int i = 0 ; (i < resources->count_connectors) and not resourcesFound ; ++i)
     {
         connectorId = resources->connectors[i];
-        auto connector = drm::drmModeGetConnector(fd, connectorId);
-        const bool connected = (connector->connection == DRM_MODE_CONNECTED);
-
-        if (connected and (connector->count_modes > 0))
-        {
-            for (int j = 0 ; j < connector->count_encoders ; ++j)
-            {
-                auto encoderId = connector->encoders[j];
-                auto encoder = drm::drmModeGetEncoder(fd, encoderId);
-
-                for (int k = 0 ; (k < resources->count_crtcs) and not resourcesFound ; ++k)
-                {
-                    uint32_t currentCrtc = 1 << k;
-
-                    if (encoder->possible_crtcs & currentCrtc)
-                    {
-                        crtcId = resources->crtcs[k];
-                        auto crtc = drm::drmModeGetCrtc(fd, crtcId);
-                        if ((crtc->mode.hdisplay > 0) and (crtc->mode.vdisplay > 0))
-                        {
-                            mode = crtc->mode;
-                            resourcesFound = true;
-                        }
-                    }
-                }
-            }
-        }
+        resourcesFound = findDrmResourcesForConnector(fd, connectorId, resources, crtcId, mode);
     }
 
     return resourcesFound;
