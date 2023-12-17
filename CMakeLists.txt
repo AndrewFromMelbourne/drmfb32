@@ -68,10 +68,14 @@ target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
+
 add_executable(life life/main.cxx
                     life/life.cxx)
 
 target_link_libraries(life drmfb32 ${DRM_LIBRARIES} Threads::Threads)
+
+endif()
 
 #--------------------------------------------------------------------------
 
