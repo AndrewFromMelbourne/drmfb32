@@ -60,6 +60,16 @@ public:
         m_y = y;
     }
 
+    void setX(T x)
+    {
+        m_x = x;
+    }
+
+    void setY(T y)
+    {
+        m_y = y;
+    }
+
 private:
 
     T m_x;

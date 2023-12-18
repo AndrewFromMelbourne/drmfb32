@@ -16,6 +16,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 #--------------------------------------------------------------------------
 
+find_package(Freetype)
+
+#--------------------------------------------------------------------------
+
 add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/fileDescriptor.cxx
                            libdrmfb32/framebuffer8880.cxx
@@ -34,6 +38,17 @@ target_compile_options(drmfb32 PUBLIC ${DRM_CFLAGS_OTHER})
 target_link_libraries(drmfb32 ${DRM_LIBRARIES})
 
 set(EXTRA_LIBS ${EXTRA_LIBS} drmfb32)
+
+#--------------------------------------------------------------------------
+
+if (FREETYPE_FOUND)
+
+add_library(drmfb32ft STATIC libdrmfb32ft/image8880FreeType.cxx)
+target_include_directories(drmfb32ft PUBLIC ${FREETYPE_INCLUDE_DIRS})
+
+include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32ft)
+
+endif()
 
 #--------------------------------------------------------------------------
 
@@ -97,11 +112,22 @@ target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-add_executable(drmfb32test test/test.cxx)
-target_link_libraries(drmfb32test drmfb32 ${DRM_LIBRARIES})
+add_executable(test test/test.cxx)
+target_link_libraries(test drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(joysticktest test/testJoystick.cxx)
 target_link_libraries(joysticktest drmfb32)
+
+#--------------------------------------------------------------------------
+
+if (FREETYPE_FOUND)
+
+add_executable(testft test/testft.cxx)
+target_link_libraries(testft drmfb32
+                             drmfb32ft
+                             -lfreetype)
+
+endif()
 
