@@ -259,8 +259,8 @@ decodeQoi(
             }
         }
 
-        auto x = static_cast<int>(i % header.getWidth());
-        auto y = static_cast<int>(i / header.getWidth());
+        int x = i % header.getWidth();
+        int y = i / header.getWidth();
 
         fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
         image.setPixelRGB(fb32::Image8880Point{x, y}, rgb);
