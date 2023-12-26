@@ -33,9 +33,8 @@
 
 //-------------------------------------------------------------------------
 
-int16_t
-inf::
-getTemperature()
+int
+inf::getTemperature()
 {
     int millidegrees = 0;
 
@@ -46,6 +45,6 @@ getTemperature()
         ifs >> millidegrees;
     }
 
-    return static_cast<int16_t>((millidegrees + 500) / 1000);
+    return static_cast<int>((millidegrees + 500) / 1000);
 }
 

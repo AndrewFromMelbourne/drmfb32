@@ -25,7 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
-#include "image8880Font.h"
+#include "image8880Font8x16.h"
 
 #include "boxworld.h"
 #include "images.h"
@@ -169,10 +169,12 @@ Boxworld::update(Joystick& js)
 //-------------------------------------------------------------------------
 
 void
-Boxworld::draw(FrameBuffer8880& fb)
+Boxworld::draw(
+    FrameBuffer8880& fb,
+    Interface8880Font& font)
 {
     drawBoard(fb);
-    drawText(fb);
+    drawText(fb, font);
 }
 
 //-------------------------------------------------------------------------
@@ -198,7 +200,7 @@ Boxworld::drawBoard(FrameBuffer8880& fb)
             }
 
             fb.putImage(
-                FB8880Point{
+                Interface8880Point{
                     (i * tileWidth) + xOffset,
                     (j * tileHeight) + yOffset
                 },
@@ -219,7 +221,9 @@ Boxworld::drawBoard(FrameBuffer8880& fb)
 //-------------------------------------------------------------------------
 
 void
-Boxworld::drawText(FrameBuffer8880& fb)
+Boxworld::drawText(
+    FrameBuffer8880& fb,
+    Interface8880Font& font)
 {
     const int xOffset = (fb.getWidth() - m_topTextImage.getWidth()) / 2;
 
@@ -227,45 +231,45 @@ Boxworld::drawText(FrameBuffer8880& fb)
 
     m_topTextImage.clear(m_backgroundRGB);
 
-    FontPoint position{ 2, 2 };
-    position = drawString(position, "level: ", m_boldRGB, m_topTextImage);
-    position = drawString(position, std::to_string(m_level + 1), m_textRGB, m_topTextImage);
+    Interface8880Point position{ 2, 2 };
+    position = font.drawString(position, "level: ", m_boldRGB, m_topTextImage);
+    position = font.drawString(position, std::to_string(m_level + 1), m_textRGB, m_topTextImage);
 
     if (m_levelSolved)
     {
-        position = drawString(position, " [solved]", m_solvedRGB, m_topTextImage);
+        position = font.drawString(position, " [solved]", m_solvedRGB, m_topTextImage);
     }
 
-    fb.putImage(FB8880Point{ xOffset, 0 }, m_topTextImage);
+    fb.putImage(Interface8880Point{ xOffset, 0 }, m_topTextImage);
 
     //---------------------------------------------------------------------
 
-    position = FontPoint{ 2, 2 };
+    position = Interface8880Point{ 2, 2 };
     auto& undoRGB = ((m_canUndo) ? m_textRGB : m_disabledRGB);
 
-    position = drawString(position, "(X): ", m_boldRGB, m_bottomTextImage);
-    position = drawString(position, "undox box move", undoRGB, m_bottomTextImage);
+    position = font.drawString(position, "(X): ", m_boldRGB, m_bottomTextImage);
+    position = font.drawString(position, "undox box move", undoRGB, m_bottomTextImage);
 
-    position = FontPoint{ 2, 18 };
+    position = Interface8880Point{ 2, 18 };
 
-    position = drawString(position, "(Y): ", m_boldRGB, m_bottomTextImage);
-    position = drawString(position, "restart level", m_textRGB, m_bottomTextImage);
+    position = font.drawString(position, "(Y): ", m_boldRGB, m_bottomTextImage);
+    position = font.drawString(position, "restart level", m_textRGB, m_bottomTextImage);
 
-    int16_t halfWidth = 2 + (m_bottomTextImage.getWidth() / 2);
+    int halfWidth = 2 + (m_bottomTextImage.getWidth() / 2);
 
-    position = FontPoint{ halfWidth, 2 };
+    position = Interface8880Point{ halfWidth, 2 };
     auto& nextRGB = ((m_level < (Level::levelCount - 1)) ? m_textRGB : m_disabledRGB);
 
-    position = drawString(position, "(A): ", m_boldRGB, m_bottomTextImage);
-    position = drawString(position, "next level", nextRGB, m_bottomTextImage);
+    position = font.drawString(position, "(A): ", m_boldRGB, m_bottomTextImage);
+    position = font.drawString(position, "next level", nextRGB, m_bottomTextImage);
 
-    position = FontPoint{ halfWidth, 18 };
+    position = Interface8880Point{ halfWidth, 18 };
     auto& previousRGB = ((m_level > 0) ? m_textRGB : m_disabledRGB);
 
-    position = drawString(position, "(B): ", m_boldRGB, m_bottomTextImage);
-    position = drawString(position, "previous level", previousRGB, m_bottomTextImage);
+    position = font.drawString(position, "(B): ", m_boldRGB, m_bottomTextImage);
+    position = font.drawString(position, "previous level", previousRGB, m_bottomTextImage);
 
-    fb.putImage(FB8880Point{ xOffset, 440 }, m_bottomTextImage);
+    fb.putImage(Interface8880Point{ xOffset, 440 }, m_bottomTextImage);
 }
 
 //-------------------------------------------------------------------------

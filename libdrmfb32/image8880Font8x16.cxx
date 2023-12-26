@@ -28,7 +28,7 @@
 #include <cstddef>
 
 #include "image8880.h"
-#include "image8880Font.h"
+#include "image8880Font8x16.h"
 #include "point.h"
 #include "rgb8880.h"
 
@@ -36,6 +36,11 @@
 
 namespace fb32
 {
+
+//-------------------------------------------------------------------------
+
+constexpr int sc_fontWidth{8};
+constexpr int sc_fontHeight{16};
 
 //-------------------------------------------------------------------------
 
@@ -4653,231 +4658,37 @@ constexpr uint8_t font[256][sc_fontHeight] =
 
 //-------------------------------------------------------------------------
 
-constexpr uint8_t battery[11][sc_fontHeight] =
+Image8880Font8x16::Image8880Font8x16()
 {
-    { // 0x00 - 0% - 10%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x01 - 10% - 20%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x02 - 20% - 30%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x03 - 30% - 40%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x04 - 40% - 50%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x05 - 50% - 60%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x06 - 60% - 70%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x07 - 70% - 80%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x08 - 80% - 90%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01000010,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    },
-    { // 0x09 - 90% - 100%
-        0b00000000,
-        0b00011000,
-        0b00011000,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b01111110,
-        0b00000000,
-        0b00000000
-    }
-};
-
-//-------------------------------------------------------------------------
-
-} // namespace fb32
-
-//-------------------------------------------------------------------------
-
-fb32::FontPoint
-fb32::drawBattery(
-    const Image8880Point& p,
-    int percent,
-    uint32_t rgb,
-    Interface8880& image)
-{
-    auto index = std::min(9, (percent / 10));
-
-    for (int j = 0 ; j < sc_fontHeight ; ++j)
-    {
-        uint8_t byte = battery[index][j];
-
-        if (byte != 0)
-        {
-            for (int i = 0 ; i < sc_fontWidth ; ++i)
-            {
-                if ((byte >> (sc_fontWidth - i - 1)) & 1 )
-                {
-                    image.setPixel(
-                        Image8880Point(p.x() + i, p.y() + j),
-                        rgb);
-                }
-            }
-        }
-    }
-
-    return FontPoint(p.x() + sc_fontWidth, p.y());
 }
 
 //-------------------------------------------------------------------------
 
-fb32::FontPoint
-fb32::drawChar(
-    const Image8880Point& p,
+Image8880Font8x16::~Image8880Font8x16()
+{
+}
+
+//-------------------------------------------------------------------------
+
+int
+Image8880Font8x16::getPixelHeight() const
+{
+    return sc_fontHeight;
+}
+
+//-------------------------------------------------------------------------
+
+int
+Image8880Font8x16::getPixelWidth() const
+{
+    return sc_fontWidth;
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+Image8880Font8x16::drawChar(
+    const Interface8880Point& p,
     uint8_t c,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4887,39 +4698,41 @@ fb32::drawChar(
 
 //-------------------------------------------------------------------------
 
-fb32::FontPoint
-fb32::drawChar(
-    const Image8880Point& p,
+Interface8880Point
+Image8880Font8x16::drawChar(
+    const Interface8880Point& p,
     uint8_t c,
     uint32_t rgb,
     Interface8880& image)
 {
-    for (int j = 0 ; j < sc_fontHeight ; ++j)
+    const auto width = getPixelWidth();
+
+    for (int j = 0 ; j < getPixelHeight() ; ++j)
     {
         uint8_t byte = font[c][j];
 
         if (byte != 0)
         {
-            for (int i = 0 ; i < sc_fontWidth ; ++i)
+            for (int i = 0 ; i < width ; ++i)
             {
-                if ((byte >> (sc_fontWidth - i - 1)) & 1 )
+                if ((byte >> (width - i - 1)) & 1 )
                 {
                     image.setPixel(
-                        Image8880Point(p.x() + i, p.y() + j),
+                        Interface8880Point(p.x() + i, p.y() + j),
                         rgb);
                 }
             }
         }
     }
 
-    return FontPoint(p.x() + sc_fontWidth, p.y());
+    return Interface8880Point(p.x() + width, p.y());
 }
 
 //-------------------------------------------------------------------------
 
-fb32::FontPoint
-fb32::drawString(
-    const Image8880Point& p,
+Interface8880Point
+Image8880Font8x16::drawString(
+    const Interface8880Point& p,
     const char* string,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4929,15 +4742,15 @@ fb32::drawString(
 
 //-------------------------------------------------------------------------
 
-fb32::FontPoint
-fb32::drawString(
-    const Image8880Point& p,
+Interface8880Point
+Image8880Font8x16::drawString(
+    const Interface8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
     Interface8880& image)
 {
-    FontPoint position{p};
-    FontPoint start{p};
+    Interface8880Point position{p};
+    Interface8880Point start{p};
 
     for (const char c : string)
     {
@@ -4945,14 +4758,14 @@ fb32::drawString(
         {
             position.set(
                 start.x(),
-                position.y() + sc_fontHeight);
+                position.y() + getPixelHeight());
         }
         else
         {
             drawChar(position, c, rgb, image);
 
             position.set(
-                position.x() + sc_fontWidth,
+                position.x() + getPixelWidth(),
                 position.y());
         }
     }
@@ -4960,3 +4773,6 @@ fb32::drawString(
     return position;
 }
 
+//-------------------------------------------------------------------------
+
+} // namespace fb32

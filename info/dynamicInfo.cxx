@@ -47,8 +47,7 @@
 //-------------------------------------------------------------------------
 
 std::string
-DynamicInfo::
-getIpAddress(
+DynamicInfo::getIpAddress(
     char& interface)
 {
     struct ifaddrs *ifaddr = nullptr;
@@ -87,40 +86,39 @@ getIpAddress(
 //-------------------------------------------------------------------------
 
 void
-DynamicInfo::
-drawIpAddress(
-    fb32::FontPoint& position)
+DynamicInfo::drawIpAddress(
+    fb32::Interface8880Point& position,
+    fb32::Interface8880Font& font)
 {
-    position = drawString(position,
-                          "ip(",
-                          m_heading,
-                          getImage());
+    position = font.drawString(position,
+                               "ip(",
+                               m_heading,
+                               getImage());
 
     char interface = ' ';
     std::string ipaddress = getIpAddress(interface);
 
-    position = drawChar(position,
-                        interface,
-                        m_foreground,
-                        getImage());
+    position = font.drawChar(position,
+                             interface,
+                             m_foreground,
+                             getImage());
 
-    position = drawString(position,
-                          ") ",
-                          m_heading,
-                          getImage());
+    position = font.drawString(position,
+                               ") ",
+                               m_heading,
+                               getImage());
 
-    position = drawString(position,
-                          ipaddress + " ",
-                          m_foreground,
-                          getImage());
+    position = font.drawString(position,
+                               ipaddress + " ",
+                               m_foreground,
+                               getImage());
 
 }
 
 //-------------------------------------------------------------------------
 
 std::string
-DynamicInfo::
-getTemperature()
+DynamicInfo::getTemperature()
 {
     return std::to_string(inf::getTemperature());
 }
@@ -128,41 +126,40 @@ getTemperature()
 //-------------------------------------------------------------------------
 
 void
-DynamicInfo::
-drawTemperature(
-    fb32::FontPoint& position)
+DynamicInfo::drawTemperature(
+    fb32::Interface8880Point& position,
+    fb32::Interface8880Font& font)
 {
-    position = drawString(position,
-                          "temperature ",
-                          m_heading,
-                          getImage());
+    position = font.drawString(position,
+                               "temperature ",
+                               m_heading,
+                               getImage());
 
     std::string temperatureString = getTemperature();
 
-    position = drawString(position,
-                          temperatureString,
-                          m_foreground,
-                          getImage());
+    position = font.drawString(position,
+                               temperatureString,
+                               m_foreground,
+                               getImage());
 
-    uint8_t degreeSymbol = 0xF8;
+    char degreeSymbol = 0xB0;
 
-    position = drawChar(position,
-                        degreeSymbol,
-                        m_foreground,
-                        getImage());
+    position = font.drawChar(position,
+                             degreeSymbol,
+                             m_foreground,
+                             getImage());
 
-    position = drawString(position,
-                          "C ",
-                          m_foreground,
-                          getImage());
+    position = font.drawString(position,
+                               "C ",
+                               m_foreground,
+                               getImage());
 
 }
 
 //-------------------------------------------------------------------------
 
 std::string
-DynamicInfo::
-getTime(
+DynamicInfo::getTime(
     time_t now)
 {
     char buffer[128];
@@ -177,32 +174,32 @@ getTime(
 //-------------------------------------------------------------------------
 
 void
-DynamicInfo::
-drawTime(
-    fb32::FontPoint& position,
+DynamicInfo::drawTime(
+    fb32::Interface8880Point& position,
+    fb32::Interface8880Font& font,
     time_t now)
 {
-    position = drawString(position,
-                          "time ",
-                          m_heading,
-                          getImage());
+    position = font.drawString(position,
+                               "time ",
+                               m_heading,
+                               getImage());
 
     std::string timeString = getTime(now);
 
-    position = drawString(position,
-                          timeString + " ",
-                          m_foreground,
-                          getImage());
+    position = font.drawString(position,
+                               timeString + " ",
+                               m_foreground,
+                               getImage());
 }
 
 //-------------------------------------------------------------------------
 
-DynamicInfo::
-DynamicInfo(
-    int16_t width,
-    int16_t yPosition)
+DynamicInfo::DynamicInfo(
+    int width,
+    int fontHeight,
+    int yPosition)
 :
-    Panel{width, fb32::sc_fontHeight + 4, yPosition},
+    Panel{width, fontHeight + 4, yPosition},
     m_heading(255, 255, 0),
     m_foreground(255, 255, 255),
     m_warning(255, 0, 0),
@@ -213,17 +210,24 @@ DynamicInfo(
 //-------------------------------------------------------------------------
 
 void
-DynamicInfo::
-update(
-    time_t now)
+DynamicInfo::init(
+    fb32::Interface8880Font& font)
+{
+}
+
+//-------------------------------------------------------------------------
+
+void
+DynamicInfo::update(
+    time_t now,
+    fb32::Interface8880Font& font)
 {
     getImage().clear(m_background);
 
     //---------------------------------------------------------------------
 
-    fb32::FontPoint position = { 0, 0 };
-    drawIpAddress(position);
-    drawTime(position, now);
-    drawTemperature(position);
+    fb32::Interface8880Point position = { 0, 0 };
+    drawIpAddress(position, font);
+    drawTime(position, font, now);
+    drawTemperature(position, font);
 }
-

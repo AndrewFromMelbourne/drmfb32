@@ -29,6 +29,7 @@
 
 #include "framebuffer8880.h"
 #include "image8880.h"
+#include "interface8880Font.h"
 #include "joystick.h"
 
 #include "images.h"
@@ -74,7 +75,7 @@ public:
 
     void init();
     void update(fb32::Joystick& js);
-    void draw(fb32::FrameBuffer8880& fb);
+    void draw(fb32::FrameBuffer8880& fb, fb32::Interface8880Font& font);
 
 private:
 
@@ -82,7 +83,7 @@ private:
     void swapPieces(const Location& location1, const Location& location2);
     void isLevelSolved();
     void drawBoard(fb32::FrameBuffer8880& fb);
-    void drawText(fb32::FrameBuffer8880& fb);
+    void drawText(fb32::FrameBuffer8880& fb, fb32::Interface8880Font& font);
 
     //---------------------------------------------------------------------
 

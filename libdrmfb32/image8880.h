@@ -45,10 +45,6 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Image8880Point = Point<int>;
-
-//-------------------------------------------------------------------------
-
 class Image8880
 :
     public Interface8880
@@ -65,6 +61,9 @@ public:
     Image8880(const Image8880&) = default;
     Image8880& operator=(const Image8880&) = default;
 
+    Image8880(Image8880&& image) = default;
+    Image8880& operator=(Image8880&& image) = default;
+
     int getWidth() const override { return m_width; }
     int getHeight() const override { return m_height; }
 
@@ -77,23 +76,23 @@ public:
 
     bool
     setPixelRGB(
-        const Image8880Point& p,
+        const Interface8880Point& p,
         const RGB8880& rgb) override
     {
         return setPixel(p, rgb.get8880());
     }
 
-    bool setPixel(const Image8880Point& p, uint32_t rgb) override;
+    bool setPixel(const Interface8880Point& p, uint32_t rgb) override;
 
-    std::pair<bool, RGB8880> getPixelRGB(const Image8880Point& p) const override;
-    std::pair<bool, uint32_t> getPixel(const Image8880Point& p) const override;
+    std::pair<bool, RGB8880> getPixelRGB(const Interface8880Point& p) const override;
+    std::pair<bool, uint32_t> getPixel(const Interface8880Point& p) const override;
 
     const uint32_t* getRow(int y) const;
 
 private:
 
     bool
-    validPixel(const Image8880Point& p) const
+    validPixel(const Interface8880Point& p) const
     {
         return ((p.x() >= 0) &&
                 (p.y() >= 0) &&
@@ -101,7 +100,7 @@ private:
                 (p.y() < m_height));
     }
 
-    size_t offset(const Image8880Point& p) const;
+    size_t offset(const Interface8880Point& p) const;
 
     int m_width;
     int m_height;

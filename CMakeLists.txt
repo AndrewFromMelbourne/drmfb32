@@ -24,12 +24,18 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/fileDescriptor.cxx
                            libdrmfb32/framebuffer8880.cxx
                            libdrmfb32/image8880.cxx
-                           libdrmfb32/image8880Font.cxx
+                           libdrmfb32/image8880Font8x16.cxx
                            libdrmfb32/image8880Graphics.cxx
                            libdrmfb32/image8880Qoi.cxx
                            libdrmfb32/interface8880.cxx
+                           libdrmfb32/interface8880Font.cxx
                            libdrmfb32/joystick.cxx
                            libdrmfb32/rgb8880.cxx)
+
+if (FREETYPE_FOUND)
+target_include_directories(drmfb32 PUBLIC ${FREETYPE_INCLUDE_DIRS})
+target_sources(drmfb32 PRIVATE libdrmfb32/image8880FreeType.cxx)
+endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32
                     ${PROJECT_SOURCE_DIR}/thread-pool/include)
@@ -38,17 +44,6 @@ target_compile_options(drmfb32 PUBLIC ${DRM_CFLAGS_OTHER})
 target_link_libraries(drmfb32 ${DRM_LIBRARIES})
 
 set(EXTRA_LIBS ${EXTRA_LIBS} drmfb32)
-
-#--------------------------------------------------------------------------
-
-if (FREETYPE_FOUND)
-
-add_library(drmfb32ft STATIC libdrmfb32ft/image8880FreeType.cxx)
-target_include_directories(drmfb32ft PUBLIC ${FREETYPE_INCLUDE_DIRS})
-
-include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32ft)
-
-endif()
 
 #--------------------------------------------------------------------------
 
@@ -64,7 +59,9 @@ add_executable(info info/info.cxx
                     info/traceGraph.cxx
                     info/traceStack.cxx)
 
-target_link_libraries(info drmfb32 ${BSD_LIBRARIES} ${DRM_LIBRARIES})
+target_link_libraries(info drmfb32 ${BSD_LIBRARIES}
+                                   ${DRM_LIBRARIES}
+                                   ${FREETYPE_LIBRARIES})
 target_include_directories(info PUBLIC ${BSD_INCLUDE_DIRS})
 target_compile_options(info PUBLIC ${BSD_CFLAGS_OTHER})
 
@@ -126,8 +123,8 @@ if (FREETYPE_FOUND)
 
 add_executable(testft test/testft.cxx)
 target_link_libraries(testft drmfb32
-                             drmfb32ft
-                             -lfreetype)
+                             ${DRM_LIBRARIE}
+                             ${FREETYPE_LIBRARIES})
 
 endif()
 

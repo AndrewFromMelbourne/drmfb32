@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2023 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -29,11 +29,10 @@
 
 //-------------------------------------------------------------------------
 
-#include <cstdint>
+#include <string>
 
-#include "image8880.h"
+#include "interface8880.h"
 #include "point.h"
-#include "rgb8880.h"
 
 //-------------------------------------------------------------------------
 
@@ -42,104 +41,57 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-void
-box(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    uint32_t rgb);
-
-inline void
-box(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    const RGB8880& rgb)
-{
-    box(image, p1, p2, rgb.get8880());
-}
+class RGB8880;
 
 //-------------------------------------------------------------------------
 
-void
-boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    uint32_t rgb);
-
-inline void
-boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    const RGB8880& rgb)
+class Interface8880Font
 {
-    boxFilled(image, p1, p2, rgb.get8880());
-}
+public:
 
-//-------------------------------------------------------------------------
+    Interface8880Font();
+    virtual ~Interface8880Font() = 0;
 
-void
-line(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    uint32_t rgb);
+    Interface8880Font(const Interface8880Font&) = delete;
+    Interface8880Font(Interface8880Font&&) = delete;
+    Interface8880Font& operator=(const Interface8880Font&) = delete;
+    Interface8880Font& operator=(Interface8880Font&&) = delete;
 
-inline void
-line(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
-    const RGB8880& rgb)
-{
-    line(image, p1, p2, rgb.get8880());
-}
+    virtual int getPixelHeight() const = 0;
+    virtual int getPixelWidth() const = 0;
 
-//-------------------------------------------------------------------------
+    virtual Interface8880Point
+    drawChar(
+        const Interface8880Point& p,
+        uint8_t c,
+        const RGB8880& rgb,
+        Interface8880& image) = 0;
 
-void
-horizontalLine(
-    Interface8880& image,
-    int x1,
-    int x2,
-    int y,
-    uint32_t rgb);
+    virtual Interface8880Point
+    drawChar(
+        const Interface8880Point& p,
+        uint8_t c,
+        uint32_t rgb,
+        Interface8880& image) = 0;
 
-inline void
-horizontalLine(
-    Interface8880& image,
-    int x1,
-    int x2,
-    int y,
-    const RGB8880& rgb)
-{
-    horizontalLine(image, x1, x2, y, rgb.get8880());
-}
+    virtual Interface8880Point
+    drawString(
+        const Interface8880Point& p,
+        const char* string,
+        const RGB8880& rgb,
+        Interface8880& image) = 0;
 
-//-------------------------------------------------------------------------
-
-void
-verticalLine(
-    Interface8880& image,
-    int x,
-    int y1,
-    int y2,
-    uint32_t rgb);
-
-inline void
-verticalLine(
-    Interface8880& image,
-    int x,
-    int y1,
-    int y2,
-    const RGB8880& rgb)
-{
-    verticalLine(image, x, y1, y2, rgb.get8880());
-}
+    virtual Interface8880Point
+    drawString(
+        const Interface8880Point& p,
+        const std::string& string,
+        const RGB8880& rgb,
+        Interface8880& image) = 0;
+};
 
 //-------------------------------------------------------------------------
 
 } // namespace fb32
+
+//-------------------------------------------------------------------------
 

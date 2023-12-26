@@ -46,7 +46,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using FB8880Point = Point<int32_t>;
+using Interface8880Point = Point<int32_t>;
 
 //-------------------------------------------------------------------------
 
@@ -80,28 +80,28 @@ public:
 
     bool
     setPixelRGB(
-        const FB8880Point& p,
+        const Interface8880Point& p,
         const RGB8880& rgb) override
     {
         return setPixel(p, rgb.get8880());
     }
 
-    bool setPixel(const FB8880Point& p, uint32_t rgb) override;
+    bool setPixel(const Interface8880Point& p, uint32_t rgb) override;
 
-    std::pair<bool, RGB8880> getPixelRGB(const FB8880Point& p) const override;
-    std::pair<bool, uint32_t> getPixel(const FB8880Point& p) const override;
+    std::pair<bool, RGB8880> getPixelRGB(const Interface8880Point& p) const override;
+    std::pair<bool, uint32_t> getPixel(const Interface8880Point& p) const override;
 
-    bool putImage(const FB8880Point& p, const Image8880& image) const;
+    bool putImage(const Interface8880Point& p, const Image8880& image) const;
 
 private:
 
     bool
     putImagePartial(
-        const FB8880Point& p,
+        const Interface8880Point& p,
         const Image8880& image) const;
 
     bool
-    validPixel(const FB8880Point& p) const
+    validPixel(const Interface8880Point& p) const
     {
         return (p.x() >= 0) &&
                (p.y() >= 0) &&
@@ -109,7 +109,7 @@ private:
                (p.y() < static_cast<int32_t>(m_height));
     }
 
-    size_t offset(const FB8880Point& p) const;
+    size_t offset(const Interface8880Point& p) const;
 
     int m_width;
     int m_height;

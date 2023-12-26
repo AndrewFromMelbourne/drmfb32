@@ -159,7 +159,7 @@ main(
         fb.clear(RGB8880{0, 0, 0});
 
         auto image = readQoi(qoi);
-        const FB8880Point center{
+        const Interface8880Point center{
             (fb.getWidth() - image.getWidth()) / 2,
             (fb.getHeight() - image.getHeight()) / 2};
         fb.putImage(center, image);

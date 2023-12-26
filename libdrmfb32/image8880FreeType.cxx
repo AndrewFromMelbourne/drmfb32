@@ -37,14 +37,21 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
+Image8880FreeType::Image8880FreeType()
+:
+    m_pixelSize{0},
+    m_face(),
+    m_library()
+{
+}
+
+//-------------------------------------------------------------------------
 
 Image8880FreeType::Image8880FreeType(
     const std::string& fontFile,
     int pixelSize)
 :
-    m_pixelSize{0},
-    m_face{},
-    m_library{}
+    Image8880FreeType()
 {
     if (FT_Init_FreeType(&m_library) != 0)
     {
@@ -93,6 +100,14 @@ Image8880FreeType::getPixelHeight() const
 
 //-------------------------------------------------------------------------
 
+int
+Image8880FreeType::getPixelWidth() const
+{
+    return m_face->size->metrics.max_advance >> 6;
+}
+
+//-------------------------------------------------------------------------
+
 bool
 Image8880FreeType::setPixelSize(
     int pixelSize)
@@ -114,9 +129,9 @@ Image8880FreeType::setPixelSize(
 
 //-------------------------------------------------------------------------
 
-FontPoint
+Interface8880Point
 Image8880FreeType::drawChar(
-    const Image8880Point& p,
+    const Interface8880Point& p,
     uint8_t c,
     const RGB8880& rgb,
     Interface8880& image)
@@ -126,11 +141,11 @@ Image8880FreeType::drawChar(
 
 //-------------------------------------------------------------------------
 
-FontPoint
+Interface8880Point
 Image8880FreeType::drawChar(
-    const Image8880Point& p,
+    const Interface8880Point& p,
     uint8_t c,
-    uint16_t rgb,
+    uint32_t rgb,
     Interface8880& image)
 {
     return drawChar(p, c, RGB8880(rgb), image);
@@ -138,16 +153,16 @@ Image8880FreeType::drawChar(
 
 //-------------------------------------------------------------------------
 
-FontPoint
+Interface8880Point
 Image8880FreeType::drawString(
-    const Image8880Point& p,
+    const Interface8880Point& p,
     const char* string,
     const RGB8880& rgb,
     Interface8880& image)
 {
     if (not string)
     {
-        return FontPoint{p};
+        return p;
     }
 
     return drawString(p, std::string(string), rgb, image);
@@ -155,14 +170,14 @@ Image8880FreeType::drawString(
 
 //-------------------------------------------------------------------------
 
-FontPoint
+Interface8880Point
 Image8880FreeType::drawString(
-    const Image8880Point& p,
+    const Interface8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
     Interface8880& image)
 {
-    FontPoint position{p};
+    Interface8880Point position{p};
     position.setY(position.y() + (m_face->size->metrics.ascender >> 6));
 
     auto slot = m_face->glyph;
@@ -173,7 +188,7 @@ Image8880FreeType::drawString(
     {
         if (c == '\n')
         {
-            position.setY(position.y() + getPixelHeight());
+            position.set(p.x(), position.y() + getPixelHeight());
         }
         else
         {
@@ -183,10 +198,10 @@ Image8880FreeType::drawString(
             {
                 FT_Vector delta;
 
-                FT_Get_Kerning(m_face, 
-                               previous, 
-                               glyph_index, 
-                               ft_kerning_default, 
+                FT_Get_Kerning(m_face,
+                               previous,
+                               glyph_index,
+                               ft_kerning_default,
                                &delta);
 
                 position.setX(position.x() + (delta.x >> 6));
@@ -196,12 +211,12 @@ Image8880FreeType::drawString(
             {
                 auto slot = m_face->glyph;
 
-                drawChar(position.x() + slot->bitmap_left, 
+                drawChar(position.x() + slot->bitmap_left,
                          position.y() - slot->bitmap_top,
                          slot->bitmap,
                          rgb,
                          image);
-                       
+
 
                 position.setX(position.x() + (slot->advance.x >> 6));
                 previous = glyph_index;
@@ -218,6 +233,8 @@ Image8880FreeType::drawString(
         position.setX(position.x() + advance);
     }
 
+    position.setY(position.y() - (m_face->size->metrics.ascender >> 6));
+
     return position;
 }
 
@@ -226,7 +243,7 @@ Image8880FreeType::drawString(
 void
 Image8880FreeType::drawChar(
         int xOffset,
-        int yOffset, 
+        int yOffset,
         const FT_Bitmap& bitmap,
         const RGB8880& rgb,
         Interface8880& image)
@@ -239,7 +256,7 @@ Image8880FreeType::drawChar(
         {
             if (row[i] > 0)
             {
-                const Image8880Point p{static_cast<int>(i + xOffset),
+                const Interface8880Point p{static_cast<int>(i + xOffset),
                                        static_cast<int>(j + yOffset)};
                 auto background = image.getPixelRGB(p);
 

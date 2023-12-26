@@ -84,12 +84,13 @@ class CpuTrace
 public:
 
     CpuTrace(
-        int16_t width,
-        int16_t traceHeight,
-        int16_t yPosition,
-        int16_t gridHeight = 20);
+        int width,
+        int traceHeight,
+        int fontHeight,
+        int yPosition,
+        int gridHeight = 20);
 
-    void update(time_t now) override;
+    void update(time_t now, fb32::Interface8880Font& font) override;
 
 private:
 

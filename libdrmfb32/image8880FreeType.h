@@ -35,7 +35,8 @@
 #include <cstdint>
 #include <string>
 
-#include "image8880.h"
+#include "interface8880.h"
+#include "interface8880Font.h"
 #include "point.h"
 
 //-------------------------------------------------------------------------
@@ -45,7 +46,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using FontPoint = Point<int>;
+using Interface8880Point = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -54,11 +55,14 @@ class RGB8880;
 //-------------------------------------------------------------------------
 
 class Image8880FreeType
+:
+    public Interface8880Font
 {
 public:
 
+    Image8880FreeType();
     Image8880FreeType(const std::string& fontFile, int pixelSize);
-    ~Image8880FreeType();
+    ~Image8880FreeType() override;
 
     Image8880FreeType(const Image8880FreeType&) = delete;
     Image8880FreeType(Image8880FreeType&&) = delete;
@@ -68,7 +72,8 @@ public:
 	std::string getFontFamilyName() const;
 	std::string getFontStyleName() const;
 
-	int getPixelHeight() const;
+	int getPixelHeight() const override;
+    int getPixelWidth() const override;
 
     int getPixelSize() const
 	{
@@ -77,33 +82,33 @@ public:
 
 	bool setPixelSize(int pixelSize);
 
-    FontPoint
+    Interface8880Point
     drawChar(
-        const Image8880Point& p,
+        const Interface8880Point& p,
         uint8_t c,
         const RGB8880& rgb,
-        Interface8880& image);
+        Interface8880& image) override;
 
-    FontPoint
+    Interface8880Point
     drawChar(
-        const Image8880Point& p,
+        const Interface8880Point& p,
         uint8_t c,
-        uint16_t rgb,
-        Interface8880& image);
+        uint32_t rgb,
+        Interface8880& image) override;
 
-    FontPoint
+    Interface8880Point
     drawString(
-        const Image8880Point& p,
+        const Interface8880Point& p,
         const char* string,
         const RGB8880& rgb,
-        Interface8880& image);
+        Interface8880& image) override;
 
-    FontPoint
+    Interface8880Point
     drawString(
-        const Image8880Point& p,
+        const Interface8880Point& p,
         const std::string& string,
         const RGB8880& rgb,
-        Interface8880& image);
+        Interface8880& image) override;
 
 private:
 
@@ -111,7 +116,7 @@ private:
     void
     drawChar(
         int xOffset,
-        int yOffset, 
+        int yOffset,
         const FT_Bitmap& bitmap,
         const RGB8880& rgb,
         Interface8880& image);

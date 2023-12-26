@@ -38,7 +38,7 @@ using size_type = std::vector<uint32_t>::size_type;
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880:: Image8880()
+fb32::Image8880::Image8880()
 :
     m_width{0},
     m_height{0},
@@ -49,7 +49,7 @@ fb32::Image8880:: Image8880()
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880:: Image8880(
+fb32::Image8880::Image8880(
     int width,
     int height,
     uint8_t numberOfFrames)
@@ -64,7 +64,7 @@ fb32::Image8880:: Image8880(
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880:: Image8880(
+fb32::Image8880::Image8880(
     int width,
     int height,
     const std::vector<uint32_t>& buffer,
@@ -87,7 +87,7 @@ fb32::Image8880:: Image8880(
 //-------------------------------------------------------------------------
 
 void
-fb32::Image8880:: setFrame(
+fb32::Image8880::setFrame(
     uint8_t frame)
 {
     if (frame < m_numberOfFrames)
@@ -99,7 +99,7 @@ fb32::Image8880:: setFrame(
 //-------------------------------------------------------------------------
 
 void
-fb32::Image8880:: clear(
+fb32::Image8880::clear(
     uint32_t rgb)
 {
     std::fill(m_buffer.begin(), m_buffer.end(), rgb);
@@ -108,8 +108,8 @@ fb32::Image8880:: clear(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Image8880:: setPixel(
-    const Image8880Point& p,
+fb32::Image8880::setPixel(
+    const Interface8880Point& p,
     uint32_t rgb)
 {
     bool isValid{validPixel(p)};
@@ -125,8 +125,8 @@ fb32::Image8880:: setPixel(
 //-------------------------------------------------------------------------
 
 std::pair<bool, fb32::RGB8880>
-fb32::Image8880:: getPixelRGB(
-    const Image8880Point& p) const
+fb32::Image8880::getPixelRGB(
+    const Interface8880Point& p) const
 {
     bool isValid{validPixel(p)};
     RGB8880 rgb{0, 0, 0};
@@ -142,8 +142,8 @@ fb32::Image8880:: getPixelRGB(
 //-------------------------------------------------------------------------
 
 std::pair<bool, uint32_t>
-fb32::Image8880:: getPixel(
-    const Image8880Point& p) const
+fb32::Image8880::getPixel(
+    const Interface8880Point& p) const
 {
     bool isValid{validPixel(p)};
     uint32_t rgb{0};
@@ -159,10 +159,10 @@ fb32::Image8880:: getPixel(
 //-------------------------------------------------------------------------
 
 const uint32_t*
-fb32::Image8880:: getRow(
+fb32::Image8880::getRow(
     int y) const
 {
-    if (validPixel(Image8880Point{0, y}))
+    if (validPixel(Interface8880Point{0, y}))
     {
         return  m_buffer.data() + (y * m_width) + (m_width * m_height * m_frame);
     }
@@ -175,8 +175,8 @@ fb32::Image8880:: getRow(
 //-------------------------------------------------------------------------
 
 size_t
-fb32::Image8880:: offset(
-    const Image8880Point& p) const
+fb32::Image8880::offset(
+    const Interface8880Point& p) const
 {
     return p.x() + (p.y() * m_width) + (m_width * m_height * m_frame);
 }

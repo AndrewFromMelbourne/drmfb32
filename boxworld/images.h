@@ -35,9 +35,6 @@ static constexpr int tileWidth = 30;
 static constexpr int tileHeight = 30;
 static constexpr int tileCount = 15;
 
-static constexpr int batteryWidth = 14;
-static constexpr int batteryHeight = 8;
-
 //-------------------------------------------------------------------------
 
 extern std::vector<uint32_t> emptyImage;
@@ -48,6 +45,4 @@ extern std::vector<uint32_t> wallImage;
 extern std::vector<uint32_t> passageWithTargetImage;
 extern std::vector<uint32_t> boxOnTargetImage;
 extern std::vector<uint32_t> playerOnTargetImage;
-
-extern std::vector<uint32_t> batteryImage;
 

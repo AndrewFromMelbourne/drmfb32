@@ -36,6 +36,7 @@
 
 #include <sys/time.h>
 
+#include "interface8880Font.h"
 #include "panel.h"
 #include "rgb8880.h"
 
@@ -53,7 +54,7 @@ struct TraceData
     std::string m_name;
     fb32::RGB8880 m_traceColour;
     fb32::RGB8880 m_gridColour;
-    std::vector<int16_t> m_values;
+    std::vector<int> m_values;
 };
 
 //-------------------------------------------------------------------------
@@ -65,29 +66,32 @@ class Trace
 public:
 
     Trace(
-        int16_t width,
-        int16_t traceHeight,
-        int16_t traceScale,
-        int16_t yPosition,
-        int16_t gridHeight,
-        int16_t traces,
+        int width,
+        int traceHeight,
+        int fontHeight,
+        int traceScale,
+        int yPosition,
+        int gridHeight,
+        int traces,
         const std::string& title,
         const std::vector<std::string>& traceNames,
         const std::vector<fb32::RGB8880>& traceColours);
 
-    static int16_t getLegendHeight();
-
-    void update(time_t now) override = 0;
+    void init(fb32::Interface8880Font& font) override;
+    void update(time_t now, fb32::Interface8880Font& font) override = 0;
 
 protected:
 
-    void addData(const std::vector<int16_t>& data, time_t now);
+    void addData(const std::vector<int>& data, time_t now);
     virtual void draw() = 0;
 
-    int16_t m_traceHeight;
-    int16_t m_traceScale;
-    int16_t m_gridHeight;
-    int16_t m_columns;
+    int m_traceHeight;
+    int m_fontHeight;
+    int m_traceScale;
+    int m_gridHeight;
+    int m_columns;
+
+    std::string m_title;
 
     bool m_autoScale;
 

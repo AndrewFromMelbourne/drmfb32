@@ -34,12 +34,16 @@
 
 //-------------------------------------------------------------------------
 
+namespace fb32
+{
+
+//-------------------------------------------------------------------------
+
 void
-fb32::
 box(
     Interface8880& image,
-    const Image8880Point& p1,
-    const Image8880Point& p2,
+    const Interface8880Point& p1,
+    const Interface8880Point& p2,
     uint32_t rgb)
 {
     verticalLine(image, p1.x(), p1.y(), p2.y(), rgb);
@@ -51,11 +55,10 @@ box(
 //-------------------------------------------------------------------------
 
 void
-fb32::
 boxFilled(
     Interface8880& image,
-    const Image8880Point& p1,
-    const Image8880Point& p2,
+    const Interface8880Point& p1,
+    const Interface8880Point& p2,
     uint32_t rgb)
 {
     int sign_y = (p1.y() <= p2.y()) ? 1 : -1;
@@ -73,11 +76,10 @@ boxFilled(
 //-------------------------------------------------------------------------
 
 void
-fb32::
 line(
     Interface8880& image,
-    const Image8880Point& p1,
-    const Image8880Point& p2,
+    const Interface8880Point& p1,
+    const Interface8880Point& p2,
     uint32_t rgb)
 {
     if (p1.y() == p2.y())
@@ -121,7 +123,7 @@ line(
                     y += sign_y;
                 }
 
-                image.setPixel(Image8880Point(x, y), rgb);
+                image.setPixel(Interface8880Point(x, y), rgb);
             }
         }
         else
@@ -144,7 +146,7 @@ line(
                     x += sign_x;
                 }
 
-                image.setPixel(Image8880Point(x, y), rgb);
+                image.setPixel(Interface8880Point(x, y), rgb);
             }
         }
     }
@@ -153,7 +155,6 @@ line(
 //-------------------------------------------------------------------------
 
 void
-fb32::
 horizontalLine(
     Interface8880& image,
     int x1,
@@ -164,19 +165,18 @@ horizontalLine(
     int sign_x = (x1 <= x2) ? 1 : -1;
     int x = x1;
 
-    image.setPixel(Image8880Point(x, y), rgb);
+    image.setPixel(Interface8880Point(x, y), rgb);
 
     while (x != x2)
     {
         x += sign_x;
-        image.setPixel(Image8880Point(x, y), rgb);
+        image.setPixel(Interface8880Point(x, y), rgb);
     }
 }
 
 //-------------------------------------------------------------------------
 
 void
-fb32::
 verticalLine(
     Interface8880& image,
     int x,
@@ -187,12 +187,15 @@ verticalLine(
     int sign_y = (y1 <= y2) ? 1 : -1;
     int y = y1;
 
-    image.setPixel(Image8880Point(x, y), rgb);
+    image.setPixel(Interface8880Point(x, y), rgb);
 
     while (y != y2)
     {
         y += sign_y;
-        image.setPixel(Image8880Point(x, y), rgb);
+        image.setPixel(Interface8880Point(x, y), rgb);
     }
 }
 
+//-------------------------------------------------------------------------
+
+} // namespace fb32

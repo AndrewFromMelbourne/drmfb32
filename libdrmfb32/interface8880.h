@@ -42,7 +42,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using FB8880Point = Point<int>;
+using Interface8880Point = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -60,13 +60,13 @@ public:
 
     virtual bool
     setPixelRGB(
-        const FB8880Point& p,
+        const Interface8880Point& p,
         const RGB8880& rgb) = 0;
 
-    virtual bool setPixel(const FB8880Point& p, uint32_t rgb) = 0;
+    virtual bool setPixel(const Interface8880Point& p, uint32_t rgb) = 0;
 
-    virtual std::pair<bool, RGB8880> getPixelRGB(const FB8880Point& p) const = 0;
-    virtual std::pair<bool, uint32_t> getPixel(const FB8880Point& p) const = 0;
+    virtual std::pair<bool, RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
+    virtual std::pair<bool, uint32_t> getPixel(const Interface8880Point& p) const = 0;
 };
 
 //-------------------------------------------------------------------------

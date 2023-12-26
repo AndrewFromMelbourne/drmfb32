@@ -25,94 +25,79 @@
 //
 //-------------------------------------------------------------------------
 
-#include <array>
-#include <cmath>
-#include <cstring>
-#include <functional>
-#include <iostream>
-
-#include "sphere.h"
+#pragma once
 
 //-------------------------------------------------------------------------
 
-using namespace fb32;
+#include <cstdint>
+#include <string>
+
+#include "interface8880.h"
+#include "interface8880Font.h"
+#include "point.h"
 
 //-------------------------------------------------------------------------
 
-double dot(vector3 a, vector3 b)
+namespace fb32
 {
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
 
 //-------------------------------------------------------------------------
 
-Sphere::Sphere(int size)
+using Interface8880Point = Point<int>;
+
+//-------------------------------------------------------------------------
+
+class RGB8880;
+
+//-------------------------------------------------------------------------
+
+class Image8880Font8x16
 :
-    m_size{size},
-    m_image(size, size),
-    m_ambient{ 0.3 },
-    m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) }
+    public Interface8880Font
 {
-}
+public:
+
+    Image8880Font8x16();
+    ~Image8880Font8x16() override;
+
+    Image8880Font8x16(const Image8880Font8x16&) = default;
+    Image8880Font8x16(Image8880Font8x16&&) = default;
+    Image8880Font8x16& operator=(const Image8880Font8x16&) = default;
+    Image8880Font8x16& operator=(Image8880Font8x16&&) = default;
+
+    int getPixelHeight() const override;
+    int getPixelWidth() const override;
+
+    Interface8880Point
+    drawChar(
+        const Interface8880Point& p,
+        uint8_t c,
+        const RGB8880& rgb,
+        Interface8880& image) override;
+
+    Interface8880Point
+    drawChar(
+        const Interface8880Point& p,
+        uint8_t c,
+        uint32_t rgb,
+        Interface8880& image) override;
+
+    Interface8880Point
+    drawString(
+        const Interface8880Point& p,
+        const char* string,
+        const RGB8880& rgb,
+        Interface8880& image) override;
+
+    Interface8880Point
+    drawString(
+        const Interface8880Point& p,
+        const std::string& string,
+        const RGB8880& rgb,
+        Interface8880& image) override;
+};
 
 //-------------------------------------------------------------------------
 
-void
-Sphere::init()
-{
-    m_image.clear(0);
-}
-
-//-------------------------------------------------------------------------
-
-void
-Sphere::update()
-{
-    auto radius = m_size / 2;
-
-    for (int j = 0 ; j < m_size ; ++j)
-    {
-        double y = double(radius - j) / radius;
-        for (int i = 0 ; i < m_size ; ++i)
-        {
-            uint8_t grey = 0;
-
-            double x = double(i - radius) / radius;
-            double sum = x * x + y * y;
-
-            if (sum <= 1.0)
-            {
-                double z = std::sqrt(1.0 - sum);
-                vector3 v{x, y, z};
-                double intensity = dot(v, m_light);
-
-                if (intensity < 0.0)
-                {
-                    intensity = 0.0;
-                }
-
-                intensity *= intensity;
-                intensity *= (1.0 - m_ambient);
-
-                grey = (uint8_t)std::ceil(255.0 * (intensity + m_ambient));
-            }
-
-            Interface8880Point p{i, j};
-            m_image.setPixelRGB(p, RGB8880(grey, grey, grey));
-        }
-    }
-
-}
-
-//-------------------------------------------------------------------------
-
-void
-Sphere::draw(
-    fb32::FrameBuffer8880& fb)
-{
-    const int xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
-    const int yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
-
-    fb.putImage(fb32::Interface8880Point(xOffset, yOffset), m_image);
-}
+} // namespace fb32
 

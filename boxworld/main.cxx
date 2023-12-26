@@ -33,6 +33,7 @@
 #include <thread>
 
 #include "framebuffer8880.h"
+#include "image8880Font8x16.h"
 #include "joystick.h"
 #include "boxworld.h"
 
@@ -125,13 +126,14 @@ main(
 
     try
     {
+        Image8880Font8x16 font;
         Joystick js(joystick);
         FrameBuffer8880 fb(device);
         fb.clear(RGB8880{0, 0, 0});
 
         Boxworld boxworld;
         boxworld.init();
-        boxworld.draw(fb);
+        boxworld.draw(fb, font);
 
         //-----------------------------------------------------------------
 
@@ -146,7 +148,7 @@ main(
             else
             {
                 boxworld.update(js);
-                boxworld.draw(fb);
+                boxworld.draw(fb, font);
             }
 
             std::this_thread::sleep_for(250ms);

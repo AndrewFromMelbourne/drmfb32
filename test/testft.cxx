@@ -34,6 +34,7 @@
 #include <thread>
 
 #include "framebuffer8880.h"
+#include "image8880.h"
 #include "image8880FreeType.h"
 #include "point.h"
 
@@ -116,6 +117,14 @@ main(
 
     //---------------------------------------------------------------------
 
+    if (font.empty())
+    {
+        std::cerr << "Error: Font file must be specfied\n";
+        exit(EXIT_FAILURE);
+    }
+
+    //---------------------------------------------------------------------
+
     try
     {
         const RGB8880 black{0, 0, 0};
@@ -131,11 +140,36 @@ main(
 
         Image8880FreeType ft(font, 32);
 
-        ft.drawString(Image8880Point{0, 0}, "abcdefghijklmnopqrstuvwxyz 0123456789", white, image);
+        Interface8880Point p{0, 0};
+
+        p = ft.drawString(p, "abcdefghijklmnopqrstuvwxyz ", white, image);
+        p = ft.drawString(p, "0123456789", white, image);
+
+        p.set(0, p.y() + ft.getPixelHeight());
+
+        p = ft.drawString(p, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", white, image);
+
+        p.set(0, p.y() + ft.getPixelHeight());
+
+        p = ft.drawChar(p, '@', white, image);
+
+        p.set(0, p.y() + ft.getPixelHeight());
+
+        for (int j = 0 ; j < 16 ; ++j)
+        {
+            for (int i = 0 ; i < 16 ; ++i)
+            {
+                uint8_t c = static_cast<uint8_t>(i + (j * 16));
+                p.setX(i * ft.getPixelWidth());
+                ft.drawChar(p, c, white, image);
+            }
+
+            p.setY(p.y() + ft.getPixelHeight());
+        }
 
         //-----------------------------------------------------------------
 
-        fb.putImage(FB8880Point{0, 0}, image);
+        fb.putImage(Interface8880Point{0, 0}, image);
 
         //-----------------------------------------------------------------
 

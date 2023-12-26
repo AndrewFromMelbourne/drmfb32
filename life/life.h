@@ -60,14 +60,14 @@ public:
 
 private:
 
-    void updateCell(int16_t col, int16_t row, int16_t value);
-    void setCell( int16_t col, int16_t row);
-    void clearCell(int16_t col, int16_t row);
+    void updateCell(int col, int row, int value);
+    void setCell( int col, int row);
+    void clearCell(int col, int row);
     void createGosperGliderGun();
     void createSimkinGliderGun();
-    void iterateUpperRows(int16_t start, int16_t end);
-    void iterateLowerRows(int16_t start, int16_t end);
-    void iterateRows(int16_t start, int16_t end);
+    void iterateUpperRows(int start, int end);
+    void iterateLowerRows(int start, int end);
+    void iterateRows(int start, int end);
     void iterate();
 
     int32_t m_size;

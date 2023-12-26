@@ -36,8 +36,7 @@
 
 //-------------------------------------------------------------------------
 
-CpuStats::
-CpuStats()
+CpuStats::CpuStats()
 {
     std::ifstream ifs{"/proc/stat", std::ifstream::in};
 
@@ -73,8 +72,7 @@ CpuStats()
 //-------------------------------------------------------------------------
 
 uint32_t
-CpuStats::
-total() const
+CpuStats::total() const
 {
     return m_user +
            m_nice +
@@ -91,8 +89,7 @@ total() const
 //-------------------------------------------------------------------------
 
 CpuStats&
-CpuStats::
-operator-=(
+CpuStats::operator-=(
     const CpuStats& rhs)
 {
     m_user -= rhs.m_user;
@@ -121,16 +118,17 @@ operator-(
 
 //-------------------------------------------------------------------------
 
-CpuTrace::
-CpuTrace(
-    int16_t width,
-    int16_t traceHeight,
-    int16_t yPosition,
-    int16_t gridHeight)
+CpuTrace::CpuTrace(
+    int width,
+    int traceHeight,
+    int fontHeight,
+    int yPosition,
+    int gridHeight)
 :
     TraceStack(
         width,
         traceHeight,
+        fontHeight,
         100,
         yPosition,
         gridHeight,
@@ -147,9 +145,9 @@ CpuTrace(
 //-------------------------------------------------------------------------
 
 void
-CpuTrace::
-update(
-    time_t now)
+CpuTrace::update(
+    time_t now,
+    fb32::Interface8880Font& font)
 {
     CpuStats currentStats;
 
@@ -157,12 +155,11 @@ update(
 
     uint32_t totalCpu = diff.total();
 
-    int16_t user = (diff.user() * m_traceScale) / totalCpu;
-    int16_t nice = (diff.nice() * m_traceScale) / totalCpu;
-    int16_t system = (diff.system() * m_traceScale) / totalCpu;
+    int user = (diff.user() * m_traceScale) / totalCpu;
+    int nice = (diff.nice() * m_traceScale) / totalCpu;
+    int system = (diff.system() * m_traceScale) / totalCpu;
 
-    Trace::addData(std::vector<int16_t>{user, nice, system}, now);
+    Trace::addData(std::vector<int>{user, nice, system}, now);
 
     m_previousStats = currentStats;
 }
-

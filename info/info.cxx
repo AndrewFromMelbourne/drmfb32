@@ -48,6 +48,8 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include "image8880FreeType.h"
+
 #include "cpuTrace.h"
 #include "dynamicInfo.h"
 #include "framebuffer8880.h"
@@ -145,6 +147,7 @@ printUsage(
     os << "\n";
     os << "    --daemon,-D - start in the background as a daemon\n";
     os << "    --device,-d - dri device to use\n";
+    os << "    --font,-f - font file to use\n";
     os << "    --help,-h - print usage and exit\n";
     os << "    --pidfile,-p <pidfile> - create and lock PID file";
     os << " (if being run as a daemon)\n";
@@ -186,15 +189,17 @@ main(
 {
     std::string device = "";
     std::string program = basename(argv[0]);
+    std::string fontFile;
     char* pidfile = nullptr;
     bool isDaemon =  false;
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:hp:D";
+    static const char* sopts = "d:f:hp:D";
     static struct option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
+        { "font", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { "pidfile", required_argument, nullptr, 'p' },
         { "daemon", no_argument, nullptr, 'D' },
@@ -210,6 +215,12 @@ main(
         case 'd':
 
             device = optarg;
+
+            break;
+
+        case 'f':
+
+            fontFile = optarg;
 
             break;
 
@@ -239,6 +250,14 @@ main(
 
             break;
         }
+    }
+
+    //---------------------------------------------------------------------
+
+    if (fontFile.empty())
+    {
+        messageLog(isDaemon, program, LOG_ERR, "Font file must be specified");
+        ::exit(EXIT_FAILURE);
     }
 
     //---------------------------------------------------------------------
@@ -316,14 +335,16 @@ main(
 
         //-----------------------------------------------------------------
 
-        constexpr int16_t traceHeight = 100;
-        constexpr int16_t gridHeight = traceHeight / 5;
+        fb32::Image8880FreeType font(fontFile, 16);
+
+        constexpr int traceHeight = 100;
+        constexpr int gridHeight = traceHeight / 5;
 
         using Panels = std::vector<std::unique_ptr<Panel>>;
 
         Panels panels;
 
-        auto panelTop = [](const Panels& panels) -> int16_t
+        auto panelTop = [](const Panels& panels) -> int
         {
             if (panels.empty())
             {
@@ -337,27 +358,36 @@ main(
 
         panels.push_back(
             std::make_unique<DynamicInfo>(fb.getWidth(),
-                                           panelTop(panels)));
+                                          font.getPixelHeight(),
+                                          panelTop(panels)));
 
         panels.push_back(
             std::make_unique<CpuTrace>(fb.getWidth(),
-                                        traceHeight,
-                                        panelTop(panels),
-                                        gridHeight));
+                                       traceHeight,
+                                       font.getPixelHeight(),
+                                       panelTop(panels),
+                                       gridHeight));
 
         panels.push_back(
             std::make_unique<MemoryTrace>(fb.getWidth(),
-                                           traceHeight,
-                                           panelTop(panels),
-                                           gridHeight));
+                                          traceHeight,
+                                          font.getPixelHeight(),
+                                          panelTop(panels),
+                                          gridHeight));
 
         panels.push_back(
             std::make_unique<NetworkTrace>(fb.getWidth(),
                                            traceHeight,
+                                           font.getPixelHeight(),
                                            panelTop(panels),
                                            gridHeight));
 
         //-----------------------------------------------------------------
+
+        for (auto& panel : panels)
+        {
+            panel->init(font);
+        }
 
         std::this_thread::sleep_for(1s);
 
@@ -368,7 +398,7 @@ main(
 
             for (auto& panel : panels)
             {
-                panel->update(now_t);
+                panel->update(now_t, font);
 
                 if (display)
                 {
@@ -405,4 +435,3 @@ main(
 
     return 0 ;
 }
-

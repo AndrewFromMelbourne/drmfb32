@@ -44,8 +44,7 @@
 
 //-------------------------------------------------------------------------
 
-NetworkStats::
-NetworkStats()
+NetworkStats::NetworkStats()
 :
     m_tx{0},
     m_rx{0}
@@ -84,8 +83,7 @@ NetworkStats()
 //-------------------------------------------------------------------------
 
 NetworkStats&
-NetworkStats::
-operator-=(
+NetworkStats::operator-=(
     const NetworkStats& rhs)
 {
     m_tx -= rhs.m_tx;
@@ -106,16 +104,17 @@ operator-(
 
 //-------------------------------------------------------------------------
 
-NetworkTrace::
-NetworkTrace(
-    int16_t width,
-    int16_t traceHeight,
-    int16_t yPosition,
-    int16_t gridHeight)
+NetworkTrace::NetworkTrace(
+    int width,
+    int traceHeight,
+    int fontHeight,
+    int yPosition,
+    int gridHeight)
 :
     TraceGraph(
         width,
         traceHeight,
+        fontHeight,
         0,
         yPosition,
         gridHeight,
@@ -130,20 +129,19 @@ NetworkTrace(
 //-------------------------------------------------------------------------
 
 void
-NetworkTrace::
-update(
-    time_t now)
+NetworkTrace::update(
+    time_t now,
+    fb32::Interface8880Font& font)
 {
     NetworkStats currentStats;
 
     NetworkStats diff{currentStats - m_previousStats};
 
-    constexpr int16_t zero{0};
-    int16_t tx = std::max(zero, static_cast<int16_t>(diff.tx()));
-    int16_t rx = std::max(zero, static_cast<int16_t>(diff.rx()));
+    constexpr int zero{0};
+    int tx = std::max(zero, static_cast<int>(diff.tx()));
+    int rx = std::max(zero, static_cast<int>(diff.rx()));
 
-    Trace::addData(std::vector<int16_t>{tx, rx}, now);
+    Trace::addData(std::vector<int>{tx, rx}, now);
 
     m_previousStats = currentStats;
 }
-

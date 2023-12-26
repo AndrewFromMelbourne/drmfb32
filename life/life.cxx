@@ -56,9 +56,9 @@ Life::Life(int32_t size)
 
 void
 Life::updateCell(
-    int16_t col,
-    int16_t row,
-    int16_t value)
+    int col,
+    int row,
+    int value)
 {
     const uint32_t left = (col == 0) ? m_size - 1 :  col - 1;
     const uint32_t right = (col == m_size - 1) ?  0 : col + 1;
@@ -85,13 +85,13 @@ Life::updateCell(
 
 void
 Life::setCell(
-    int16_t col,
-    int16_t row)
+    int col,
+    int row)
 {
     updateCell(col, row, 1);
     m_cellsNext[col + (row * m_size)] |= aliveCellMask;
 
-    fb32::Image8880Point p{ col, row };
+    fb32::Interface8880Point p{ col, row };
     m_image.setPixel(p, m_cellColours[1]);
 }
 
@@ -99,13 +99,13 @@ Life::setCell(
 
 void
 Life::clearCell(
-    int16_t col,
-    int16_t row)
+    int col,
+    int row)
 {
     updateCell(col, row, -1);
     m_cellsNext[col + (row * m_size)] &= ~aliveCellMask;
 
-    fb32::Image8880Point p{ col, row };
+    fb32::Interface8880Point p{ col, row };
     m_image.setPixel(p, m_cellColours[0]);
 }
 
@@ -113,10 +113,10 @@ Life::clearCell(
 
 void
 Life::iterateUpperRows(
-   int16_t start,
-   int16_t end)
+   int start,
+   int end)
 {
-    int16_t diff = end - start;
+    int diff = end - start;
 
     iterateRows(start, start + (diff / 2));
 }
@@ -125,10 +125,10 @@ Life::iterateUpperRows(
 
 void
 Life::iterateLowerRows(
-   int16_t start,
-   int16_t end)
+   int start,
+   int end)
 {
-    int16_t diff = end - start;
+    int diff = end - start;
 
     iterateRows(start + (diff / 2), end);
 }
@@ -137,12 +137,12 @@ Life::iterateLowerRows(
 
 void
 Life::iterateRows(
-   int16_t start,
-   int16_t end)
+   int start,
+   int end)
 {
-    for (int16_t row = start ; row < end ; ++row)
+    for (int row = start ; row < end ; ++row)
     {
-        for (int16_t col = 0 ; col < m_size ; ++col)
+        for (int col = 0 ; col < m_size ; ++col)
         {
             auto cell = m_cells[col + (row * m_size)];
             auto neighbours = cell & ~aliveCellMask;
@@ -193,9 +193,9 @@ Life::init()
     std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
     m_image.clear(0);
 
-    for (int16_t row = 0 ; row < m_size ; ++row)
+    for (int row = 0 ; row < m_size ; ++row)
     {
-        for (int16_t col = 0 ; col < m_size ; ++col)
+        for (int col = 0 ; col < m_size ; ++col)
         {
             if (std::rand() > (RAND_MAX / 2))
             {
@@ -212,8 +212,8 @@ Life::init()
 void
 Life::createGosperGliderGun()
 {
-    const int16_t x = (m_size - 36) / 2;
-    const int16_t y = (m_size - 8) / 2;
+    const int x = (m_size - 36) / 2;
+    const int y = (m_size - 8) / 2;
 
     std::fill(m_cells.begin(), m_cells.end(), 0);
     std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
@@ -272,8 +272,8 @@ Life::createGosperGliderGun()
 void
 Life::createSimkinGliderGun()
 {
-    const int16_t x = (m_size - 30) / 2;
-    const int16_t y = (m_size - 20 ) / 2;
+    const int x = (m_size - 30) / 2;
+    const int y = (m_size - 20 ) / 2;
     m_image.clear(0);
 
     std::fill(m_cells.begin(), m_cells.end(), 0);
@@ -361,9 +361,9 @@ void
 Life::draw(
     fb32::FrameBuffer8880& fb)
 {
-    const int16_t xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
-    const int16_t yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
+    const int xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
+    const int yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
 
-    fb.putImage(fb32::FB8880Point(xOffset, yOffset), m_image);
+    fb.putImage(fb32::Interface8880Point(xOffset, yOffset), m_image);
 }
 

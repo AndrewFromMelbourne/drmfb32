@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2023 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,15 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
-#pragma once
-
-//-------------------------------------------------------------------------
-
-#include <cstdint>
-#include <string>
-
-#include "image8880.h"
-#include "point.h"
+#include "interface8880Font.h"
 
 //-------------------------------------------------------------------------
 
@@ -42,55 +34,16 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using FontPoint = Point<int>;
+Interface8880Font::Interface8880Font()
+{
+}
 
 //-------------------------------------------------------------------------
 
-class RGB8880;
-
-//-------------------------------------------------------------------------
-
-constexpr int sc_fontWidth{8};
-constexpr int sc_fontHeight{16};
-
-//-------------------------------------------------------------------------
-
-FontPoint
-drawBattery(
-    const Image8880Point& p,
-    int percent,
-    uint32_t rgb,
-    Interface8880& image);
-
-FontPoint
-drawChar(
-    const Image8880Point& p,
-    uint8_t c,
-    const RGB8880& rgb,
-    Interface8880& image);
-
-FontPoint
-drawChar(
-    const Image8880Point& p,
-    uint8_t c,
-    uint32_t rgb,
-    Interface8880& image);
-
-FontPoint
-drawString(
-    const Image8880Point& p,
-    const char* string,
-    const RGB8880& rgb,
-    Interface8880& image);
-
-FontPoint
-drawString(
-    const Image8880Point& p,
-    const std::string& string,
-    const RGB8880& rgb,
-    Interface8880& image);
+Interface8880Font::~Interface8880Font()
+{
+}
 
 //-------------------------------------------------------------------------
 
 } // namespace fb32
-

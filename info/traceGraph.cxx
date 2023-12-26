@@ -39,14 +39,14 @@
 
 //-------------------------------------------------------------------------
 
-TraceGraph::
-TraceGraph(
-    int16_t width,
-    int16_t traceHeight,
-    int16_t traceScale,
-    int16_t yPosition,
-    int16_t gridHeight,
-    int16_t traces,
+TraceGraph::TraceGraph(
+    int width,
+    int traceHeight,
+    int fontHeight,
+    int traceScale,
+    int yPosition,
+    int gridHeight,
+    int traces,
     const std::string& title,
     const std::vector<std::string>& traceNames,
     const std::vector<fb32::RGB8880>& traceColours)
@@ -54,6 +54,7 @@ TraceGraph(
     Trace(
         width,
         traceHeight,
+        fontHeight,
         traceScale,
         yPosition,
         gridHeight,
@@ -67,13 +68,12 @@ TraceGraph(
 //-------------------------------------------------------------------------
 
 void
-TraceGraph::
-draw()
+TraceGraph::draw()
 {
     boxFilled(
         getImage(),
-        fb32::Image8880Point(0, 0),
-        fb32::Image8880Point(getImage().getWidth() - 1, m_traceHeight),
+        fb32::Interface8880Point(0, 0),
+        fb32::Interface8880Point(getImage().getWidth() - 1, m_traceHeight),
         sc_background);
 
     //---------------------------------------------------------------------
@@ -109,15 +109,14 @@ draw()
         {
             auto i1 = i2 - 1;
 
-            int16_t y1 = (trace.m_values[i1] * m_traceHeight)/m_traceScale;
-            int16_t y2 = (trace.m_values[i2] * m_traceHeight)/m_traceScale;
+            int y1 = (trace.m_values[i1] * m_traceHeight)/m_traceScale;
+            int y2 = (trace.m_values[i2] * m_traceHeight)/m_traceScale;
 
             line(
                 getImage(),
-                fb32::Image8880Point(i1, m_traceHeight - y1),
-                fb32::Image8880Point(i2, m_traceHeight - y2),
+                fb32::Interface8880Point(i1, m_traceHeight - y1),
+                fb32::Interface8880Point(i2, m_traceHeight - y2),
                 trace.m_traceColour);
         }
     }
 }
-

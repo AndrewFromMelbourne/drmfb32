@@ -34,6 +34,7 @@
 
 #include "framebuffer8880.h"
 #include "image8880.h"
+#include "interface8880Font.h"
 
 //-------------------------------------------------------------------------
 
@@ -42,9 +43,9 @@ class Panel
 public:
 
     Panel(
-        int16_t width,
-        int16_t height,
-        int16_t yPosition)
+        int width,
+        int height,
+        int yPosition)
     :
         m_yPosition{yPosition},
         m_image{width, height}
@@ -53,17 +54,18 @@ public:
 
     virtual ~Panel() = default;
 
-    int16_t getBottom() const { return m_yPosition + m_image.getHeight(); }
+    int getBottom() const { return m_yPosition + m_image.getHeight(); }
 
     fb32::Image8880& getImage() { return m_image; }
     const fb32::Image8880& getImage() const { return m_image; }
 
     void show(const fb32::FrameBuffer8880& fb) const;
-    virtual void update(time_t now) = 0;
+    virtual void init(fb32::Interface8880Font& font) = 0;
+    virtual void update(time_t now, fb32::Interface8880Font& font) = 0;
 
 private:
 
-    int16_t m_yPosition;
+    int m_yPosition;
     fb32::Image8880 m_image;
 };
 

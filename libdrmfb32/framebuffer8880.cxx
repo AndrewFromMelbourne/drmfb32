@@ -152,7 +152,7 @@ findDrmDevice()
 
 //=========================================================================
 
-fb32::FrameBuffer8880:: FrameBuffer8880(
+fb32::FrameBuffer8880::FrameBuffer8880(
     const std::string& device)
 :
     m_width{0},
@@ -301,7 +301,7 @@ fb32::FrameBuffer8880:: FrameBuffer8880(
 
 //-------------------------------------------------------------------------
 
-fb32::FrameBuffer8880:: ~FrameBuffer8880()
+fb32::FrameBuffer8880::~FrameBuffer8880()
 {
     ::munmap(m_fbp, m_length);
     drmModeRmFB(m_fd.fd(), m_fbId);
@@ -326,7 +326,7 @@ fb32::FrameBuffer8880:: ~FrameBuffer8880()
 //-------------------------------------------------------------------------
 
 void
-fb32::FrameBuffer8880:: clear(
+fb32::FrameBuffer8880::clear(
     uint32_t rgb)
 {
     std::fill(m_fbp, m_fbp + (m_length / bytesPerPixel), rgb);
@@ -335,8 +335,8 @@ fb32::FrameBuffer8880:: clear(
 //-------------------------------------------------------------------------
 
 bool
-fb32::FrameBuffer8880:: setPixel(
-    const FB8880Point& p,
+fb32::FrameBuffer8880::setPixel(
+    const Interface8880Point& p,
     uint32_t rgb)
 {
     bool isValid{validPixel(p)};
@@ -352,8 +352,8 @@ fb32::FrameBuffer8880:: setPixel(
 //-------------------------------------------------------------------------
 
 std::pair<bool, fb32::RGB8880>
-fb32::FrameBuffer8880:: getPixelRGB(
-    const FB8880Point& p) const
+fb32::FrameBuffer8880::getPixelRGB(
+    const Interface8880Point& p) const
 {
     bool isValid{validPixel(p)};
     RGB8880 rgb{0, 0, 0};
@@ -369,8 +369,8 @@ fb32::FrameBuffer8880:: getPixelRGB(
 //-------------------------------------------------------------------------
 
 std::pair<bool, uint32_t>
-fb32::FrameBuffer8880:: getPixel(
-    const FB8880Point& p) const
+fb32::FrameBuffer8880::getPixel(
+    const Interface8880Point& p) const
 {
     bool isValid{validPixel(p)};
     uint32_t rgb{0};
@@ -386,11 +386,11 @@ fb32::FrameBuffer8880:: getPixel(
 //-------------------------------------------------------------------------
 
 bool
-fb32::FrameBuffer8880:: putImage(
-    const FB8880Point& p_left,
+fb32::FrameBuffer8880::putImage(
+    const Interface8880Point& p_left,
     const Image8880& image) const
 {
-    FB8880Point p{ p_left.x(), p_left.y() };
+    Interface8880Point p{ p_left.x(), p_left.y() };
 
     if ((p.x() < 0) ||
         ((p.x() + image.getWidth()) > static_cast<int32_t>(m_width)))
@@ -419,8 +419,8 @@ fb32::FrameBuffer8880:: putImage(
 //-------------------------------------------------------------------------
 
 bool
-fb32::FrameBuffer8880:: putImagePartial(
-    const FB8880Point& p,
+fb32::FrameBuffer8880::putImagePartial(
+    const Interface8880Point& p,
     const Image8880& image) const
 {
     auto x = p.x();
@@ -480,8 +480,8 @@ fb32::FrameBuffer8880:: putImagePartial(
 //-------------------------------------------------------------------------
 
 size_t
-fb32::FrameBuffer8880:: offset(
-    const FB8880Point& p) const
+fb32::FrameBuffer8880::offset(
+    const Interface8880Point& p) const
 {
     return p.x() + p.y() * m_lineLengthPixels;
 }

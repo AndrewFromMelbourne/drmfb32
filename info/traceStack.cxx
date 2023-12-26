@@ -37,14 +37,14 @@
 
 //-------------------------------------------------------------------------
 
-TraceStack::
-TraceStack(
-    int16_t width,
-    int16_t traceHeight,
-    int16_t traceScale,
-    int16_t yPosition,
-    int16_t gridHeight,
-    int16_t traces,
+TraceStack::TraceStack(
+    int width,
+    int traceHeight,
+    int fontHeight,
+    int traceScale,
+    int yPosition,
+    int gridHeight,
+    int traces,
     const std::string& title,
     const std::vector<std::string>& traceNames,
     const std::vector<fb32::RGB8880>& traceColours)
@@ -52,6 +52,7 @@ TraceStack(
     Trace(
         width,
         traceHeight,
+        fontHeight,
         traceScale,
         yPosition,
         gridHeight,
@@ -65,30 +66,29 @@ TraceStack(
 //-------------------------------------------------------------------------
 
 void
-TraceStack::
-draw()
+TraceStack::draw()
 {
-    for (int16_t i = 0 ; i < m_columns ; ++i)
+    for (int i = 0 ; i < m_columns ; ++i)
     {
-        int16_t j = m_traceHeight - 1;
+        int j = m_traceHeight - 1;
 
         for (auto& trace : m_traceData)
         {
-            int16_t value = (trace.m_values[i] * m_traceHeight)
+            int value = (trace.m_values[i] * m_traceHeight)
                           / m_traceScale;
 
-            for (int16_t v = 0 ; v < value ; ++v)
+            for (int v = 0 ; v < value ; ++v)
             {
                 if (((j % m_gridHeight) == 0) || (m_time[i] == 0))
                 {
                     getImage().setPixelRGB(
-                        fb32::Image8880Point{i, j--},
+                        fb32::Interface8880Point{i, j--},
                         trace.m_gridColour);
                 }
                 else
                 {
                     getImage().setPixelRGB(
-                        fb32::Image8880Point{i, j--},
+                        fb32::Interface8880Point{i, j--},
                         trace.m_traceColour);
                 }
             }
@@ -99,16 +99,15 @@ draw()
             if (((j % m_gridHeight) == 0) || (m_time[i] == 0))
             {
                 getImage().setPixelRGB(
-                    fb32::Image8880Point{i, j},
+                    fb32::Interface8880Point{i, j},
                     sc_gridColour);
             }
             else
             {
                 getImage().setPixelRGB(
-                    fb32::Image8880Point{i, j},
+                    fb32::Interface8880Point{i, j},
                     sc_background);
             }
         }
     }
 }
-

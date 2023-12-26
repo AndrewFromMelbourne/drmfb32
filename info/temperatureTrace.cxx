@@ -37,16 +37,17 @@
 
 //-------------------------------------------------------------------------
 
-TemperatureTrace::
-TemperatureTrace(
-    int16_t width,
-    int16_t traceHeight,
-    int16_t yPosition,
-    int16_t gridHeight)
+TemperatureTrace::TemperatureTrace(
+    int width,
+    int traceHeight,
+    int fontHeight,
+    int yPosition,
+    int gridHeight)
 :
     TraceGraph(
         width,
         traceHeight,
+        fontHeight,
         100,
         yPosition,
         gridHeight,
@@ -60,12 +61,12 @@ TemperatureTrace(
 //-------------------------------------------------------------------------
 
 void
-TemperatureTrace::
-update(
-    time_t now)
+TemperatureTrace::update(
+    time_t now,
+    fb32::Interface8880Font& font)
 {
-    int16_t temperature = inf::getTemperature();
+    int temperature = inf::getTemperature();
 
-    Trace::addData(std::vector<int16_t>{temperature}, now);
+    Trace::addData(std::vector<int>{temperature}, now);
 }
 

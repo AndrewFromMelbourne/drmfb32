@@ -135,7 +135,8 @@ QoiHeader::QoiHeader(
 
 //-------------------------------------------------------------------------
 
-void checkFooter(
+void
+checkFooter(
     const std::array<uint8_t, QOI_FOOTER_SIZE>& data)
 {
     const std::array<uint8_t, QOI_FOOTER_SIZE> expected{
@@ -160,7 +161,9 @@ struct QoiRGBA
 
 //-------------------------------------------------------------------------
 
-int rgbaHashQoi(const QoiRGBA& rgba)
+int
+rgbaHashQoi(
+    const QoiRGBA& rgba)
 {
     return (rgba.r * 3 + rgba.g * 5 + rgba.b * 7 + rgba.a * 11) % 64;
 }
@@ -259,11 +262,11 @@ decodeQoi(
             }
         }
 
-        auto x = static_cast<int>(i % header.getWidth());
-        auto y = static_cast<int>(i / header.getWidth());
+        int x = i % header.getWidth();
+        int y = i / header.getWidth();
 
         fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
-        image.setPixelRGB(fb32::Image8880Point{x, y}, rgb);
+        image.setPixelRGB(fb32::Interface8880Point{x, y}, rgb);
     }
 
     return image;

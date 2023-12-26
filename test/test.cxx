@@ -37,7 +37,7 @@
 
 #include "framebuffer8880.h"
 #include "image8880.h"
-#include "image8880Font.h"
+#include "image8880Font8x16.h"
 #include "image8880Graphics.h"
 #include "point.h"
 
@@ -141,17 +141,17 @@ main(
         Image8880 image{48, 48};
         image.clear(red);
 
-        auto rgb = image.getPixelRGB(Image8880Point(0,0));
+        auto rgb = image.getPixelRGB(Interface8880Point(0,0));
 
         TEST((rgb.first == true), "Image8880::getPixelRGB()");
         TEST((rgb.second == red), "Image8880::getPixelRGB()");
 
         line(image,
-             Image8880Point(0,0),
-             Image8880Point(47,47),
+             Interface8880Point(0,0),
+             Interface8880Point(47,47),
              green);
 
-        FB8880Point imageLocation
+        Interface8880Point imageLocation
         {
             (fb.getWidth() - image.getWidth()) / 2,
             (fb.getHeight() - image.getHeight()) / 2
@@ -175,14 +175,16 @@ main(
         Image8880 textImage(168, 16);
         textImage.clear(darkBlue);
 
-        FB8880Point textLocation
+        Interface8880Point textLocation
         {
             (fb.getWidth() - textImage.getWidth()) / 2,
             (fb.getHeight() - textImage.getHeight()) / 3
         };
 
-        drawString(
-            FontPoint{0, 0},
+        Image8880Font8x16 font;
+
+        font.drawString(
+            Interface8880Point{0, 0},
             "This is a test string",
             white,
             textImage);
