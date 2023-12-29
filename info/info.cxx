@@ -389,6 +389,8 @@ main(
             panel->init(font);
         }
 
+        //-----------------------------------------------------------------
+
         std::this_thread::sleep_for(1s);
 
         while (run)
