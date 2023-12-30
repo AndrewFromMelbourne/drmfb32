@@ -84,8 +84,22 @@ public:
     virtual Interface8880Point
     drawString(
         const Interface8880Point& p,
+        const char* string,
+        uint32_t rgb,
+        Interface8880& image) = 0;
+
+    virtual Interface8880Point
+    drawString(
+        const Interface8880Point& p,
         const std::string& string,
         const RGB8880& rgb,
+        Interface8880& image) = 0;
+
+    virtual Interface8880Point
+    drawString(
+        const Interface8880Point& p,
+        const std::string& string,
+        uint32_t rgb,
         Interface8880& image) = 0;
 };
 

@@ -173,6 +173,18 @@ Image8880FreeType::drawString(
 Interface8880Point
 Image8880FreeType::drawString(
     const Interface8880Point& p,
+    const char* string,
+    uint32_t rgb,
+    Interface8880& image)
+{
+    return drawString(p, string, RGB8880(rgb), image);
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+Image8880FreeType::drawString(
+    const Interface8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
     Interface8880& image)
@@ -236,6 +248,18 @@ Image8880FreeType::drawString(
     position.setY(position.y() - (m_face->size->metrics.ascender >> 6));
 
     return position;
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+Image8880FreeType::drawString(
+    const Interface8880Point& p,
+    const std::string& string,
+    uint32_t rgb,
+    Interface8880& image)
+{
+    return drawString(p, string, RGB8880(rgb), image);
 }
 
 //-------------------------------------------------------------------------

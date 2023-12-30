@@ -4745,8 +4745,32 @@ Image8880Font8x16::drawString(
 Interface8880Point
 Image8880Font8x16::drawString(
     const Interface8880Point& p,
+    const char* string,
+    uint32_t rgb,
+    Interface8880& image)
+{
+    return drawString(p, std::string(string), rgb, image);
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+Image8880Font8x16::drawString(
+    const Interface8880Point& p,
     const std::string& string,
     const RGB8880& rgb,
+    Interface8880& image)
+{
+    return drawString(p, string, rgb.get8880(), image);
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+Image8880Font8x16::drawString(
+    const Interface8880Point& p,
+    const std::string& string,
+    uint32_t rgb,
     Interface8880& image)
 {
     Interface8880Point position{p};
