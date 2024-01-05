@@ -64,8 +64,7 @@ NetworkStats::NetworkStats()
         {
             int family = ifa->ifa_addr->sa_family;
 
-            if ((family == AF_PACKET) &&
-                (std::string(ifa->ifa_name) != "lo"))
+            if ((family == AF_PACKET) and (std::string(ifa->ifa_name) != "lo"))
             {
                 rtnl_link_stats* stats =
                     static_cast<rtnl_link_stats*>(ifa->ifa_data);

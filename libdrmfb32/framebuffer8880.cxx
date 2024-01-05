@@ -392,13 +392,13 @@ fb32::FrameBuffer8880::putImage(
 {
     Interface8880Point p{ p_left.x(), p_left.y() };
 
-    if ((p.x() < 0) ||
+    if ((p.x() < 0) or
         ((p.x() + image.getWidth()) > static_cast<int32_t>(m_width)))
     {
         return putImagePartial(p, image);
     }
 
-    if ((p.y() < 0) ||
+    if ((p.y() < 0) or
         ((p.y() + image.getHeight()) > static_cast<int32_t>(m_height)))
     {
         return putImagePartial(p, image);

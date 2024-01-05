@@ -80,7 +80,7 @@ drm::DrmDevices::~DrmDevices()
 drmDevicePtr
 drm::DrmDevices::getDevice(int index) const
 {
-    if (index < 0 || index >= m_deviceCount)
+    if (index < 0 or index >= m_deviceCount)
     {
         return nullptr;
     }
