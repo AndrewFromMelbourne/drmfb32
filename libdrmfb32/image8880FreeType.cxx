@@ -284,12 +284,12 @@ Image8880FreeType::drawChar(
                                        static_cast<int>(j + yOffset)};
                 auto background = image.getPixelRGB(p);
 
-                if (background.first)
+                if (background)
                 {
                     image.setPixelRGB(p,
                                       RGB8880::blend(row[i],
                                                      rgb,
-                                                     background.second));
+                                                     *background));
                 }
             }
         }

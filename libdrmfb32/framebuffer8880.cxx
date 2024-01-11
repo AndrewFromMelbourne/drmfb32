@@ -351,36 +351,30 @@ fb32::FrameBuffer8880::setPixel(
 
 //-------------------------------------------------------------------------
 
-std::pair<bool, fb32::RGB8880>
+std::optional<fb32::RGB8880>
 fb32::FrameBuffer8880::getPixelRGB(
     const Interface8880Point& p) const
 {
-    bool isValid{validPixel(p)};
-    RGB8880 rgb{0, 0, 0};
-
-    if (isValid)
+    if (validPixel(p))
     {
-        rgb.set8880(m_fbp[offset(p)]);
+        return RGB8880(m_fbp[offset(p)]);
     }
 
-    return std::make_pair(isValid, rgb);
+    return {};
 }
 
 //-------------------------------------------------------------------------
 
-std::pair<bool, uint32_t>
+std::optional<uint32_t>
 fb32::FrameBuffer8880::getPixel(
     const Interface8880Point& p) const
 {
-    bool isValid{validPixel(p)};
-    uint32_t rgb{0};
-
-    if (isValid)
+    if (validPixel(p))
     {
-        rgb = m_fbp[offset(p)];
+        return m_fbp[offset(p)];
     }
 
-    return std::make_pair(isValid, rgb);
+    return {};
 }
 
 //-------------------------------------------------------------------------

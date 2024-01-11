@@ -31,7 +31,6 @@
 
 #include <cstdint>
 #include <string>
-#include <utility>
 
 #include "drmMode.h"
 #include "point.h"
@@ -88,8 +87,8 @@ public:
 
     bool setPixel(const Interface8880Point& p, uint32_t rgb) override;
 
-    std::pair<bool, RGB8880> getPixelRGB(const Interface8880Point& p) const override;
-    std::pair<bool, uint32_t> getPixel(const Interface8880Point& p) const override;
+    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
+    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
 
     bool putImage(const Interface8880Point& p, const Image8880& image) const;
 

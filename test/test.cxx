@@ -143,8 +143,8 @@ main(
 
         auto rgb = image.getPixelRGB(Interface8880Point(0,0));
 
-        TEST((rgb.first == true), "Image8880::getPixelRGB()");
-        TEST((rgb.second == red), "Image8880::getPixelRGB()");
+        TEST((rgb), "Image8880::getPixelRGB()");
+        TEST((*rgb == red), "Image8880::getPixelRGB()");
 
         line(image,
              Interface8880Point(0,0),
@@ -161,8 +161,8 @@ main(
 
         rgb = fb.getPixelRGB(imageLocation);
 
-        TEST((rgb.first == true), "FrameBuffer8880::getPixelRGB()");
-        TEST((rgb.second == green), "FrameBuffer8880::getPixelRGB()");
+        TEST((rgb), "FrameBuffer8880::getPixelRGB()");
+        TEST((*rgb == green), "FrameBuffer8880::getPixelRGB()");
 
         //-----------------------------------------------------------------
 

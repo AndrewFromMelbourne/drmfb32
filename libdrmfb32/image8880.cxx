@@ -124,36 +124,30 @@ fb32::Image8880::setPixel(
 
 //-------------------------------------------------------------------------
 
-std::pair<bool, fb32::RGB8880>
+std::optional<fb32::RGB8880>
 fb32::Image8880::getPixelRGB(
     const Interface8880Point& p) const
 {
-    bool isValid{validPixel(p)};
-    RGB8880 rgb{0, 0, 0};
-
-    if (isValid)
+    if (validPixel(p))
     {
-        rgb.set8880(m_buffer[offset(p)]);
+        return RGB8880(m_buffer[offset(p)]);
     }
 
-    return std::make_pair(isValid, rgb);
+    return {};
 }
 
 //-------------------------------------------------------------------------
 
-std::pair<bool, uint32_t>
+std::optional<uint32_t>
 fb32::Image8880::getPixel(
     const Interface8880Point& p) const
 {
-    bool isValid{validPixel(p)};
-    uint32_t rgb{0};
-
-    if (isValid)
+    if (validPixel(p))
     {
-        rgb = m_buffer[offset(p)];
+        return m_buffer[offset(p)];
     }
 
-    return std::make_pair(isValid, rgb);
+    return {};
 }
 
 //-------------------------------------------------------------------------
@@ -162,9 +156,11 @@ const uint32_t*
 fb32::Image8880::getRow(
     int y) const
 {
-    if (validPixel(Interface8880Point{0, y}))
+    const Interface8880Point p{0, y};
+
+    if (validPixel(p))
     {
-        return  m_buffer.data() + (y * m_width) + (m_width * m_height * m_frame);
+        return  m_buffer.data() + offset(p);
     }
     else
     {

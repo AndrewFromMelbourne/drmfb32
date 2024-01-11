@@ -30,7 +30,7 @@
 //-------------------------------------------------------------------------
 
 #include <cstdint>
-#include <utility>
+#include <optional>
 
 #include "point.h"
 #include "rgb8880.h"
@@ -65,8 +65,8 @@ public:
 
     virtual bool setPixel(const Interface8880Point& p, uint32_t rgb) = 0;
 
-    virtual std::pair<bool, RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
-    virtual std::pair<bool, uint32_t> getPixel(const Interface8880Point& p) const = 0;
+    virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
+    virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
 };
 
 //-------------------------------------------------------------------------
