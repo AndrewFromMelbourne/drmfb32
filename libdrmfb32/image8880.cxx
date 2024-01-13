@@ -128,12 +128,12 @@ std::optional<fb32::RGB8880>
 fb32::Image8880::getPixelRGB(
     const Interface8880Point& p) const
 {
-    if (validPixel(p))
+    if (not validPixel(p))
     {
-        return RGB8880(m_buffer[offset(p)]);
+        return {};
     }
 
-    return {};
+    return RGB8880(m_buffer[offset(p)]);
 }
 
 //-------------------------------------------------------------------------
@@ -142,12 +142,12 @@ std::optional<uint32_t>
 fb32::Image8880::getPixel(
     const Interface8880Point& p) const
 {
-    if (validPixel(p))
+    if (not validPixel(p))
     {
-        return m_buffer[offset(p)];
+        return {};
     }
 
-    return {};
+    return m_buffer[offset(p)];
 }
 
 //-------------------------------------------------------------------------

@@ -355,12 +355,12 @@ std::optional<fb32::RGB8880>
 fb32::FrameBuffer8880::getPixelRGB(
     const Interface8880Point& p) const
 {
-    if (validPixel(p))
+    if (not validPixel(p))
     {
-        return RGB8880(m_fbp[offset(p)]);
+        return {};
     }
 
-    return {};
+    return RGB8880(m_fbp[offset(p)]);
 }
 
 //-------------------------------------------------------------------------
@@ -369,12 +369,12 @@ std::optional<uint32_t>
 fb32::FrameBuffer8880::getPixel(
     const Interface8880Point& p) const
 {
-    if (validPixel(p))
+    if (not validPixel(p))
     {
-        return m_fbp[offset(p)];
+        return {};
     }
 
-    return {};
+    return m_fbp[offset(p)];
 }
 
 //-------------------------------------------------------------------------
@@ -387,13 +387,13 @@ fb32::FrameBuffer8880::putImage(
     Interface8880Point p{ p_left.x(), p_left.y() };
 
     if ((p.x() < 0) or
-        ((p.x() + image.getWidth()) > static_cast<int32_t>(m_width)))
+        ((p.x() + image.getWidth()) > m_width))
     {
         return putImagePartial(p, image);
     }
 
     if ((p.y() < 0) or
-        ((p.y() + image.getHeight()) > static_cast<int32_t>(m_height)))
+        ((p.y() + image.getHeight()) > m_height))
     {
         return putImagePartial(p, image);
     }
@@ -431,8 +431,7 @@ fb32::FrameBuffer8880::putImagePartial(
         x = 0;
     }
 
-    if ((x - xStart + image.getWidth()) >
-        static_cast<int32_t>(m_width))
+    if ((x - xStart + image.getWidth()) > m_width)
     {
         xEnd = m_height - 1 - (x - xStart);
     }
@@ -443,8 +442,7 @@ fb32::FrameBuffer8880::putImagePartial(
         y = 0;
     }
 
-    if ((y - yStart + image.getHeight()) >
-        static_cast<int32_t>(m_height))
+    if ((y - yStart + image.getHeight()) > m_height)
     {
         yEnd = m_height - 1 - (y - yStart);
     }
