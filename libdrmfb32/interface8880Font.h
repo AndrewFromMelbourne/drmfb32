@@ -29,6 +29,7 @@
 
 //-------------------------------------------------------------------------
 
+#include <optional>
 #include <string>
 
 #include "interface8880.h"
@@ -49,6 +50,11 @@ class Interface8880Font
 {
 public:
 
+    enum class CharacterCode
+    {
+        DEGREE_SYMBOL
+    };
+
     Interface8880Font();
     virtual ~Interface8880Font() = 0;
 
@@ -59,6 +65,8 @@ public:
 
     virtual int getPixelHeight() const = 0;
     virtual int getPixelWidth() const = 0;
+
+    virtual std::optional<char> getCharacterCode(CharacterCode code) const = 0;
 
     virtual Interface8880Point
     drawChar(

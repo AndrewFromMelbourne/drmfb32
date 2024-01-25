@@ -4658,18 +4658,6 @@ constexpr uint8_t font[256][sc_fontHeight] =
 
 //-------------------------------------------------------------------------
 
-Image8880Font8x16::Image8880Font8x16()
-{
-}
-
-//-------------------------------------------------------------------------
-
-Image8880Font8x16::~Image8880Font8x16()
-{
-}
-
-//-------------------------------------------------------------------------
-
 int
 Image8880Font8x16::getPixelHeight() const
 {
@@ -4682,6 +4670,23 @@ int
 Image8880Font8x16::getPixelWidth() const
 {
     return sc_fontWidth;
+}
+
+//-------------------------------------------------------------------------
+
+std::optional<char>
+Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const
+{
+    switch (code)
+    {
+        using enum Interface8880Font::CharacterCode;
+
+    case DEGREE_SYMBOL:
+
+        return char(0xF8);
+    }
+
+    return {};
 }
 
 //-------------------------------------------------------------------------

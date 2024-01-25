@@ -142,12 +142,15 @@ DynamicInfo::drawTemperature(
                                m_foreground,
                                getImage());
 
-    char degreeSymbol = 0xB0;
+    auto degreeSymbol = font.getCharacterCode(fb32::Interface8880Font::CharacterCode::DEGREE_SYMBOL);
 
-    position = font.drawChar(position,
-                             degreeSymbol,
-                             m_foreground,
-                             getImage());
+    if (degreeSymbol)
+    {
+        position = font.drawChar(position,
+                                *degreeSymbol,
+                                m_foreground,
+                                getImage());
+    }
 
     position = font.drawString(position,
                                "C ",

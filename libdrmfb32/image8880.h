@@ -51,12 +51,14 @@ class Image8880
 {
 public:
 
-    Image8880();
+    Image8880() = default;
     Image8880(int width, int height, uint8_t numberOfFrames = 1);
     Image8880(int width,
               int height,
               const std::vector<uint32_t>& buffer,
               uint8_t numberOfFrames = 1);
+
+    ~Image8880() override = default;
 
     Image8880(const Image8880&) = default;
     Image8880& operator=(const Image8880&) = default;
@@ -99,13 +101,13 @@ private:
 
     size_t offset(const Interface8880Point& p) const;
 
-    int m_width;
-    int m_height;
+    int m_width{};
+    int m_height{};
 
-    uint8_t m_frame;
-    uint8_t m_numberOfFrames;
+    uint8_t m_frame{};
+    uint8_t m_numberOfFrames{};
 
-    std::vector<uint32_t> m_buffer;
+    std::vector<uint32_t> m_buffer{};
 };
 
 //-------------------------------------------------------------------------

@@ -37,16 +37,6 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-Image8880FreeType::Image8880FreeType()
-:
-    m_pixelSize{0},
-    m_face(),
-    m_library()
-{
-}
-
-//-------------------------------------------------------------------------
-
 Image8880FreeType::Image8880FreeType(
     const std::string& fontFile,
     int pixelSize)
@@ -104,6 +94,23 @@ int
 Image8880FreeType::getPixelWidth() const
 {
     return m_face->size->metrics.max_advance >> 6;
+}
+
+//-------------------------------------------------------------------------
+
+std::optional<char>
+Image8880FreeType::getCharacterCode(Interface8880Font::CharacterCode code) const
+{
+    switch (code)
+    {
+        using enum Interface8880Font::CharacterCode;
+
+    case DEGREE_SYMBOL:
+
+        return char(0xB0);
+    }
+
+    return {};
 }
 
 //-------------------------------------------------------------------------

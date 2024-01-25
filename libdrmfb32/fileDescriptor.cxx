@@ -31,15 +31,6 @@
 
 //-------------------------------------------------------------------------
 
-fb32::FileDescriptor:: FileDescriptor()
-:
-    m_fd{-1},
-    m_close_if{[](int){ return false; }}
-{
-}
-
-//-------------------------------------------------------------------------
-
 fb32::FileDescriptor:: FileDescriptor(
     int fd,
     CloseIfFunction close_if)

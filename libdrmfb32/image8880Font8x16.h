@@ -57,8 +57,8 @@ class Image8880Font8x16
 {
 public:
 
-    Image8880Font8x16();
-    ~Image8880Font8x16() override;
+    Image8880Font8x16() = default;
+    ~Image8880Font8x16() override = default;
 
     Image8880Font8x16(const Image8880Font8x16&) = default;
     Image8880Font8x16(Image8880Font8x16&&) = default;
@@ -67,6 +67,8 @@ public:
 
     int getPixelHeight() const override;
     int getPixelWidth() const override;
+
+    std::optional<char> getCharacterCode(CharacterCode code) const override;
 
     Interface8880Point
     drawChar(

@@ -80,8 +80,8 @@ public:
 
 private:
 
-    int m_deviceCount;
-    std::array<drmDevicePtr, MaxDrmNodes> m_devices;
+    int m_deviceCount{};
+    std::array<drmDevicePtr, MaxDrmNodes> m_devices{};
 };
 
 //-------------------------------------------------------------------------

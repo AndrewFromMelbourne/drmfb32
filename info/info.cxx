@@ -254,14 +254,6 @@ main(
 
     //---------------------------------------------------------------------
 
-    if (fontFile.empty())
-    {
-        messageLog(isDaemon, program, LOG_ERR, "Font file must be specified");
-        ::exit(EXIT_FAILURE);
-    }
-
-    //---------------------------------------------------------------------
-
     struct pidfh* pfh = nullptr;
 
     if (isDaemon)
@@ -305,9 +297,7 @@ main(
 
     //---------------------------------------------------------------------
 
-    constexpr std::array<int, 4> signals = { SIGINT, SIGTERM, SIGUSR1, SIGUSR2 };
-
-    for (auto signal : signals)
+    for (auto signal : { SIGINT, SIGTERM, SIGUSR1, SIGUSR2 })
     {
         if (std::signal(signal, signalHandler) == SIG_ERR)
         {
@@ -327,6 +317,22 @@ main(
 
     //---------------------------------------------------------------------
 
+    std::unique_ptr<fb32::Interface8880Font> font{std::make_unique<fb32::Image8880Font8x16>()};
+
+    if (not fontFile.empty())
+    {
+        try
+        {
+            font = std::make_unique<fb32::Image8880FreeType>(fontFile, 16);
+        }
+            catch (std::exception& error)
+        {
+            std::cerr << "Warning: " << error.what() << "\n";
+        }
+    }
+
+    //---------------------------------------------------------------------
+
     try
     {
         fb32::FrameBuffer8880 fb(device);
@@ -334,8 +340,6 @@ main(
         fb.clear(fb32::RGB8880{0, 0, 0});
 
         //-----------------------------------------------------------------
-
-        fb32::Image8880FreeType font(fontFile, 16);
 
         constexpr int traceHeight = 100;
         constexpr int gridHeight = traceHeight / 5;
@@ -358,27 +362,27 @@ main(
 
         panels.push_back(
             std::make_unique<DynamicInfo>(fb.getWidth(),
-                                          font.getPixelHeight(),
+                                          font->getPixelHeight(),
                                           panelTop(panels)));
 
         panels.push_back(
             std::make_unique<CpuTrace>(fb.getWidth(),
                                        traceHeight,
-                                       font.getPixelHeight(),
+                                       font->getPixelHeight(),
                                        panelTop(panels),
                                        gridHeight));
 
         panels.push_back(
             std::make_unique<MemoryTrace>(fb.getWidth(),
                                           traceHeight,
-                                          font.getPixelHeight(),
+                                          font->getPixelHeight(),
                                           panelTop(panels),
                                           gridHeight));
 
         panels.push_back(
             std::make_unique<NetworkTrace>(fb.getWidth(),
                                            traceHeight,
-                                           font.getPixelHeight(),
+                                           font->getPixelHeight(),
                                            panelTop(panels),
                                            gridHeight));
 
@@ -386,7 +390,7 @@ main(
 
         for (auto& panel : panels)
         {
-            panel->init(font);
+            panel->init(*font);
         }
 
         //-----------------------------------------------------------------
@@ -400,7 +404,7 @@ main(
 
             for (auto& panel : panels)
             {
-                panel->update(now_t, font);
+                panel->update(now_t, *font);
 
                 if (display)
                 {

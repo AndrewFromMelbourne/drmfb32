@@ -60,7 +60,7 @@ class Image8880FreeType
 {
 public:
 
-    Image8880FreeType();
+    Image8880FreeType() = default;
     Image8880FreeType(const std::string& fontFile, int pixelSize);
     ~Image8880FreeType() override;
 
@@ -74,6 +74,8 @@ public:
 
 	int getPixelHeight() const override;
     int getPixelWidth() const override;
+
+    std::optional<char> getCharacterCode(CharacterCode code) const override;
 
     int getPixelSize() const
 	{
@@ -135,10 +137,10 @@ private:
         const RGB8880& rgb,
         Interface8880& image);
 
-    int m_pixelSize;
+    int m_pixelSize{};
 
-    FT_Face m_face;
-    FT_Library m_library;
+    FT_Face m_face{};
+    FT_Library m_library{};
 };
 
 //-------------------------------------------------------------------------
