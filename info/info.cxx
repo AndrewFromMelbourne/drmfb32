@@ -65,8 +65,8 @@ using namespace std::chrono_literals;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
-volatile static std::sig_atomic_t display = 1;
+volatile static std::sig_atomic_t run{1};
+volatile static std::sig_atomic_t display{1};
 }
 
 //-------------------------------------------------------------------------
@@ -187,16 +187,16 @@ main(
     int argc,
     char *argv[])
 {
-    std::string device = "";
-    std::string program = basename(argv[0]);
-    std::string fontFile;
-    char* pidfile = nullptr;
-    bool isDaemon =  false;
+    std::string device{};
+    std::string program{basename(argv[0])};
+    std::string fontFile{};
+    char* pidfile{};
+    bool isDaemon{false};
 
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:f:hp:D";
-    static struct option lopts[] =
+    static option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "font", required_argument, nullptr, 'f' },
@@ -206,7 +206,7 @@ main(
         { nullptr, no_argument, nullptr, 0 }
     };
 
-    int opt = 0;
+    int opt{};
 
     while ((opt = ::getopt_long(argc, argv, sopts, lopts, nullptr)) != -1)
     {
@@ -254,7 +254,7 @@ main(
 
     //---------------------------------------------------------------------
 
-    struct pidfh* pfh = nullptr;
+    pidfh* pfh{};
 
     if (isDaemon)
     {
@@ -341,12 +341,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        constexpr int traceHeight = 100;
-        constexpr int gridHeight = traceHeight / 5;
-
         using Panels = std::vector<std::unique_ptr<Panel>>;
-
-        Panels panels;
 
         auto panelTop = [](const Panels& panels) -> int
         {
@@ -359,6 +354,13 @@ main(
                 return panels.back()->getBottom();
             }
         };
+
+        //-----------------------------------------------------------------
+
+        constexpr int traceHeight = 100;
+        constexpr int gridHeight = traceHeight / 5;
+
+        Panels panels;
 
         panels.push_back(
             std::make_unique<DynamicInfo>(fb.getWidth(),

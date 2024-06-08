@@ -109,8 +109,8 @@ TraceGraph::draw()
         {
             auto i1 = i2 - 1;
 
-            int y1 = (trace.m_values[i1] * m_traceHeight)/m_traceScale;
-            int y2 = (trace.m_values[i2] * m_traceHeight)/m_traceScale;
+            int y1 = (trace.m_values[i1] * m_traceHeight) / m_traceScale;
+            int y2 = (trace.m_values[i2] * m_traceHeight) / m_traceScale;
 
             line(
                 getImage(),
@@ -120,3 +120,4 @@ TraceGraph::draw()
         }
     }
 }
+

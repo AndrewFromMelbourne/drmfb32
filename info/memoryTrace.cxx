@@ -116,16 +116,18 @@ MemoryTrace::update(
     time_t now,
     fb32::Interface8880Font& font)
 {
+    auto scale = [](int value, int total, int scale) -> int
+    {
+        return (value * scale) / total;
+    };
+
+    //---------------------------------------------------------------------
+
     MemoryStats memoryStats;
 
-    int used = (memoryStats.used() * m_traceScale)
-                 / memoryStats.total();
-
-    int buffers = (memoryStats.buffers() * m_traceScale)
-                    / memoryStats.total();
-
-    int cached = (memoryStats.cached() * m_traceScale)
-                   / memoryStats.total();
+    auto used = scale(memoryStats.used(), memoryStats.total(), m_traceScale);
+    auto buffers = scale(memoryStats.buffers(), memoryStats.total(), m_traceScale);
+    auto cached = scale(memoryStats.cached(), memoryStats.total(), m_traceScale);
 
     Trace::addData(std::vector<int>{used, buffers, cached}, now);
 }

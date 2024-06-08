@@ -43,8 +43,8 @@ using namespace fb32;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
-const char* defaultJoystick = "/dev/input/js0";
+volatile static std::sig_atomic_t run{1};
+const char* defaultJoystick{"/dev/input/js0"};
 }
 
 //-------------------------------------------------------------------------
@@ -70,14 +70,14 @@ main(
     int argc,
     char *argv[])
 {
-    std::string device = "";
-    std::string program = basename(argv[0]);
-    std::string joystick = defaultJoystick;
+    std::string device{""};
+    std::string program{basename(argv[0])};
+    std::string joystick{defaultJoystick};
 
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:hj:";
-    static struct option lopts[] =
+    static option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
@@ -85,7 +85,7 @@ main(
         { nullptr, no_argument, nullptr, 0 }
     };
 
-    int opt = 0;
+    int opt{};
 
     while ((opt = ::getopt_long(argc, argv, sopts, lopts, nullptr)) != -1)
     {
@@ -123,8 +123,8 @@ main(
 
     try
     {
-        Joystick js(joystick);
-        FrameBuffer8880 fb(device);
+        Joystick js{joystick};
+        FrameBuffer8880 fb{device};
         fb.clear(RGB8880{0, 0, 0});
 
         std::cout

@@ -46,20 +46,15 @@ drm::drmDeviceHasDumbBuffer(
 
     //---------------------------------------------------------------------
 
-    uint64_t hasDumb;
-    if ((drmGetCap(fd.fd(), DRM_CAP_DUMB_BUFFER, &hasDumb) < 0) or not hasDumb)
-    {
-        return false;
-    }
-
-    return true;
+    uint64_t hasDumb{};
+    return not drmGetCap(fd.fd(), DRM_CAP_DUMB_BUFFER, &hasDumb) and hasDumb;
 }
 
 //-------------------------------------------------------------------------
 
 drm::DrmDevices::DrmDevices()
 :
-    m_deviceCount{0},
+    m_deviceCount{},
     m_devices{}
 {
     m_deviceCount = drmGetDevices2(0, m_devices.data(), m_devices.size());
@@ -184,11 +179,11 @@ drm::drmGetPropertyValue(
     uint32_t objectType,
     const std::string& name)
 {
-    auto properties = drmModeObjectGetProperties(fd, objectId, objectType);
+    auto properties{drmModeObjectGetProperties(fd, objectId, objectType)};
 
-    for (uint32_t i = 0; i < properties->count_props; ++i)
+    for (auto i = 0; i < properties->count_props; ++i)
     {
-        auto property = drmModeGetProperty(fd, properties->props[i]);
+        auto property{drmModeGetProperty(fd, properties->props[i])};
 
         if (name == property->name)
         {

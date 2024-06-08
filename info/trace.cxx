@@ -70,7 +70,7 @@ Trace::Trace(
     m_time(width)
 
 {
-    for (int trace = 0 ; trace < traces ; ++trace)
+    for (auto trace = 0 ; trace < traces ; ++trace)
     {
 
         TraceData traceData =
@@ -103,7 +103,7 @@ Trace::init(
                    sc_foreground,
                    getImage());
 
-    bool first = true;
+    bool first{true};
     for (auto& trace : m_traceData)
     {
         if (first)
@@ -177,7 +177,7 @@ Trace::addData(
 
     //-----------------------------------------------------------------
 
-    auto value = data.begin();
+    auto value{data.begin()};
     for (auto& trace : m_traceData)
     {
         trace.m_values[index] = *(value++);
@@ -194,7 +194,7 @@ Trace::addData(
         for (auto& trace : m_traceData)
         {
             int max = *max_element(trace.m_values.begin(),
-                                       trace.m_values.end());
+                                   trace.m_values.end());
 
             m_traceScale = std::max(m_traceScale, max);
         }
@@ -209,3 +209,4 @@ Trace::addData(
 
     draw();
 }
+

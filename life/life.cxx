@@ -116,7 +116,7 @@ Life::iterateUpperRows(
    int start,
    int end)
 {
-    int diff = end - start;
+    auto diff = end - start;
 
     iterateRows(start, start + (diff / 2));
 }
@@ -128,7 +128,7 @@ Life::iterateLowerRows(
    int start,
    int end)
 {
-    int diff = end - start;
+    auto diff = end - start;
 
     iterateRows(start + (diff / 2), end);
 }
@@ -140,9 +140,9 @@ Life::iterateRows(
    int start,
    int end)
 {
-    for (int row = start ; row < end ; ++row)
+    for (auto row = start ; row < end ; ++row)
     {
-        for (int col = 0 ; col < m_size ; ++col)
+        for (auto col = 0 ; col < m_size ; ++col)
         {
             auto cell = m_cells[col + (row * m_size)];
             auto neighbours = cell & ~aliveCellMask;

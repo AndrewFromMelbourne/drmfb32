@@ -187,9 +187,9 @@ decodeQoi(
         rgba = QoiRGBA{ .r = 0, .g = 0, .b = 0, .a = 0 };
     }
 
-    const int pixels = header.getWidth() * header.getHeight();
-    auto d = data.begin();
-    int run = 0;
+    const auto pixels{header.getWidth() * header.getHeight()};
+    auto d{data.begin()};
+    int run{};
 
     for (int i = 0 ; (i < pixels) and (d != data.end()) ; ++i)
     {
@@ -199,7 +199,7 @@ decodeQoi(
         }
         else
         {
-            auto value = *d++;
+            const auto value = *d++;
 
             if (value == QOI_OP_RGB)
             {
@@ -240,10 +240,10 @@ decodeQoi(
 
                     case QOI_MASKED_OP_LUMA:
                     {
-                        int diffs = *d++;
-                        int dg = (value & 0x3f) - 32;
-                        int dr_dg = (diffs >> 4) & 0x0F;
-                        int db_dg = diffs & 0x0F;
+                        const auto diffs{*d++};
+                        const auto dg{(value & 0x3f) - 32};
+                        const auto dr_dg{(diffs >> 4) & 0x0F};
+                        const auto db_dg{diffs & 0x0F};
 
                         currentRGBA.r += dg - 8 + dr_dg;
                         currentRGBA.g += dg;
@@ -262,8 +262,8 @@ decodeQoi(
             }
         }
 
-        int x = i % header.getWidth();
-        int y = i / header.getWidth();
+        const int x = i % header.getWidth();
+        const int y = i / header.getWidth();
 
         fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
         image.setPixelRGB(fb32::Interface8880Point{x, y}, rgb);
@@ -287,18 +287,18 @@ Image8880
 readQoi(
     const std::string& name)
 {
-    auto length = std::filesystem::file_size(std::filesystem::path(name));
+    const auto length{std::filesystem::file_size(std::filesystem::path(name))};
 
-    std::ifstream ifs(name, std::ios_base::binary);
+    std::ifstream ifs{name, std::ios_base::binary};
 
-    std::array<uint8_t, QOI_HEADER_SIZE> rawHeader;
+    std::array<uint8_t, QOI_HEADER_SIZE> rawHeader{};
     ifs.read(reinterpret_cast<char*>(rawHeader.data()), rawHeader.size());
     QoiHeader header(rawHeader);
 
     std::vector<uint8_t> buffer(length - QOI_HEADER_SIZE - QOI_FOOTER_SIZE);
     ifs.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
 
-    std::array<uint8_t, QOI_FOOTER_SIZE> rawFooter;
+    std::array<uint8_t, QOI_FOOTER_SIZE> rawFooter{};
     ifs.read(reinterpret_cast<char*>(rawFooter.data()), rawFooter.size());
     checkFooter(rawFooter);
 

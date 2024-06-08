@@ -36,7 +36,7 @@
 int
 inf::getTemperature()
 {
-    int millidegrees = 0;
+    int millidegrees{};
 
     std::ifstream ifs{"/sys/class/thermal/thermal_zone0/temp"};
 

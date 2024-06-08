@@ -50,19 +50,22 @@ std::string
 DynamicInfo::getIpAddress(
     char& interface)
 {
-    struct ifaddrs *ifaddr = nullptr;
-    struct ifaddrs *ifa = nullptr;
     interface = 'X';
+    std::string address{"   .   .   .   "};
 
-    std::string address = "   .   .   .   ";
-
+    ifaddrs* ifaddr{};
     ::getifaddrs(&ifaddr);
 
-    for (ifa = ifaddr ; ifa != nullptr ; ifa = ifa->ifa_next)
+    if (not ifaddr)
     {
-        if (ifa ->ifa_addr->sa_family == AF_INET)
+        return address;
+    }
+
+    for (auto ifa = ifaddr ; ifa != nullptr ; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr->sa_family == AF_INET)
         {
-            void *addr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            void *addr = &((sockaddr_in *)ifa->ifa_addr)->sin_addr;
 
             if (strcmp(ifa->ifa_name, "lo") != 0)
             {
@@ -75,10 +78,7 @@ DynamicInfo::getIpAddress(
         }
     }
 
-    if (ifaddr != nullptr)
-    {
-        ::freeifaddrs(ifaddr);
-    }
+    ::freeifaddrs(ifaddr);
 
     return address;
 }
@@ -135,7 +135,7 @@ DynamicInfo::drawTemperature(
                                m_heading,
                                getImage());
 
-    std::string temperatureString = getTemperature();
+    std::string temperatureString{getTemperature()};
 
     position = font.drawString(position,
                                temperatureString,
@@ -165,10 +165,10 @@ std::string
 DynamicInfo::getTime(
     time_t now)
 {
-    char buffer[128];
+    tm result;
+    tm *lt = ::localtime_r(&now, &result);
 
-    struct tm result;
-    struct tm *lt = ::localtime_r(&now, &result);
+    char buffer[128];
     std::strftime(buffer, sizeof(buffer), "%T", lt);
 
     return buffer;

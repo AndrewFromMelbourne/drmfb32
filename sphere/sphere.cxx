@@ -70,12 +70,12 @@ Sphere::update()
 {
     auto radius = m_size / 2;
 
-    for (int j = 0 ; j < m_size ; ++j)
+    for (auto j = 0 ; j < m_size ; ++j)
     {
         double y = double(radius - j) / radius;
-        for (int i = 0 ; i < m_size ; ++i)
+        for (auto i = 0 ; i < m_size ; ++i)
         {
-            uint8_t grey = 0;
+            uint8_t grey{};
 
             double x = double(i - radius) / radius;
             double sum = x * x + y * y;
@@ -110,8 +110,8 @@ void
 Sphere::draw(
     fb32::FrameBuffer8880& fb)
 {
-    const int xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
-    const int yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
+    const auto xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
+    const auto yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
 
     fb.putImage(fb32::Interface8880Point(xOffset, yOffset), m_image);
 }

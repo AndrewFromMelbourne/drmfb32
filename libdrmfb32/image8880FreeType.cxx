@@ -199,11 +199,11 @@ Image8880FreeType::drawString(
     Interface8880Point position{p};
     position.setY(position.y() + (m_face->size->metrics.ascender >> 6));
 
-    auto slot = m_face->glyph;
-    auto use_kerning = FT_HAS_KERNING(m_face);
-    FT_UInt previous = 0;
+    auto slot{m_face->glyph};
+    auto use_kerning{FT_HAS_KERNING(m_face)};
+    FT_UInt previous{0};
 
-    for (auto c : string)
+    for (const auto c : string)
     {
         if (c == '\n')
         {
@@ -211,7 +211,7 @@ Image8880FreeType::drawString(
         }
         else
         {
-            auto glyph_index = FT_Get_Char_Index(m_face, c);
+            const auto glyph_index{FT_Get_Char_Index(m_face, c)};
 
             if (use_kerning and previous and glyph_index)
             {
@@ -228,7 +228,7 @@ Image8880FreeType::drawString(
 
             if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
             {
-                auto slot = m_face->glyph;
+                const auto slot = m_face->glyph;
 
                 drawChar(position.x() + slot->bitmap_left,
                          position.y() - slot->bitmap_top,
@@ -245,7 +245,7 @@ Image8880FreeType::drawString(
 
     //-----------------------------------------------------------------
 
-    auto advance = slot->bitmap.width - (slot->advance.x >> 6);
+    const auto advance = slot->bitmap.width - (slot->advance.x >> 6);
 
     if (advance > 0)
     {
@@ -281,11 +281,11 @@ Image8880FreeType::drawChar(
 {
     for (unsigned j = 0 ; j < bitmap.rows ; ++j)
     {
-        uint8_t* row = bitmap.buffer + (j * bitmap.pitch);
+        const auto row = bitmap.buffer + (j * bitmap.pitch);
 
         for (unsigned i = 0 ; i < bitmap.width ; ++i)
         {
-            if (row[i] > 0)
+            if (row[i])
             {
                 const Interface8880Point p{static_cast<int>(i + xOffset),
                                        static_cast<int>(j + yOffset)};

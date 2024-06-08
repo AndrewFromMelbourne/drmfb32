@@ -73,7 +73,7 @@ main(
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:f:h";
-    static struct option lopts[] =
+    static option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "font", required_argument, nullptr, 'f' },
@@ -81,7 +81,7 @@ main(
         { nullptr, no_argument, nullptr, 0 }
     };
 
-    int opt = 0;
+    int opt{};
 
     while ((opt = ::getopt_long(argc, argv, sopts, lopts, nullptr)) != -1)
     {

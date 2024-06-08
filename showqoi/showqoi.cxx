@@ -46,7 +46,7 @@ using namespace std::chrono_literals;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
+volatile static std::sig_atomic_t run{1};
 }
 
 //-------------------------------------------------------------------------
@@ -88,14 +88,14 @@ main(
     int argc,
     char *argv[])
 {
-    std::string device = "";
-    std::string program = basename(argv[0]);
-    std::string qoi;
+    std::string device{""};
+    std::string program{basename(argv[0])};
+    std::string qoi{};
 
     //---------------------------------------------------------------------
 
     static const char* sopts = "d:hq:";
-    static struct option lopts[] =
+    static option lopts[] =
     {
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
@@ -103,7 +103,7 @@ main(
         { nullptr, no_argument, nullptr, 0 }
     };
 
-    int opt = 0;
+    int opt{};
 
     while ((opt = ::getopt_long(argc, argv, sopts, lopts, nullptr)) != -1)
     {
@@ -183,3 +183,4 @@ main(
 
     return 0 ;
 }
+

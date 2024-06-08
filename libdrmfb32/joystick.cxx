@@ -37,6 +37,22 @@
 
 //-------------------------------------------------------------------------
 
+namespace
+{
+
+bool
+readJoystickEvent(
+    fb32::FileDescriptor& joystickFd,
+    js_event& event)
+{
+    const auto bytes{::read(joystickFd.fd(), &event, sizeof(event))};
+    return (bytes != -1) and (bytes == sizeof(event));
+}
+
+}
+
+//-------------------------------------------------------------------------
+
 fb32::Joystick:: Joystick(bool blocking)
 :
     Joystick("/dev/input/js0", blocking)
@@ -112,16 +128,16 @@ fb32::Joystick:: numberOfAxes() const
 bool
 fb32::Joystick:: buttonPressed(int button)
 {
-    bool pressed = false;
-
-    if (button < numberOfButtons())
+    if (button >= numberOfButtons())
     {
-        pressed = m_buttons.at(button).pressed;
+        return false;
+    }
 
-        if (pressed)
-        {
-            m_buttons[button].pressed = false;
-        }
+    const auto pressed = m_buttons.at(button).pressed;
+
+    if (pressed)
+    {
+        m_buttons[button].pressed = false;
     }
 
     return pressed;
@@ -132,15 +148,12 @@ fb32::Joystick:: buttonPressed(int button)
 bool
 fb32::Joystick:: buttonDown(int button) const
 {
-    bool down = false;
-
-
-    if (button < numberOfButtons())
+    if (button >= numberOfButtons())
     {
-        down = m_buttons.at(button).down;
+        return false;
     }
 
-    return down;
+    return m_buttons.at(button).down;
 }
 
 //-------------------------------------------------------------------------
@@ -156,27 +169,20 @@ fb32::Joystick:: getAxes(int joystickNumber) const
 void
 fb32::Joystick:: read()
 {
-    struct js_event event;
-    ssize_t bytes = 0;
+    js_event event{};
 
     if (m_blocking)
     {
-        if ((bytes = ::read(m_joystickFd.fd(), &event, sizeof(event))) != -1)
+        if (readJoystickEvent(m_joystickFd, event))
         {
-            if (bytes == sizeof(event))
-            {
-                process(event);
-            }
+            process(event);
         }
     }
     else
     {
-        while ((bytes = ::read(m_joystickFd.fd(), &event, sizeof(event))) != -1)
+        while (readJoystickEvent(m_joystickFd, event))
         {
-            if (bytes == sizeof(event))
-            {
-                process(event);
-            }
+            process(event);
         }
     }
 }
@@ -184,7 +190,7 @@ fb32::Joystick:: read()
 //-------------------------------------------------------------------------
 
 void
- fb32::Joystick:: process(const struct js_event& event)
+ fb32::Joystick:: process(const js_event& event)
 {
     switch (event.type)
     {
@@ -203,7 +209,7 @@ void
 
         case JS_EVENT_AXIS:
         {
-            size_t axis = event.number / 2;
+            const auto axis{event.number / 2};
 
             if (axis < 3)
             {

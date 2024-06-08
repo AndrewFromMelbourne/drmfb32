@@ -56,65 +56,77 @@ namespace
 
 //-------------------------------------------------------------------------
 
-bool
+struct FoundDrmResource
+{
+    bool m_found{false};
+    uint32_t m_connectorId{};
+    uint32_t m_crtcId{};
+    drmModeModeInfo m_mode{};
+};
+
+//-------------------------------------------------------------------------
+
+FoundDrmResource
 findDrmResourcesForConnector(
     fb32::FileDescriptor& fd,
     uint32_t connectorId,
-    const drm::drmModeRes_ptr& resources,
-    uint32_t& crtcId,
-    drmModeModeInfo& mode)
+    const drm::drmModeRes_ptr& resources)
 {
-    bool resourcesFound = false;
-    auto connector = drm::drmModeGetConnector(fd, connectorId);
-    const bool connected = (connector->connection == DRM_MODE_CONNECTED);
+    auto connector{drm::drmModeGetConnector(fd, connectorId)};
+    const bool connected{connector->connection == DRM_MODE_CONNECTED};
 
     if (connected and (connector->count_modes > 0))
     {
-        for (int j = 0 ; j < connector->count_encoders ; ++j)
+        for (auto j = 0 ; j < connector->count_encoders ; ++j)
         {
             auto encoderId = connector->encoders[j];
             auto encoder = drm::drmModeGetEncoder(fd, encoderId);
 
-            for (int k = 0 ; (k < resources->count_crtcs) and not resourcesFound ; ++k)
+            for (auto k = 0 ; k < resources->count_crtcs ; ++k)
             {
-                uint32_t currentCrtc = 1 << k;
+                const auto currentCrtc{1 << k};
 
                 if (encoder->possible_crtcs & currentCrtc)
                 {
-                    crtcId = resources->crtcs[k];
-                    auto crtc = drm::drmModeGetCrtc(fd, crtcId);
+                    const auto currentCrtcId = resources->crtcs[k];
+                    const auto crtc{drm::drmModeGetCrtc(fd, currentCrtcId)};
                     if ((crtc->mode.hdisplay > 0) and (crtc->mode.vdisplay > 0))
                     {
-                        mode = crtc->mode;
-                        resourcesFound = true;
+                        return FoundDrmResource{
+                            .m_found = true,
+                            .m_connectorId = connectorId,
+                            .m_crtcId = currentCrtcId,
+                            .m_mode = crtc->mode
+                        };
                     }
                 }
             }
         }
     }
 
-    return resourcesFound;
+    return FoundDrmResource{ .m_found = false };
 }
 
 //-------------------------------------------------------------------------
 
-bool
+FoundDrmResource
 findDrmResources(
-    fb32::FileDescriptor& fd,
-    uint32_t& crtcId,
-    uint32_t& connectorId,
-    drmModeModeInfo& mode)
+    fb32::FileDescriptor& fd)
 {
     auto resources = drm::drmModeGetResources(fd);
-    bool resourcesFound = false;
 
-    for (int i = 0 ; (i < resources->count_connectors) and not resourcesFound ; ++i)
+    for (int i = 0 ; i < resources->count_connectors ; ++i)
     {
-        connectorId = resources->connectors[i];
-        resourcesFound = findDrmResourcesForConnector(fd, connectorId, resources, crtcId, mode);
+        const auto connectorId = resources->connectors[i];
+        const auto resource{findDrmResourcesForConnector(fd, connectorId, resources)};
+
+        if (resource.m_found)
+        {
+            return resource;
+        }
     }
 
-    return resourcesFound;
+    return FoundDrmResource{ .m_found = false };
 }
 
 //-------------------------------------------------------------------------
@@ -203,21 +215,21 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
-    uint32_t crtcId = 0;
-    uint32_t connectorId = 0;
-    drmModeModeInfo mode;
+    const auto resource{findDrmResources(m_fd)};
 
-    if (not findDrmResources(m_fd, crtcId, connectorId, mode))
+    if (not resource.m_found)
     {
         throw std::logic_error("no connected CRTC found");
     }
 
     //---------------------------------------------------------------------
 
+    auto mode{resource.m_mode};
+
     m_width = mode.hdisplay;
     m_height = mode.vdisplay;
 
-    struct drm_mode_create_dumb dmcb =
+    drm_mode_create_dumb dmcb =
     {
         .height = mode.vdisplay,
         .width = mode.hdisplay,
@@ -263,7 +275,7 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
-    struct drm_mode_map_dumb dmmd =
+    drm_mode_map_dumb dmmd =
     {
         .handle = m_fbHandle
     };
@@ -288,10 +300,10 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
-    m_connectorId = connectorId;
-    m_originalCrtc = drm::drmModeGetCrtc(m_fd, crtcId);
+    m_connectorId = resource.m_connectorId;
+    m_originalCrtc = drm::drmModeGetCrtc(m_fd, resource.m_crtcId);
 
-    if (drmModeSetCrtc(m_fd.fd(), crtcId, m_fbId, 0, 0, &connectorId, 1, &mode) < 0)
+    if (drmModeSetCrtc(m_fd.fd(), resource.m_crtcId, m_fbId, 0, 0, &m_connectorId, 1, &mode) < 0)
     {
         throw std::system_error(errno,
                                 std::system_category(),
@@ -306,7 +318,7 @@ fb32::FrameBuffer8880::~FrameBuffer8880()
     ::munmap(m_fbp, m_length);
     drmModeRmFB(m_fd.fd(), m_fbId);
 
-    struct drm_mode_destroy_dumb dmdd =
+    drm_mode_destroy_dumb dmdd =
     {
         .handle = m_fbHandle
     };

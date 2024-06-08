@@ -47,7 +47,7 @@ findConnectedConnectors(
 
     auto resources = drm::drmModeGetResources(fd);
 
-    for (int i = 0 ; i < resources->count_connectors ; ++i)
+    for (auto i = 0 ; i < resources->count_connectors ; ++i)
     {
         auto connectorId = resources->connectors[i];
         auto connector = drm::drmModeGetConnector(fd, connectorId);
@@ -55,12 +55,12 @@ findConnectedConnectors(
 
         if (connected and (connector->count_modes > 0))
         {
-            for (int j = 0 ; j < connector->count_encoders ; ++j)
+            for (auto j = 0 ; j < connector->count_encoders ; ++j)
             {
                 auto encoderId = connector->encoders[j];
                 auto encoder = drm::drmModeGetEncoder(fd, encoderId);
 
-                for (int k = 0 ; k < resources->count_crtcs ; ++k)
+                for (auto k = 0 ; k < resources->count_crtcs ; ++k)
                 {
                     uint32_t currentCrtc = 1 << k;
 
@@ -113,3 +113,4 @@ main()
 
     return 0;
 }
+

@@ -68,16 +68,15 @@ TraceStack::TraceStack(
 void
 TraceStack::draw()
 {
-    for (int i = 0 ; i < m_columns ; ++i)
+    for (auto i = 0 ; i < m_columns ; ++i)
     {
-        int j = m_traceHeight - 1;
+        auto j = m_traceHeight - 1;
 
         for (auto& trace : m_traceData)
         {
-            int value = (trace.m_values[i] * m_traceHeight)
-                          / m_traceScale;
+            auto value = (trace.m_values[i] * m_traceHeight) / m_traceScale;
 
-            for (int v = 0 ; v < value ; ++v)
+            for (auto v = 0 ; v < value ; ++v)
             {
                 if (((j % m_gridHeight) == 0) or (m_time[i] == 0))
                 {
@@ -111,3 +110,4 @@ TraceStack::draw()
         }
     }
 }
+

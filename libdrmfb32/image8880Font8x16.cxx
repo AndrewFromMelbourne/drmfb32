@@ -4714,13 +4714,13 @@ Image8880Font8x16::drawChar(
 
     for (int j = 0 ; j < getPixelHeight() ; ++j)
     {
-        uint8_t byte = font[c][j];
+        const auto byte = font[c][j];
 
-        if (byte != 0)
+        if (byte)
         {
             for (int i = 0 ; i < width ; ++i)
             {
-                if ((byte >> (width - i - 1)) & 1 )
+                if ((byte >> (width - i - 1)) & 1)
                 {
                     image.setPixel(
                         Interface8880Point(p.x() + i, p.y() + j),
