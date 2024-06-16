@@ -258,12 +258,12 @@ main(
 
     if (isDaemon)
     {
-        if (pidfile != nullptr)
+        if (pidfile)
         {
             pid_t otherpid;
             pfh = ::pidfile_open(pidfile, 0600, &otherpid);
 
-            if (pfh == nullptr)
+            if (not pfh)
             {
                 std::cerr
                     << program

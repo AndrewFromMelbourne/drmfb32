@@ -4712,13 +4712,13 @@ Image8880Font8x16::drawChar(
 {
     const auto width = getPixelWidth();
 
-    for (int j = 0 ; j < getPixelHeight() ; ++j)
+    for (auto j = 0 ; j < getPixelHeight() ; ++j)
     {
         const auto byte = font[c][j];
 
         if (byte)
         {
-            for (int i = 0 ; i < width ; ++i)
+            for (auto i = 0 ; i < width ; ++i)
             {
                 if ((byte >> (width - i - 1)) & 1)
                 {
@@ -4781,7 +4781,7 @@ Image8880Font8x16::drawString(
     Interface8880Point position{p};
     Interface8880Point start{p};
 
-    for (const char c : string)
+    for (const auto c : string)
     {
         if (c == '\n')
         {

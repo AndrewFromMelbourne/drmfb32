@@ -70,6 +70,8 @@ public:
         m_y = y;
     }
 
+    friend bool operator<=>(const Point& lhs, const Point& rhs) = default;
+
 private:
 
     T m_x;

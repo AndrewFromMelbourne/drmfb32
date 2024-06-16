@@ -135,9 +135,9 @@ NetworkTrace::update(
 
     NetworkStats diff{currentStats - m_previousStats};
 
-    constexpr int zero{0};
-    int tx = std::max(zero, static_cast<int>(diff.tx()));
-    int rx = std::max(zero, static_cast<int>(diff.rx()));
+    constexpr uint32_t zero{0};
+    const int tx = std::max(zero, diff.tx());
+    const int rx = std::max(zero, diff.rx());
 
     Trace::addData(std::vector<int>{tx, rx}, now);
 
