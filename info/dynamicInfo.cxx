@@ -67,7 +67,7 @@ DynamicInfo::getIpAddress(
         {
             void *addr = &((sockaddr_in *)ifa->ifa_addr)->sin_addr;
 
-            if (strcmp(ifa->ifa_name, "lo") != 0)
+            if (std::string(ifa->ifa_name) != std::string("lo"))
             {
                 char buffer[INET_ADDRSTRLEN];
                 ::inet_ntop(AF_INET, addr, buffer, sizeof(buffer));
