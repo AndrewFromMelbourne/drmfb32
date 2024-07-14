@@ -161,6 +161,37 @@ Image8880FreeType::drawChar(
 //-------------------------------------------------------------------------
 
 Interface8880Point
+Image8880FreeType::drawWideChar(
+    const Interface8880Point& p,
+    uint32_t c,
+    const RGB8880& rgb,
+    Interface8880& image)
+{
+    Interface8880Point position{p};
+    position.setY(position.y() + (m_face->size->metrics.ascender >> 6));
+    const auto glyph_index{FT_Get_Char_Index(m_face, c)};
+
+    if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
+    {
+        const auto slot{m_face->glyph};
+
+        drawChar(position.x() + slot->bitmap_left,
+                 position.y() - slot->bitmap_top,
+                 slot->bitmap,
+                 rgb,
+                 image);
+
+
+        position.setX(position.x() + (slot->advance.x >> 6));
+    }
+
+    position.setY(position.y() - (m_face->size->metrics.ascender >> 6));
+    return position;
+}
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
 Image8880FreeType::drawString(
     const Interface8880Point& p,
     const char* string,
@@ -228,7 +259,7 @@ Image8880FreeType::drawString(
 
             if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
             {
-                const auto slot = m_face->glyph;
+                const auto slot{m_face->glyph};
 
                 drawChar(position.x() + slot->bitmap_left,
                          position.y() - slot->bitmap_top,
@@ -281,7 +312,7 @@ Image8880FreeType::drawChar(
 {
     for (unsigned j = 0 ; j < bitmap.rows ; ++j)
     {
-        const auto row = bitmap.buffer + (j * bitmap.pitch);
+        const auto row{bitmap.buffer + (j * bitmap.pitch)};
 
         for (unsigned i = 0 ; i < bitmap.width ; ++i)
         {
@@ -289,7 +320,7 @@ Image8880FreeType::drawChar(
             {
                 const Interface8880Point p{static_cast<int>(i + xOffset),
                                        static_cast<int>(j + yOffset)};
-                auto background = image.getPixelRGB(p);
+                auto background{image.getPixelRGB(p)};
 
                 if (background)
                 {

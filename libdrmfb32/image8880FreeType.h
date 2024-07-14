@@ -99,6 +99,13 @@ public:
         Interface8880& image) override;
 
     Interface8880Point
+    drawWideChar(
+        const Interface8880Point& p,
+        uint32_t c,
+        const RGB8880& rgb,
+        Interface8880& image);
+
+    Interface8880Point
     drawString(
         const Interface8880Point& p,
         const char* string,

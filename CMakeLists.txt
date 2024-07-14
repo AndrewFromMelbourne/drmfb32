@@ -127,5 +127,10 @@ target_link_libraries(testft drmfb32
                              ${DRM_LIBRARIE}
                              ${FREETYPE_LIBRARIES})
 
+add_executable(testft2 test/testft2.cxx)
+target_link_libraries(testft2 drmfb32
+                             ${DRM_LIBRARIE}
+                             ${FREETYPE_LIBRARIES})
+
 endif()
 

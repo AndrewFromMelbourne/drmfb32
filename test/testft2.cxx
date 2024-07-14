@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2024 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,38 +25,24 @@
 //
 //-------------------------------------------------------------------------
 
+#include <getopt.h>
+#include <libgen.h>
+
 #include <chrono>
-#include <iomanip>
+#include <cstdlib>
 #include <iostream>
 #include <system_error>
 #include <thread>
 
-#include <getopt.h>
-#include <libgen.h>
-#include <unistd.h>
-
 #include "framebuffer8880.h"
 #include "image8880.h"
-#include "image8880Font8x16.h"
-#include "image8880Graphics.h"
+#include "image8880FreeType.h"
 #include "point.h"
 
 //-------------------------------------------------------------------------
 
 using namespace fb32;
 using namespace std::chrono_literals;
-
-//-------------------------------------------------------------------------
-
-#define TEST(expression, message) \
-    if (!expression) \
-    { \
-        std::cerr \
-            << __FILE__ "(" \
-            << __LINE__ \
-            << ") : " message " : " #expression " : test failed\n"; \
-        exit(EXIT_FAILURE); \
-    } \
 
 //-------------------------------------------------------------------------
 
@@ -68,7 +54,9 @@ printUsage(
     os << "\n";
     os << "Usage: " << name << " <options>\n";
     os << "\n";
+    os << "    --character,-c - character to print\n";
     os << "    --device,-d - dri device to use\n";
+    os << "    --font,-f - font file to use\n";
     os << "    --help,-h - print usage and exit\n";
     os << "\n";
 }
@@ -82,13 +70,17 @@ main(
 {
     std::string device{};
     std::string program = basename(argv[0]);
+    std::string font{};
+    uint32_t c{'A'};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:h";
+    static const char* sopts = "c:d:f:h";
     static option lopts[] =
     {
+        { "character", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
+        { "font", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { nullptr, no_argument, nullptr, 0 }
     };
@@ -99,9 +91,20 @@ main(
     {
         switch (opt)
         {
+        case 'c':
+
+            c = ::strtol(optarg, nullptr, 0);
+
+            break;
         case 'd':
 
             device = optarg;
+
+            break;
+
+        case 'f':
+
+            font = optarg;
 
             break;
 
@@ -125,77 +128,32 @@ main(
 
     try
     {
+        const RGB8880 black{0, 0, 0};
+        const RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device};
-        fb.clear();
+
+        fb.clear(black);
+
+        Image8880 image{fb.getWidth(), fb.getHeight()};
+        image.clear(black);
 
         //-----------------------------------------------------------------
 
-        RGB8880 red{255, 0, 0};
-        RGB8880 green{0, 255, 0};
+        Image8880FreeType ft{font, 32};
+        Interface8880Point p{0, 0};
 
-        std::cout << "  red: 0x" << std::setfill('0') << std::setw(8) << std::hex << red.get8880() << "\n";
-        std::cout << "green: 0x" << std::setfill('0') << std::setw(8) << std::hex << green.get8880() << "\n";
-
-        //-----------------------------------------------------------------
-
-        Image8880 image{48, 48};
-        image.clear(red);
-
-        auto rgb = image.getPixelRGB(Interface8880Point(0,0));
-
-        TEST((rgb), "Image8880::getPixelRGB()");
-        TEST((*rgb == red), "Image8880::getPixelRGB()");
-
-        line(image,
-             Interface8880Point(0,0),
-             Interface8880Point(47,47),
-             green);
-
-        Interface8880Point imageLocation
-        {
-            (fb.getWidth() - image.getWidth()) / 2,
-            (fb.getHeight() - image.getHeight()) / 2
-        };
-
-        fb.putImage(imageLocation, image);
-
-        rgb = fb.getPixelRGB(imageLocation);
-
-        TEST((rgb), "FrameBuffer8880::getPixelRGB()");
-        TEST((*rgb == green), "FrameBuffer8880::getPixelRGB()");
+        p = ft.drawWideChar(p, c, white, image);
 
         //-----------------------------------------------------------------
 
-        RGB8880 darkBlue{0, 0, 63};
-        RGB8880 white{255, 255, 255};
-
-        std::cout << "Dblue: 0x" << std::setfill('0') << std::setw(8) << std::hex << darkBlue.get8880() << "\n";
-        std::cout << "white: 0x" << std::setfill('0') << std::setw(8) << std::hex << white.get8880() << "\n";
-
-        Image8880 textImage(168, 16);
-        textImage.clear(darkBlue);
-
-        Interface8880Point textLocation
-        {
-            (fb.getWidth() - textImage.getWidth()) / 2,
-            (fb.getHeight() - textImage.getHeight()) / 3
-        };
-
-        Image8880Font8x16 font;
-
-        font.drawString(
-            Interface8880Point{0, 0},
-            "This is a test string",
-            white,
-            textImage);
-
-        fb.putImage(textLocation, textImage);
+        fb.putImage(Interface8880Point{0, 0}, image);
 
         //-----------------------------------------------------------------
 
         std::this_thread::sleep_for(10s);
 
         fb.clear();
+
     }
     catch (std::exception& error)
     {
@@ -203,5 +161,8 @@ main(
         exit(EXIT_FAILURE);
     }
 
-    return 0;
+    //---------------------------------------------------------------------
+
+    return 0 ;
 }
+

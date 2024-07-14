@@ -66,9 +66,9 @@ main(
     int argc,
     char *argv[])
 {
-    std::string device;
+    std::string device{};
     std::string program = basename(argv[0]);
-    std::string font;
+    std::string font{};
 
     //---------------------------------------------------------------------
 
@@ -129,16 +129,16 @@ main(
     {
         const RGB8880 black{0, 0, 0};
         const RGB8880 white{255, 255, 255};
-        FrameBuffer8880 fb(device);
+        FrameBuffer8880 fb{device};
 
         fb.clear(black);
 
-        Image8880 image(fb.getWidth(), fb.getHeight());
+        Image8880 image{fb.getWidth(), fb.getHeight()};
         image.clear(black);
 
         //-----------------------------------------------------------------
 
-        Image8880FreeType ft(font, 32);
+        Image8880FreeType ft{font, 32};
 
         Interface8880Point p{0, 0};
 
