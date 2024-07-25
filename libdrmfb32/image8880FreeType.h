@@ -69,20 +69,20 @@ public:
     Image8880FreeType& operator=(const Image8880FreeType&) = delete;
     Image8880FreeType& operator=(Image8880FreeType&&) = delete;
 
-	std::string getFontFamilyName() const;
-	std::string getFontStyleName() const;
+    std::string getFontFamilyName() const;
+    std::string getFontStyleName() const;
 
-	int getPixelHeight() const override;
+    int getPixelHeight() const override;
     int getPixelWidth() const override;
 
     std::optional<char> getCharacterCode(CharacterCode code) const override;
 
     int getPixelSize() const
-	{
-	    return m_pixelSize;
-	}
+    {
+        return m_pixelSize;
+    }
 
-	bool setPixelSize(int pixelSize);
+    bool setPixelSize(int pixelSize);
 
     Interface8880Point
     drawChar(
