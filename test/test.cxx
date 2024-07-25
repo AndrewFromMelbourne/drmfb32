@@ -190,6 +190,7 @@ main(
             textImage);
 
         fb.putImage(textLocation, textImage);
+        fb.update();
 
         //-----------------------------------------------------------------
 

@@ -381,12 +381,15 @@ main(
                                           panelTop(panels),
                                           gridHeight));
 
-        panels.push_back(
-            std::make_unique<NetworkTrace>(fb.getWidth(),
-                                           traceHeight,
-                                           font->getPixelHeight(),
-                                           panelTop(panels),
-                                           gridHeight));
+            if (fb.getHeight() >= 400)
+            {
+                panels.push_back(
+                std::make_unique<NetworkTrace>(fb.getWidth(),
+                                               traceHeight,
+                                               font->getPixelHeight(),
+                                               panelTop(panels),
+                                               gridHeight));
+        }
 
         //-----------------------------------------------------------------
 
@@ -411,6 +414,7 @@ main(
                 if (display)
                 {
                     panel->show(fb);
+                    fb.update();
                 }
             }
 

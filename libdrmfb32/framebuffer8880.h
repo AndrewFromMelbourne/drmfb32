@@ -92,6 +92,8 @@ public:
 
     bool putImage(const Interface8880Point& p, const Image8880& image) const;
 
+    void update();
+
 private:
 
     bool
@@ -118,6 +120,8 @@ private:
     uint32_t m_fbHandle;
 
     uint32_t m_connectorId;
+    uint32_t m_crtcId;
+    drmModeModeInfo m_mode;
     drm::drmModeCrtc_ptr m_originalCrtc;
 };
 

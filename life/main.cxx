@@ -152,6 +152,7 @@ main(
             {
                 life.update(js);
                 life.draw(fb);
+                fb.update();
             }
         }
 

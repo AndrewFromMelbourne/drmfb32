@@ -176,6 +176,8 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     m_fbId{0},
     m_fbHandle{0},
     m_connectorId{0},
+    m_crtcId{0},
+    m_mode{},
     m_originalCrtc(nullptr, [](drmModeCrtc*){})
 {
     std::string card{device};
@@ -193,6 +195,10 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     }
 
     m_fd = FileDescriptor{::open(card.c_str(), O_RDWR)};
+
+    //---------------------------------------------------------------------
+
+    drmSetMaster(m_fd.fd());
 
     //---------------------------------------------------------------------
 
@@ -224,15 +230,15 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
     //---------------------------------------------------------------------
 
-    auto mode{resource.m_mode};
+    m_mode = resource.m_mode;
 
-    m_width = mode.hdisplay;
-    m_height = mode.vdisplay;
+    m_width = m_mode.hdisplay;
+    m_height = m_mode.vdisplay;
 
     drm_mode_create_dumb dmcb =
     {
-        .height = mode.vdisplay,
-        .width = mode.hdisplay,
+        .height = m_mode.vdisplay,
+        .width = m_mode.hdisplay,
         .bpp = 32,
         .flags = 0,
         .handle = 0,
@@ -259,8 +265,8 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
     if (drmModeAddFB2(
             m_fd.fd(),
-            mode.hdisplay,
-            mode.vdisplay,
+            m_mode.hdisplay,
+            m_mode.vdisplay,
             DRM_FORMAT_XRGB8888,
             handles,
             strides,
@@ -301,9 +307,10 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     //---------------------------------------------------------------------
 
     m_connectorId = resource.m_connectorId;
+    m_crtcId = resource.m_crtcId;
     m_originalCrtc = drm::drmModeGetCrtc(m_fd, resource.m_crtcId);
 
-    if (drmModeSetCrtc(m_fd.fd(), resource.m_crtcId, m_fbId, 0, 0, &m_connectorId, 1, &mode) < 0)
+    if (drmModeSetCrtc(m_fd.fd(), resource.m_crtcId, m_fbId, 0, 0, &m_connectorId, 1, &m_mode) < 0)
     {
         throw std::system_error(errno,
                                 std::system_category(),
@@ -333,6 +340,11 @@ fb32::FrameBuffer8880::~FrameBuffer8880()
                    &m_connectorId,
                    1,
                    &(m_originalCrtc->mode));
+
+    if (drmIsMaster(m_fd.fd()))
+    {
+        drmDropMaster(m_fd.fd());
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -445,7 +457,7 @@ fb32::FrameBuffer8880::putImagePartial(
 
     if ((x - xStart + image.getWidth()) > m_width)
     {
-        xEnd = m_height - 1 - (x - xStart);
+        xEnd = m_width - 1 - (x - xStart);
     }
 
     if (y < 0)
@@ -469,13 +481,15 @@ fb32::FrameBuffer8880::putImagePartial(
         return false;
     }
 
+    const auto xLength = xEnd - xStart + 1;
+
     for (auto j = yStart ; j <= yEnd ; ++j)
     {
         auto start = image.getRow(j) + xStart;
 
         std::copy(start,
-                  start + (xEnd - xStart + 1),
-                  m_fbp + ((j - yStart) * m_lineLengthPixels) + x);
+                  start + xLength,
+                  m_fbp + ((j - yStart + y) * m_lineLengthPixels) + x);
     }
 
     return true;
@@ -489,3 +503,12 @@ fb32::FrameBuffer8880::offset(
 {
     return p.x() + p.y() * m_lineLengthPixels;
 }
+
+//-------------------------------------------------------------------------
+
+void
+fb32::FrameBuffer8880::update()
+{
+    drmModeSetCrtc(m_fd.fd(), m_crtcId, m_fbId, 0, 0, &m_connectorId, 1, &m_mode);
+}
+
