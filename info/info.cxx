@@ -414,10 +414,10 @@ main(
                 if (display)
                 {
                     panel->show(fb);
-                    fb.update();
                 }
             }
 
+            fb.update();
             std::this_thread::sleep_for(1s);
         }
 
