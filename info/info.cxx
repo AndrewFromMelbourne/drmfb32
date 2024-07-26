@@ -325,7 +325,7 @@ main(
         {
             font = std::make_unique<fb32::Image8880FreeType>(fontFile, 16);
         }
-            catch (std::exception& error)
+        catch (std::exception& error)
         {
             std::cerr << "Warning: " << error.what() << "\n";
         }
