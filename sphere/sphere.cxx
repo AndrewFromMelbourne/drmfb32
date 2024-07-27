@@ -90,6 +90,10 @@ Sphere::update()
                 {
                     intensity = 0.0;
                 }
+                else if (intensity > 1.0)
+                {
+                    intensity = 1.0;
+                }
 
                 intensity *= intensity;
                 intensity *= (1.0 - m_ambient);
@@ -102,6 +106,34 @@ Sphere::update()
         }
     }
 
+}
+
+//-------------------------------------------------------------------------
+
+void
+Sphere::setLight(
+    double inclination,
+    double bearing)
+{
+    if (inclination < 0.0)
+    {
+        inclination = 0.0;
+    }
+    else if (inclination > 90.0)
+    {
+        inclination = 90.0;
+    }
+
+    auto deg2rad = [](double deg) -> double
+    {
+        return (deg * M_PI) / 180.0;
+    };
+
+    const auto radius{cos(deg2rad(inclination))};
+
+    m_light[0] = radius * sin(deg2rad(bearing)); // X
+    m_light[1] = radius * cos(deg2rad(bearing)); // Y
+    m_light[2] = sin(deg2rad(inclination)); // Z
 }
 
 //-------------------------------------------------------------------------

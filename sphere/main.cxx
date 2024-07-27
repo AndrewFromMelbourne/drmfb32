@@ -157,16 +157,21 @@ main(
             << "\n";
 
         Sphere sphere(fb.getHeight() - 10);
-        sphere.init();
-        sphere.update();
-        sphere.draw(fb);
-        fb.update();
+        sphere.setAmbient(0.1);
 
         //-----------------------------------------------------------------
 
+        int bearing = 0;
+
         while (run)
         {
-            std::this_thread::sleep_for(1s);
+            sphere.init();
+            sphere.setLight(45.0, bearing);
+            sphere.update();
+            sphere.draw(fb);
+            fb.update();
+
+            bearing = (bearing + 1) % 360;
         }
 
         fb.clear();

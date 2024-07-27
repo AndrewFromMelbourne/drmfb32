@@ -48,6 +48,8 @@ public:
 
     void init();
     void update();
+    void setAmbient(double ambient) { m_ambient = ambient; }
+    void setLight(double inclination, double bearing);
     void draw(fb32::FrameBuffer8880& fb);
 
 private:
