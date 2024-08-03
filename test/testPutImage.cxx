@@ -52,6 +52,7 @@ printUsage(
     os << "\n";
     os << "Usage: " << name << " <options>\n";
     os << "\n";
+    os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - device to use\n";
     os << "    --help,-h - print usage and exit\n";
     os << "\n";
@@ -64,14 +65,16 @@ main(
     int argc,
     char *argv[])
 {
+    uint32_t connector{0};
     std::string device{};
     std::string program{basename(argv[0])};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:h";
+    static const char* sopts = "c:d:h";
     static option lopts[] =
     {
+        { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
         { nullptr, no_argument, nullptr, 0 }
@@ -83,6 +86,12 @@ main(
     {
         switch (opt)
         {
+        case 'c':
+
+            connector = std::stol(optarg);
+
+            break;
+
         case 'd':
 
             device = optarg;

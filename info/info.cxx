@@ -146,6 +146,7 @@ printUsage(
     os << "Usage: " << name << " <options>\n";
     os << "\n";
     os << "    --daemon,-D - start in the background as a daemon\n";
+    os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --font,-f - font file to use\n";
     os << "    --help,-h - print usage and exit\n";
@@ -187,6 +188,7 @@ main(
     int argc,
     char *argv[])
 {
+    uint32_t connector{0};
     std::string device{};
     std::string program{basename(argv[0])};
     std::string fontFile{};
@@ -195,9 +197,10 @@ main(
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:f:hp:D";
+    static const char* sopts = "c:d:f:hp:D";
     static option lopts[] =
     {
+        { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "font", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
@@ -212,6 +215,12 @@ main(
     {
         switch (opt)
         {
+        case 'c':
+
+            connector = std::stol(optarg);
+
+            break;
+
         case 'd':
 
             device = optarg;
@@ -335,7 +344,7 @@ main(
 
     try
     {
-        fb32::FrameBuffer8880 fb(device);
+        fb32::FrameBuffer8880 fb(device, connector);
 
         fb.clear(fb32::RGB8880{0, 0, 0});
 

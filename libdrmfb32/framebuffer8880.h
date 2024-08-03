@@ -61,7 +61,9 @@ public:
 
     static constexpr size_t bytesPerPixel{4};
 
-    explicit FrameBuffer8880(const std::string& device = "");
+    explicit FrameBuffer8880(
+        const std::string& device = "",
+        uint32_t connectorId = 0);
 
     ~FrameBuffer8880() override;
 

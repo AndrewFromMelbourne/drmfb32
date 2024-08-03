@@ -60,6 +60,7 @@ printUsage(
     os << "\n";
     os << "Usage: " << name << " <options>\n";
     os << "\n";
+    os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --help,-h - print usage and exit\n";
     os << "    --joystick,-j - joystick device\n";
@@ -73,15 +74,17 @@ main(
     int argc,
     char *argv[])
 {
+    uint32_t connector{0};
     std::string device{};
     std::string program{basename(argv[0])};
     std::string joystick{defaultJoystick};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "d:hj:";
+    static const char* sopts = "c:d:hj:";
     static option lopts[] =
     {
+        { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
         { "joystick", required_argument, nullptr, 'j' },
@@ -94,6 +97,12 @@ main(
     {
         switch (opt)
         {
+        case 'c':
+
+            connector = std::stol(optarg);
+
+            break;
+
         case 'd':
 
             device = optarg;
@@ -128,7 +137,7 @@ main(
     {
         Image8880Font8x16 font;
         Joystick js{joystick};
-        FrameBuffer8880 fb{device};
+        FrameBuffer8880 fb{device, connector};
         fb.clear(RGB8880{0, 0, 0});
 
         Boxworld boxworld;
