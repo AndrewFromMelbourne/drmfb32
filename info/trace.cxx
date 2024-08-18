@@ -125,13 +125,12 @@ Trace::init(
         const auto quaterWidth = font.getPixelWidth() / 4;
         const auto quaterHeight = font.getPixelHeight() / 4;
 
-        fb32::Interface8880Point p1{position.x() + quaterWidth, position.y() + quaterHeight};
-        fb32::Interface8880Point p2{position.x() + 3 * quaterWidth, position.y() + 3 * quaterHeight};
+        const fb32::Interface8880Point p1{position.x() + quaterWidth, position.y() + quaterHeight};
+        const fb32::Interface8880Point p2{position.x() + 3 * quaterWidth, position.y() + 3 * quaterHeight};
 
         boxFilled(getImage(), p1, p2, trace.m_traceColour);
+        position.setX(position.x() + font.getPixelWidth());
     }
-
-    position.setX(position.x() + font.getPixelWidth());
 
     position = font.drawString(position,
                                ")",

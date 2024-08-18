@@ -44,10 +44,15 @@
 #include "dynamicInfo.h"
 #include "system.h"
 
+//=========================================================================
+
+namespace
+{
+
 //-------------------------------------------------------------------------
 
 std::string
-DynamicInfo::getIpAddress(
+getIpAddress(
     char& interface)
 {
     interface = 'X';
@@ -85,6 +90,33 @@ DynamicInfo::getIpAddress(
 
 //-------------------------------------------------------------------------
 
+std::string
+getTemperature()
+{
+    return std::to_string(inf::getTemperature());
+}
+
+//-------------------------------------------------------------------------
+
+std::string
+getTime(
+    time_t now)
+{
+    tm result;
+    tm *lt = ::localtime_r(&now, &result);
+
+    char buffer[128];
+    std::strftime(buffer, sizeof(buffer), "%T", lt);
+
+    return buffer;
+}
+
+//-------------------------------------------------------------------------
+
+} // namespace
+
+//=========================================================================
+
 void
 DynamicInfo::drawIpAddress(
     fb32::Interface8880Point& position,
@@ -113,14 +145,6 @@ DynamicInfo::drawIpAddress(
                                m_foreground,
                                getImage());
 
-}
-
-//-------------------------------------------------------------------------
-
-std::string
-DynamicInfo::getTemperature()
-{
-    return std::to_string(inf::getTemperature());
 }
 
 //-------------------------------------------------------------------------
@@ -157,21 +181,6 @@ DynamicInfo::drawTemperature(
                                m_foreground,
                                getImage());
 
-}
-
-//-------------------------------------------------------------------------
-
-std::string
-DynamicInfo::getTime(
-    time_t now)
-{
-    tm result;
-    tm *lt = ::localtime_r(&now, &result);
-
-    char buffer[128];
-    std::strftime(buffer, sizeof(buffer), "%T", lt);
-
-    return buffer;
 }
 
 //-------------------------------------------------------------------------

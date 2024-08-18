@@ -65,15 +65,12 @@ private:
     fb32::RGB8880 m_warning;
     fb32::RGB8880 m_background;
 
-    static std::string getIpAddress(char& interface);
     void drawIpAddress(fb32::Interface8880Point& position,
                        fb32::Interface8880Font& font);
 
-    static std::string getTemperature();
     void drawTemperature(fb32::Interface8880Point& position,
                          fb32::Interface8880Font& font);
 
-    static std::string getTime(time_t now);
     void drawTime(fb32::Interface8880Point& position,
                   fb32::Interface8880Font& font,
                   time_t now);
