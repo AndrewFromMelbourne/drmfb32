@@ -141,5 +141,43 @@ verticalLine(
 
 //-------------------------------------------------------------------------
 
+void
+circle(
+    Interface8880& image,
+    const Interface8880Point& p,
+    int r,
+    uint32_t rgb);
+
+inline void
+circle(
+    Interface8880& image,
+    const Interface8880Point& p,
+    int r,
+    const RGB8880& rgb)
+{
+    circle(image, p, r, rgb.get8880());
+}
+
+//-------------------------------------------------------------------------
+
+void
+circleFilled(
+    Interface8880& image,
+    const Interface8880Point& p,
+    int r,
+    uint32_t rgb);
+
+inline void
+circleFilled(
+    Interface8880& image,
+    const Interface8880Point& p,
+    int r,
+    const RGB8880& rgb)
+{
+    circleFilled(image, p, r, rgb.get8880());
+}
+
+//-------------------------------------------------------------------------
+
 } // namespace fb32
 
