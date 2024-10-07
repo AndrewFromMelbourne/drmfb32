@@ -148,6 +148,14 @@ main(
 
     //---------------------------------------------------------------------
 
+    if (qoi.empty())
+    {
+        printUsage(std::cerr, program);
+        ::exit(EXIT_FAILURE);
+    }
+
+    //---------------------------------------------------------------------
+
     for (auto signal : { SIGINT, SIGTERM })
     {
         if (std::signal(signal, signalHandler) == SIG_ERR)
