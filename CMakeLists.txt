@@ -18,6 +18,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 #--------------------------------------------------------------------------
 
 find_package(Freetype)
+pkg_check_modules(TURBOJPEG libturbojpeg)
 
 #--------------------------------------------------------------------------
 
@@ -36,6 +37,11 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
 if (FREETYPE_FOUND)
 target_include_directories(drmfb32 PUBLIC ${FREETYPE_INCLUDE_DIRS})
 target_sources(drmfb32 PRIVATE libdrmfb32/image8880FreeType.cxx)
+endif()
+
+if (TURBOJPEG_FOUND)
+target_include_directories(drmfb32 PUBLIC ${TURBJPEG_INCLUDE_DIRS})
+target_sources(drmfb32 PRIVATE libdrmfb32/image8880Jpeg.cxx)
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32
@@ -95,6 +101,14 @@ endif()
 add_executable(modes modes/modes.cxx)
 
 target_link_libraries(modes drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
+if (TURBOJPEG_FOUND)
+add_executable(showjpeg showjpeg/showjpeg.cxx)
+target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
+                                       ${TURBOJPEG_LIBRARIES})
+endif()
 
 #--------------------------------------------------------------------------
 

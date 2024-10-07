@@ -90,6 +90,7 @@ public:
     std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
 
     const uint32_t* getRow(int y) const;
+    uint32_t* getBuffer() { return m_buffer.data(); };
 
 private:
 
