@@ -71,7 +71,7 @@ public:
 
     uint8_t getFrame() const { return m_frame; }
     uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
-    void setFrame(uint8_t frame);
+    void setFrame(uint8_t frame) const;
 
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb) override;
@@ -92,6 +92,8 @@ public:
     const uint32_t* getRow(int y) const;
     uint32_t* getBuffer() { return m_buffer.data(); };
 
+    Image8880 resizeNearestNeighbour(int width, int height) const;
+
 private:
 
     bool
@@ -105,7 +107,7 @@ private:
     int m_width{};
     int m_height{};
 
-    uint8_t m_frame{};
+    mutable uint8_t m_frame;
     uint8_t m_numberOfFrames{};
 
     std::vector<uint32_t> m_buffer{};

@@ -25,10 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdexcept>
 
 #include "image8880.h"
 
@@ -77,7 +74,7 @@ fb32::Image8880::Image8880(
 
 void
 fb32::Image8880::setFrame(
-    uint8_t frame)
+    uint8_t frame) const
 {
     if (frame < m_numberOfFrames)
     {
@@ -155,6 +152,51 @@ fb32::Image8880::getRow(
     {
         return nullptr;
     }
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::resizeNearestNeighbour(
+    int width,
+    int height) const
+{
+    if ((width <= 0) or (height <= 0))
+    {
+        throw std::invalid_argument("width and height must be greater than zero");
+    }
+
+    const int a = (width > m_width) ? 0 : 1;
+    const int b = (height > m_height) ? 0 : 1;
+
+    Image8880 image{width, height, m_numberOfFrames};
+
+    auto originalFrame = getFrame();
+
+    for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        setFrame(frame);
+        image.setFrame(frame);
+
+        for (int j = 0 ; j < height ; ++j)
+        {
+            const int y = (j * (m_height - b)) / (height - b);
+            for (int i = 0 ; i < width ; ++i)
+            {
+                const int x = (i * (m_width - a)) / (width - a);
+                auto pixel{getPixel(Interface8880Point{x, y})};
+
+                if (pixel.has_value())
+                {
+                    image.setPixel(Interface8880Point{i, j}, pixel.value());
+                }
+            }
+        }
+    }
+
+    setFrame(originalFrame);
+
+    return image;
 }
 
 //-------------------------------------------------------------------------

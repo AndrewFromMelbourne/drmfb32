@@ -77,6 +77,7 @@ printUsage(
     os << "\n";
     os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
+    os << "    --fit,-f - fit image to screen\n";
     os << "    --help,-h - print usage and exit\n";
     os << "    --qoi,-q - qoi file to display\n";
     os << "\n";
@@ -93,14 +94,16 @@ main(
     std::string device{""};
     std::string program{basename(argv[0])};
     std::string qoi{};
+    bool fitToScreen{false};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:hq:";
+    static const char* sopts = "c:d:fhq:";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
+        { "fit", no_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { "qoi", required_argument, nullptr, 'q' },
         { nullptr, no_argument, nullptr, 0 }
@@ -121,6 +124,12 @@ main(
         case 'd':
 
             device = optarg;
+
+            break;
+
+        case 'f':
+
+            fitToScreen = true;
 
             break;
 
@@ -176,6 +185,21 @@ main(
         fb.clear(RGB8880{0, 0, 0});
 
         auto image = readQoi(qoi);
+
+        if (fitToScreen)
+        {
+            int width = (fb.getHeight() * image.getWidth()) / image.getHeight();
+            int height = fb.getHeight();
+
+            if (width > fb.getWidth())
+            {
+                width = fb.getWidth();
+                height = (fb.getWidth() * image.getHeight()) / image.getWidth();
+            }
+
+            image = image.resizeNearestNeighbour(width, height);
+        }
+
         const Interface8880Point center{
             (fb.getWidth() - image.getWidth()) / 2,
             (fb.getHeight() - image.getHeight()) / 2};
