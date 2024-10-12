@@ -71,7 +71,7 @@ public:
 
     uint8_t getFrame() const { return m_frame; }
     uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
-    void setFrame(uint8_t frame) const;
+    void setFrame(uint8_t frame);
 
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb) override;
@@ -81,13 +81,26 @@ public:
         const Interface8880Point& p,
         const RGB8880& rgb) override
     {
-        return setPixel(p, rgb.get8880());
+        return setPixel(p, rgb.get8880(), m_frame);
     }
 
-    bool setPixel(const Interface8880Point& p, uint32_t rgb) override;
+    bool setPixel(
+        const Interface8880Point& p,
+        uint32_t rgb) override
+    {
+        return setPixel(p, rgb, m_frame);
+    }
 
-    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
-    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
+    std::optional<RGB8880> getPixelRGB(
+        const Interface8880Point& p) const override
+    {
+        return getPixelRGB(p, m_frame);
+    }
+
+    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override
+    {
+        return getPixel(p, m_frame);
+    }
 
     const uint32_t* getRow(int y) const;
     uint32_t* getBuffer() { return m_buffer.data(); };
@@ -97,17 +110,36 @@ public:
 private:
 
     bool
+    setPixelRGB(
+        const Interface8880Point& p,
+        const RGB8880& rgb,
+        uint8_t frame)
+    {
+        return setPixel(p, rgb.get8880(), frame);
+    }
+
+    bool setPixel(const Interface8880Point& p, uint32_t rgb, uint8_t frame);
+
+    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p, uint8_t frame) const;
+    std::optional<uint32_t> getPixel(const Interface8880Point& p, uint8_t frame) const;
+
+    bool
     validPixel(const Interface8880Point& p) const
     {
         return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height));
     }
 
-    size_t offset(const Interface8880Point& p) const;
+    size_t offset(const Interface8880Point& p) const
+    {
+        return offset(p, m_frame);
+    }
+
+    size_t offset(const Interface8880Point& p, uint8_t frame) const;
 
     int m_width{};
     int m_height{};
 
-    mutable uint8_t m_frame;
+    uint8_t m_frame;
     uint8_t m_numberOfFrames{};
 
     std::vector<uint32_t> m_buffer{};

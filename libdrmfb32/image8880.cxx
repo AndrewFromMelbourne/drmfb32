@@ -74,7 +74,7 @@ fb32::Image8880::Image8880(
 
 void
 fb32::Image8880::setFrame(
-    uint8_t frame) const
+    uint8_t frame)
 {
     if (frame < m_numberOfFrames)
     {
@@ -96,13 +96,14 @@ fb32::Image8880::clear(
 bool
 fb32::Image8880::setPixel(
     const Interface8880Point& p,
-    uint32_t rgb)
+    uint32_t rgb,
+    uint8_t frame)
 {
     bool isValid{validPixel(p)};
 
     if (isValid)
     {
-        m_buffer[offset(p)] = rgb;
+        m_buffer[offset(p, frame)] = rgb;
     }
 
     return isValid;
@@ -112,28 +113,30 @@ fb32::Image8880::setPixel(
 
 std::optional<fb32::RGB8880>
 fb32::Image8880::getPixelRGB(
-    const Interface8880Point& p) const
+    const Interface8880Point& p,
+    uint8_t frame) const
 {
     if (not validPixel(p))
     {
         return {};
     }
 
-    return RGB8880(m_buffer[offset(p)]);
+    return RGB8880(m_buffer[offset(p, frame)]);
 }
 
 //-------------------------------------------------------------------------
 
 std::optional<uint32_t>
 fb32::Image8880::getPixel(
-    const Interface8880Point& p) const
+    const Interface8880Point& p,
+    uint8_t frame) const
 {
     if (not validPixel(p))
     {
         return {};
     }
 
-    return m_buffer[offset(p)];
+    return m_buffer[offset(p, frame)];
 }
 
 //-------------------------------------------------------------------------
@@ -171,30 +174,23 @@ fb32::Image8880::resizeNearestNeighbour(
 
     Image8880 image{width, height, m_numberOfFrames};
 
-    auto originalFrame = getFrame();
-
     for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
     {
-        setFrame(frame);
-        image.setFrame(frame);
-
         for (int j = 0 ; j < height ; ++j)
         {
             const int y = (j * (m_height - b)) / (height - b);
             for (int i = 0 ; i < width ; ++i)
             {
                 const int x = (i * (m_width - a)) / (width - a);
-                auto pixel{getPixel(Interface8880Point{x, y})};
+                auto pixel{getPixel(Interface8880Point{x, y}, frame)};
 
                 if (pixel.has_value())
                 {
-                    image.setPixel(Interface8880Point{i, j}, pixel.value());
+                    image.setPixel(Interface8880Point{i, j}, pixel.value(), frame);
                 }
             }
         }
     }
-
-    setFrame(originalFrame);
 
     return image;
 }
@@ -203,8 +199,9 @@ fb32::Image8880::resizeNearestNeighbour(
 
 size_t
 fb32::Image8880::offset(
-    const Interface8880Point& p) const
+    const Interface8880Point& p,
+    uint8_t frame) const
 {
-    return p.x() + (p.y() * m_width) + (m_width * m_height * m_frame);
+    return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
 }
 
