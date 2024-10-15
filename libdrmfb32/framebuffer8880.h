@@ -73,11 +73,20 @@ public:
     FrameBuffer8880(FrameBuffer8880&& fb) = delete;
     FrameBuffer8880& operator=(FrameBuffer8880&& fb) = delete;
 
+    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
+    void clear(uint32_t rgb = 0) override;
+
+    uint32_t* getBuffer() override { return m_fbp; };
+    const uint32_t* getBuffer() const override { return m_fbp; }
+
+
+    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
+    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
+
     int getWidth() const override { return m_width; }
     int getHeight() const override { return m_height; }
 
-    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
-    void clear(uint32_t rgb = 0) override;
+    size_t offset(const Interface8880Point& p) const override;
 
     bool
     setPixelRGB(
@@ -89,27 +98,15 @@ public:
 
     bool setPixel(const Interface8880Point& p, uint32_t rgb) override;
 
-    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
-    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
-
-    bool putImage(const Interface8880Point& p, const Image8880& image) const;
-
     void update();
 
 private:
-
-    bool
-    putImagePartial(
-        const Interface8880Point& p,
-        const Image8880& image) const;
 
     bool
     validPixel(const Interface8880Point& p) const
     {
         return (p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height);
     }
-
-    size_t offset(const Interface8880Point& p) const;
 
     int m_width;
     int m_height;

@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include "image8880.h"
 #include "interface8880.h"
 
 //-------------------------------------------------------------------------
@@ -36,6 +37,100 @@ namespace fb32
 
 Interface8880::~Interface8880()
 {
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Interface8880::putImage(
+    const Interface8880Point& p_left,
+    const Image8880& image)
+{
+    Interface8880Point p{ p_left.x(), p_left.y() };
+
+    if ((p.x() < 0) or
+        ((p.x() + image.getWidth()) > getWidth()))
+    {
+        return putImagePartial(p, image);
+    }
+
+    if ((p.y() < 0) or
+        ((p.y() + image.getHeight()) > getHeight()))
+    {
+        return putImagePartial(p, image);
+    }
+
+    for (int j = 0 ; j < image.getHeight() ; ++j)
+    {
+        auto start = image.getRow(j);
+
+        std::copy(start,
+                  start + image.getWidth(),
+                  getBuffer() + offset(Interface8880Point{p.x(), j + p.y()}));
+    }
+
+    return true;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Interface8880::putImagePartial(
+    const Interface8880Point& p,
+    const Image8880& image)
+{
+    auto x = p.x();
+    auto xStart = 0;
+    auto xEnd = image.getWidth() - 1;
+
+    auto y = p.y();
+    auto yStart = 0;
+    auto yEnd = image.getHeight() - 1;
+
+    if (x < 0)
+    {
+        xStart = -x;
+        x = 0;
+    }
+
+    if ((x - xStart + image.getWidth()) > getWidth())
+    {
+        xEnd = getWidth() - 1 - (x - xStart);
+    }
+
+    if (y < 0)
+    {
+        yStart = -y;
+        y = 0;
+    }
+
+    if ((y - yStart + image.getHeight()) > getHeight())
+    {
+        yEnd = getHeight() - 1 - (y - yStart);
+    }
+
+    if ((xEnd - xStart) <= 0)
+    {
+        return false;
+    }
+
+    if ((yEnd - yStart) <= 0)
+    {
+        return false;
+    }
+
+    const auto xLength = xEnd - xStart + 1;
+
+    for (auto j = yStart ; j <= yEnd ; ++j)
+    {
+        auto start = image.getRow(j) + xStart;
+
+        std::copy(start,
+                  start + xLength,
+                  getBuffer() + offset(Interface8880Point{x, j - yStart + y}));
+    }
+
+    return true;
 }
 
 //-------------------------------------------------------------------------
