@@ -104,6 +104,14 @@ target_link_libraries(modes drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(puzzle-15 puzzle-15/main.cxx
+                         puzzle-15/images.cxx
+                         puzzle-15/puzzle.cxx)
+
+target_link_libraries(puzzle-15 drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 if (TURBOJPEG_FOUND)
 add_executable(showjpeg showjpeg/showjpeg.cxx)
 target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
