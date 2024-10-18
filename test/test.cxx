@@ -181,7 +181,7 @@ main(
         std::cout << "Dblue: 0x" << std::setfill('0') << std::setw(8) << std::hex << darkBlue.get8880() << "\n";
         std::cout << "white: 0x" << std::setfill('0') << std::setw(8) << std::hex << white.get8880() << "\n";
 
-        Image8880 textImage(168, 16);
+        Image8880 textImage(248, 16);
         textImage.clear(darkBlue);
 
         Interface8880Point textLocation
@@ -193,8 +193,8 @@ main(
         Image8880Font8x16 font;
 
         font.drawString(
-            Interface8880Point{0, 0},
-            "This is a test string",
+            Interface8880Point{4, 0},
+            "Lorem ipsum dolor sit amet ...",
             white,
             textImage);
 
@@ -205,6 +205,22 @@ main(
 
         std::this_thread::sleep_for(10s);
 
+        //-----------------------------------------------------------------
+
+        fb.clear();
+        textImage = textImage.scaleUp(3);
+
+        textLocation = Interface8880Point
+        {
+            (fb.getWidth() - textImage.getWidth()) / 2,
+            (fb.getHeight() - textImage.getHeight()) / 2
+        };
+
+        fb.putImage(textLocation, textImage);
+
+        //-----------------------------------------------------------------
+
+        std::this_thread::sleep_for(10s);
         fb.clear();
     }
     catch (std::exception& error)

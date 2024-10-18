@@ -93,24 +93,6 @@ fb32::Image8880::clear(
 
 //-------------------------------------------------------------------------
 
-bool
-fb32::Image8880::setPixel(
-    const Interface8880Point& p,
-    uint32_t rgb,
-    uint8_t frame)
-{
-    bool isValid{validPixel(p)};
-
-    if (isValid)
-    {
-        m_buffer[offset(p, frame)] = rgb;
-    }
-
-    return isValid;
-}
-
-//-------------------------------------------------------------------------
-
 std::optional<fb32::RGB8880>
 fb32::Image8880::getPixelRGB(
     const Interface8880Point& p,
@@ -157,7 +139,6 @@ fb32::Image8880::getRow(
     }
 }
 
-
 //-------------------------------------------------------------------------
 
 fb32::Image8880
@@ -194,6 +175,54 @@ fb32::Image8880::resizeNearestNeighbour(
     }
 
     return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::scaleUp(
+    uint8_t scale) const
+{
+    Image8880 image{m_width * scale, m_height * scale, m_numberOfFrames};
+
+    for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        for (int j = 0 ; j < m_height ; ++j)
+        {
+            for (int i = 0 ; i < m_width ; ++i)
+            {
+                auto pixel = getPixel(Interface8880Point{i, j}, frame);
+                for (int b = 0 ; b < scale ; ++b)
+                {
+                    for (int a = 0 ; a < scale ; ++a)
+                    {
+                        Interface8880Point p{ (i * scale) + a, (j * scale) + b};
+                        image.setPixel(p, *pixel, frame);
+                    }
+                }
+            }
+        }
+    }
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Image8880::setPixel(
+    const Interface8880Point& p,
+    uint32_t rgb,
+    uint8_t frame)
+{
+    bool isValid{validPixel(p)};
+
+    if (isValid)
+    {
+        m_buffer[offset(p, frame)] = rgb;
+    }
+
+    return isValid;
 }
 
 //-------------------------------------------------------------------------
