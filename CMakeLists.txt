@@ -8,7 +8,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
@@ -132,6 +132,16 @@ target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+if (TURBOJPEG_FOUND)
+add_executable(slideshow slideshow/slideshow.cxx
+                         slideshow/viewer.cxx)
+
+target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
+                                        ${TURBOJPEG_LIBRARIES})
+endif()
+
+#--------------------------------------------------------------------------
+
 add_executable(test test/test.cxx)
 target_link_libraries(test drmfb32 ${DRM_LIBRARIES})
 
@@ -139,16 +149,6 @@ target_link_libraries(test drmfb32 ${DRM_LIBRARIES})
 
 add_executable(testCircle test/testCircle.cxx)
 target_link_libraries(testCircle drmfb32 ${DRM_LIBRARIES})
-
-#--------------------------------------------------------------------------
-
-add_executable(testPutImage test/testPutImage.cxx)
-target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
-
-#--------------------------------------------------------------------------
-
-add_executable(joysticktest test/testJoystick.cxx)
-target_link_libraries(joysticktest drmfb32)
 
 #--------------------------------------------------------------------------
 
@@ -165,4 +165,14 @@ target_link_libraries(testft2 drmfb32
                              ${FREETYPE_LIBRARIES})
 
 endif()
+
+#--------------------------------------------------------------------------
+
+add_executable(testPutImage test/testPutImage.cxx)
+target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
+add_executable(joysticktest test/testJoystick.cxx)
+target_link_libraries(joysticktest drmfb32)
 
