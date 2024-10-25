@@ -8,7 +8,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
