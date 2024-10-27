@@ -52,7 +52,7 @@ public:
         CELL_ALIVE
     };
 
-    explicit Life(int32_t size);
+    explicit Life(int size);
 
     void init();
     void update(fb32::Joystick& js);
@@ -70,7 +70,7 @@ private:
     void iterateRows(int start, int end);
     void iterate();
 
-    int32_t m_size;
+    int m_size;
     std::array<uint32_t, 2> m_cellColours;
     std::vector<uint8_t> m_cells;
     std::vector<uint8_t> m_cellsNext;

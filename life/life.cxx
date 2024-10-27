@@ -28,6 +28,7 @@
 #include <array>
 #include <cstring>
 #include <functional>
+#include <random>
 
 #include "life.h"
 
@@ -38,7 +39,7 @@ using namespace std::placeholders;
 
 //-------------------------------------------------------------------------
 
-Life::Life(int32_t size)
+Life::Life(int size)
 :
     m_size{size},
     m_cellColours{
@@ -60,14 +61,14 @@ Life::updateCell(
     int row,
     int value)
 {
-    const uint32_t left = (col == 0) ? m_size - 1 :  col - 1;
-    const uint32_t right = (col == m_size - 1) ?  0 : col + 1;
-    const uint32_t above = (row == 0) ? m_size - 1 : row - 1;
-    const uint32_t below = (row == m_size - 1) ? 0 : row + 1;
+    const int left = (col == 0) ? m_size - 1 :  col - 1;
+    const int right = (col == m_size - 1) ?  0 : col + 1;
+    const int above = (row == 0) ? m_size - 1 : row - 1;
+    const int below = (row == m_size - 1) ? 0 : row + 1;
 
-    const uint32_t aboveOffset = above * m_size;
-    const uint32_t rowOffset = row * m_size;
-    const uint32_t belowOffset = below * m_size;
+    const int aboveOffset = above * m_size;
+    const int rowOffset = row * m_size;
+    const int belowOffset = below * m_size;
 
     m_cellsNext[left + aboveOffset] += value;
     m_cellsNext[col + aboveOffset] += value;
@@ -148,19 +149,13 @@ Life::iterateRows(
             auto neighbours = cell & ~aliveCellMask;
             auto alive = cell & aliveCellMask;
 
-            if (alive)
+            if (alive and (neighbours != 2) and (neighbours != 3))
             {
-                if ((neighbours != 2) && (neighbours != 3))
-                {
-                    clearCell(col, row);
-                }
+                clearCell(col, row);
             }
-            else
+            else if (not alive and (neighbours == 3))
             {
-                if (neighbours == 3)
-                {
-                    setCell(col, row);
-                }
+                setCell(col, row);
             }
         }
     }
@@ -189,6 +184,10 @@ Life::iterate()
 void
 Life::init()
 {
+    std::random_device randomDevice;
+    std::mt19937 generator(randomDevice());
+    std::uniform_int_distribution<> distribution(0, 1);
+
     std::fill(m_cells.begin(), m_cells.end(), 0);
     std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
     m_image.clear(0);
@@ -197,7 +196,7 @@ Life::init()
     {
         for (int col = 0 ; col < m_size ; ++col)
         {
-            if (std::rand() > (RAND_MAX / 2))
+            if (distribution(generator))
             {
                 setCell(col, row);
             }
