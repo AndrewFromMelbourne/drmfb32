@@ -1,15 +1,16 @@
 # Conway's Game of Life
 
-A version of Conway's Game of Life for the Odroid Go Super, written in C++.
+A version of Conway's Game of Life written in C++.
 
 # usage
         life <options>
 
-        --device,-d - framebuffer device to use (default is /dev/fb0)
+        --connector,-c - dri connector to use
+        --device,-d - dri device to use
         --help,-h - print usage and exit
+        --joystick,-j - joystick device
 
 ## Controls:-
-- (A) Switch between displaying cells and displaying a 'heat map' of cell's neighbour count.
 - (B) Create a new random arrangement of cells with approximately half of the cells 'Alive'.
 - (X) Create a 'Gosper Glider Gun' in the middle of the field.
 - (Y) Create a 'Simkin Glider Gun' in the middle of the field.
