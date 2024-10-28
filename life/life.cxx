@@ -113,30 +113,6 @@ Life::clearCell(
 //-------------------------------------------------------------------------
 
 void
-Life::iterateUpperRows(
-   int start,
-   int end)
-{
-    auto diff = end - start;
-
-    iterateRows(start, start + (diff / 2));
-}
-
-//-------------------------------------------------------------------------
-
-void
-Life::iterateLowerRows(
-   int start,
-   int end)
-{
-    auto diff = end - start;
-
-    iterateRows(start + (diff / 2), end);
-}
-
-//-------------------------------------------------------------------------
-
-void
 Life::iterateRows(
    int start,
    int end)
@@ -166,15 +142,23 @@ Life::iterateRows(
 void
 Life::iterate()
 {
+    auto iterateUpperRows = [this](int start, int end)
     {
-        auto taskUpper = m_threadPool.parallelize_loop(m_size, std::bind(&Life::iterateUpperRows, this, _1, _2));
-        taskUpper.wait();
-    }
+        const auto diff = end - start;
+        iterateRows(start, start + (diff / 2));
+    };
 
+    m_threadPool.detach_blocks<int>(0, m_size, iterateUpperRows);
+    m_threadPool.wait();
+
+    auto iterateLowerRows = [this](int start, int end)
     {
-        auto taskLower = m_threadPool.parallelize_loop(m_size, std::bind(&Life::iterateLowerRows, this, _1, _2));
-        taskLower.wait();
-    }
+        const auto diff = end - start;
+        iterateRows(start + (diff / 2), end);
+    };
+
+    m_threadPool.detach_blocks<int>(0, m_size, iterateLowerRows);
+    m_threadPool.wait();
 
     m_cells = m_cellsNext;
 }

@@ -65,8 +65,6 @@ private:
     void clearCell(int col, int row);
     void createGosperGliderGun();
     void createSimkinGliderGun();
-    void iterateUpperRows(int start, int end);
-    void iterateLowerRows(int start, int end);
     void iterateRows(int start, int end);
     void iterate();
 
