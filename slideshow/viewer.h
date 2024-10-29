@@ -58,8 +58,8 @@ public:
 private:
 
     bool haveImages() const { return m_current != INVALID_INDEX; }
-    bool viewingImage() const { return not m_isBlank; }
     bool originalSize() const { return m_percent == 100; }
+    bool viewingImage() const { return not m_isBlank; }
 
     void annotate();
     bool handleGeneral(fb32::Joystick& js);
@@ -71,6 +71,7 @@ private:
     void paint();
     void pan(int dx, int dy);
     fb32::Interface8880Point placeImage(const fb32::Image8880& image) const;
+    void processImage();
     void readDirectory();
     int zoomedHeight() const;
     int zoomedWidth() const;
@@ -85,8 +86,9 @@ private:
     std::string m_directory;
     std::vector<std::string> m_files;
     bool m_fitToScreen;
-    bool m_isBlank;
     fb32::Image8880 m_image;
+    fb32::Image8880 m_imageProcessed;
+    bool m_isBlank;
     int m_percent;
     int m_xOffset;
     int m_yOffset;

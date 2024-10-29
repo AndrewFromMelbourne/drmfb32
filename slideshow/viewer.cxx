@@ -69,8 +69,9 @@ Viewer::Viewer(
     m_current{-1},
     m_directory{folder},
     m_files{},
-    m_image{},
     m_fitToScreen{false},
+    m_image{},
+    m_imageProcessed{},
     m_isBlank{false},
     m_percent{100},
     m_xOffset{0},
@@ -198,6 +199,7 @@ Viewer::handleImageViewing(
         if (m_zoom < MAX_ZOOM)
         {
             ++m_zoom;
+            processImage();
             paint();
             return true;
         }
@@ -214,6 +216,7 @@ Viewer::handleImageViewing(
                 m_yOffset = 0;
             }
 
+            processImage();
             paint();
             return true;
         }
@@ -221,6 +224,7 @@ Viewer::handleImageViewing(
     if (js.buttonPressed(fb32::Joystick::BUTTON_LEFT_SHOULDER))
     {
             m_fitToScreen = !m_fitToScreen;
+            processImage();
             paint();
             return true;
     }
@@ -285,6 +289,20 @@ Viewer::imagePrevious()
 
 // ------------------------------------------------------------------------
 
+void
+Viewer::openImage()
+{
+    m_image = fb32::readJpeg(m_files[m_current]);
+
+    m_xOffset = 0;
+    m_yOffset = 0;
+
+    processImage();
+    paint();
+}
+
+// ------------------------------------------------------------------------
+
 bool
 Viewer::oversize() const
 {
@@ -297,19 +315,6 @@ Viewer::oversize() const
     {
         return false;
     }
-}
-
-// ------------------------------------------------------------------------
-
-void
-Viewer::openImage()
-{
-    m_image = fb32::readJpeg(m_files[m_current]);
-
-    m_xOffset = 0;
-    m_yOffset = 0;
-
-    paint();
 }
 
 // ------------------------------------------------------------------------
@@ -330,38 +335,7 @@ Viewer::paint()
         m_yOffset = 0;
     }
 
-    fb32::Image8880 image;
-
-    if (((m_zoom == SCALE_OVERSIZED) and not oversize() and not m_fitToScreen) or (m_zoom == 1))
-    {
-        image = m_image;
-        m_percent = 100;
-    }
-    else
-    {
-        if (m_zoom == SCALE_OVERSIZED)
-        {
-            int width = (m_buffer.getHeight() * m_image.getWidth()) / m_image.getHeight();
-            int height = m_buffer.getHeight();
-
-            if (width > m_buffer.getWidth())
-            {
-                width = m_buffer.getWidth();
-                height = (m_buffer.getWidth() * m_image.getHeight()) / m_image.getWidth();
-            }
-
-            image = m_image.resizeNearestNeighbour(width, height);
-            auto percent = (100.0 * image.getWidth()) / m_image.getWidth();
-            m_percent = static_cast<int>(0.5 + percent);
-        }
-        else
-        {
-            image = m_image.scaleUp(m_zoom);
-            m_percent = m_zoom * 100;
-        }
-    }
-
-    m_buffer.putImage(placeImage(image), image);
+    m_buffer.putImage(placeImage(m_imageProcessed), m_imageProcessed);
     annotate();
 }
 
@@ -387,6 +361,46 @@ Viewer::placeImage(
     auto y = (m_buffer.getHeight() / 2) - (image.getHeight() / 2) + m_yOffset;
 
     return fb32::Interface8880Point{x, y};
+}
+
+// ------------------------------------------------------------------------
+
+void
+Viewer::processImage()
+{
+    if (((m_zoom == SCALE_OVERSIZED) and
+         not oversize() and
+         not m_fitToScreen) or (m_zoom == 1))
+    {
+        m_imageProcessed = m_image;
+        m_percent = 100;
+    }
+    else
+    {
+        if (m_zoom == SCALE_OVERSIZED)
+        {
+            int width = (m_buffer.getHeight() * m_image.getWidth()) /
+                         m_image.getHeight();
+            int height = m_buffer.getHeight();
+
+            if (width > m_buffer.getWidth())
+            {
+                width = m_buffer.getWidth();
+                height = (m_buffer.getWidth() * m_image.getHeight()) /
+                          m_image.getWidth();
+            }
+
+            m_imageProcessed = m_image.resizeNearestNeighbour(width, height);
+            auto percent = (100.0 * m_imageProcessed.getWidth()) /
+                           m_image.getWidth();
+            m_percent = static_cast<int>(0.5 + percent);
+        }
+        else
+        {
+            m_imageProcessed = m_image.scaleUp(m_zoom);
+            m_percent = m_zoom * 100;
+        }
+    }
 }
 
 // ------------------------------------------------------------------------
