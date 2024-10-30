@@ -168,7 +168,7 @@ main(
         {
             for (int i = 0 ; i < 16 ; ++i)
             {
-                uint8_t c = static_cast<uint8_t>(i + (j * 16));
+                const uint8_t c = static_cast<uint8_t>(i + (j * 16));
                 p.setX(i * ft.getPixelWidth());
                 ft.drawChar(p, c, white, image);
             }

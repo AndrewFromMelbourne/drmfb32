@@ -159,14 +159,14 @@ DynamicInfo::drawTemperature(
                                m_heading,
                                getImage());
 
-    std::string temperatureString{getTemperature()};
+    const std::string temperatureString{getTemperature()};
 
     position = font.drawString(position,
                                temperatureString,
                                m_foreground,
                                getImage());
 
-    auto degreeSymbol = font.getCharacterCode(fb32::Interface8880Font::CharacterCode::DEGREE_SYMBOL);
+    const auto degreeSymbol = font.getCharacterCode(fb32::Interface8880Font::CharacterCode::DEGREE_SYMBOL);
 
     if (degreeSymbol)
     {
@@ -196,7 +196,7 @@ DynamicInfo::drawTime(
                                m_heading,
                                getImage());
 
-    std::string timeString = getTime(now);
+    const std::string timeString = getTime(now);
 
     position = font.drawString(position,
                                timeString + " ",

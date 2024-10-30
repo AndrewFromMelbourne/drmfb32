@@ -131,9 +131,8 @@ NetworkTrace::update(
     time_t now,
     fb32::Interface8880Font& font)
 {
-    NetworkStats currentStats;
-
-    NetworkStats diff{currentStats - m_previousStats};
+    const NetworkStats currentStats;
+    const NetworkStats diff{currentStats - m_previousStats};
 
     constexpr uint32_t zero{0};
     const int tx = std::max(zero, diff.tx());

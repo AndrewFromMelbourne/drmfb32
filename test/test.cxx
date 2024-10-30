@@ -139,11 +139,23 @@ main(
 
         //-----------------------------------------------------------------
 
-        RGB8880 red{255, 0, 0};
-        RGB8880 green{0, 255, 0};
+        const RGB8880 red{255, 0, 0};
+        const RGB8880 green{0, 255, 0};
 
-        std::cout << "  red: 0x" << std::setfill('0') << std::setw(8) << std::hex << red.get8880() << "\n";
-        std::cout << "green: 0x" << std::setfill('0') << std::setw(8) << std::hex << green.get8880() << "\n";
+        std::cout
+            << "  red: 0x"
+            << std::setfill('0')
+            << std::setw(8)
+            << std::hex
+            << red.get8880()
+            << '\n';
+        std::cout
+            << "green: 0x"
+            << std::setfill('0')
+            << std::setw(8)
+            << std::hex
+            << green.get8880()
+            << '\n';
 
         //-----------------------------------------------------------------
 
@@ -160,7 +172,7 @@ main(
              Interface8880Point(47,47),
              green);
 
-        Interface8880Point imageLocation
+        const Interface8880Point imageLocation
         {
             (fb.getWidth() - image.getWidth()) / 2,
             (fb.getHeight() - image.getHeight()) / 2
@@ -175,16 +187,28 @@ main(
 
         //-----------------------------------------------------------------
 
-        RGB8880 darkBlue{0, 0, 63};
-        RGB8880 white{255, 255, 255};
+        const RGB8880 darkBlue{0, 0, 63};
+        const RGB8880 white{255, 255, 255};
 
-        std::cout << "Dblue: 0x" << std::setfill('0') << std::setw(8) << std::hex << darkBlue.get8880() << "\n";
-        std::cout << "white: 0x" << std::setfill('0') << std::setw(8) << std::hex << white.get8880() << "\n";
+        std::cout
+            << "Dblue: 0x"
+            << std::setfill('0')
+            << std::setw(8)
+            << std::hex
+            << darkBlue.get8880()
+            << '\n';
+        std::cout
+            << "white: 0x"
+            << std::setfill('0')
+            << std::setw(8)
+            << std::hex
+            << white.get8880()
+            << '\n';
 
         Image8880 textImage(248, 16);
         textImage.clear(darkBlue);
 
-        Interface8880Point textLocation
+        const Interface8880Point textLocation
         {
             (fb.getWidth() - textImage.getWidth()) / 2,
             (fb.getHeight() - textImage.getHeight()) / 3
@@ -210,13 +234,13 @@ main(
         fb.clear();
         textImage = textImage.scaleUp(3);
 
-        textLocation = Interface8880Point
+        const Interface8880Point textLocation2
         {
             (fb.getWidth() - textImage.getWidth()) / 2,
             (fb.getHeight() - textImage.getHeight()) / 2
         };
 
-        fb.putImage(textLocation, textImage);
+        fb.putImage(textLocation2, textImage);
 
         //-----------------------------------------------------------------
 
@@ -231,3 +255,4 @@ main(
 
     return 0;
 }
+

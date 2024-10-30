@@ -150,9 +150,7 @@ main(
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{font, 32};
-        Interface8880Point p{0, 0};
-
-        p = ft.drawWideChar(p, c, white, image);
+        Interface8880Point p = ft.drawWideChar(p, c, white, image);
 
         //-----------------------------------------------------------------
 

@@ -72,18 +72,18 @@ Sphere::update()
 
     for (auto j = 0 ; j < m_size ; ++j)
     {
-        double y = double(radius - j) / radius;
+        const double y = double(radius - j) / radius;
         for (auto i = 0 ; i < m_size ; ++i)
         {
             uint8_t grey{};
 
-            double x = double(i - radius) / radius;
-            double sum = x * x + y * y;
+            const double x = double(i - radius) / radius;
+            const double sum = x * x + y * y;
 
             if (sum <= 1.0)
             {
-                double z = std::sqrt(1.0 - sum);
-                vector3 v{x, y, z};
+                const double z = std::sqrt(1.0 - sum);
+                const vector3 v{x, y, z};
                 double intensity = dot(v, m_light);
 
                 if (intensity < 0.0)
@@ -101,7 +101,7 @@ Sphere::update()
                 grey = (uint8_t)std::ceil(255.0 * (intensity + m_ambient));
             }
 
-            Interface8880Point p{i, j};
+            const Interface8880Point p{i, j};
             m_image.setPixelRGB(p, RGB8880(grey, grey, grey));
         }
     }

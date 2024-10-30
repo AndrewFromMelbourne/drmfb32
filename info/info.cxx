@@ -413,8 +413,8 @@ main(
 
         while (run)
         {
-            auto now = std::chrono::system_clock::now();
-            auto now_t = std::chrono::system_clock::to_time_t(now);
+            const auto now = std::chrono::system_clock::now();
+            const auto now_t = std::chrono::system_clock::to_time_t(now);
 
             for (auto& panel : panels)
             {

@@ -124,7 +124,9 @@ drm::drmModeObjectGetProperties(
     uint32_t objectId,
     uint32_t objectType)
 {
-    return drmModeObjectProperties_ptr(::drmModeObjectGetProperties(fd.fd(), objectId, objectType),
+    return drmModeObjectProperties_ptr(::drmModeObjectGetProperties(fd.fd(),
+                                                                    objectId,
+                                                                    objectType),
                                        &drmModeFreeObjectProperties);
 }
 

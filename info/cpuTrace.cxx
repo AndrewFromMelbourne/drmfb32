@@ -149,11 +149,10 @@ CpuTrace::update(
     time_t now,
     fb32::Interface8880Font& font)
 {
-    CpuStats currentStats;
+    const CpuStats currentStats;
+    const CpuStats diff{currentStats - m_previousStats};
 
-    CpuStats diff{currentStats - m_previousStats};
-
-    uint32_t totalCpu = diff.total();
+    const uint32_t totalCpu = diff.total();
 
     int user = (diff.user() * m_traceScale) / totalCpu;
     int nice = (diff.nice() * m_traceScale) / totalCpu;

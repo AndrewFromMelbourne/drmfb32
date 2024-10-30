@@ -182,8 +182,6 @@ bool
 Viewer::handleImageViewing(
     fb32::Joystick& js)
 {
-    bool result{false};
-
     if (js.buttonPressed(fb32::Joystick::BUTTON_Y))
     {
         imagePrevious();
@@ -242,8 +240,12 @@ Viewer::handleImageViewing(
         return false;
     }
 
-    auto dx = (value.x) ? (10 * value.x / std::abs(value.x)) : 0;
-    auto dy = (value.y) ? (10 * value.y / std::abs(value.y)) : 0;
+    const auto dx = (value.x)
+                  ? (10 * value.x / std::abs(value.x))
+                  : 0;
+    const auto dy = (value.y)
+                  ? (10 * value.y / std::abs(value.y))
+                  : 0;
 
     pan(dx, dy);
     paint();
@@ -357,8 +359,12 @@ fb32::Interface8880Point
 Viewer::placeImage(
     const fb32::Image8880& image) const
 {
-    auto x = (m_buffer.getWidth() / 2) - (image.getWidth() / 2) + m_xOffset;
-    auto y = (m_buffer.getHeight() / 2) - (image.getHeight() / 2) + m_yOffset;
+    const auto x = (m_buffer.getWidth() / 2) -
+                   (image.getWidth() / 2) +
+                   m_xOffset;
+    const auto y = (m_buffer.getHeight() / 2) -
+                   (image.getHeight() / 2) +
+                   m_yOffset;
 
     return fb32::Interface8880Point{x, y};
 }
@@ -445,7 +451,7 @@ Viewer::readDirectory()
 int
 Viewer::zoomedHeight() const
 {
-    auto zoom = (m_zoom == 0) ? 1 : m_zoom;
+    const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 
     return m_image.getHeight() * zoom;
 }
@@ -455,7 +461,7 @@ Viewer::zoomedHeight() const
 int
 Viewer::zoomedWidth() const
 {
-    auto zoom = (m_zoom == 0) ? 1 : m_zoom;
+    const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 
     return m_image.getWidth() * zoom;
 }

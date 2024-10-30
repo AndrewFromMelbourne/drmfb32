@@ -137,7 +137,7 @@ Puzzle::init()
         for (auto i = 0 ; i < boardSize - 1 ; ++i)
         {
             std::uniform_int_distribution<> distribution(i, boardSize - 1);
-            auto j = distribution(generator);
+            const auto j = distribution(generator);
             std::swap(m_board[i], m_board[j]);
         }
 
@@ -172,18 +172,21 @@ Puzzle::update(Joystick& js)
         return false;
     }
 
-    auto dx = (value.x) ? (value.x / std::abs(value.x)) : 0;
-    auto dy = (value.y) ? (value.y / std::abs(value.y)) : 0;
+    const auto dx = (value.x) ? (value.x / std::abs(value.x)) : 0;
+    const auto dy = (value.y) ? (value.y / std::abs(value.y)) : 0;
 
-    Location newLocation = {.x = m_blankLocation.x - dx, .y = m_blankLocation.y - dy};
+    const Location newLocation = { .x = m_blankLocation.x - dx,
+                                   .y = m_blankLocation.y - dy};
 
     if ((newLocation.x >= 0) and
         (newLocation.x < puzzleWidth) and
         (newLocation.y >= 0) and
         (newLocation.y < puzzleHeight))
     {
-        const auto indexNew = newLocation.x + (newLocation.y * puzzleWidth);
-        const auto indexBlank = m_blankLocation.x + (m_blankLocation.y * puzzleWidth);
+        const auto indexNew = newLocation.x
+                            + (newLocation.y * puzzleWidth);
+        const auto indexBlank = m_blankLocation.x
+                              + (m_blankLocation.y * puzzleWidth);
         std::swap(m_board[indexNew], m_board[indexBlank]);
 
         m_blankLocation = newLocation;
@@ -207,8 +210,8 @@ Puzzle::draw(Interface8880& fb)
     {
         for (int i = 0 ; i < puzzleWidth ; ++i)
         {
-           Interface8880Point p{ xOffset + (i * tileWidth),
-                                 yOffset + (j * tileHeight) };
+           const Interface8880Point p{ xOffset + (i * tileWidth),
+                                       yOffset + (j * tileHeight) };
            int tile = m_board[i + (j * puzzleWidth)];
            fb.putImage(p, m_tileBuffers[tile]);
         }

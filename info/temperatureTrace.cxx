@@ -65,8 +65,7 @@ TemperatureTrace::update(
     time_t now,
     fb32::Interface8880Font& font)
 {
-    auto temperature{inf::getTemperature()};
-
+    const auto temperature{inf::getTemperature()};
     Trace::addData(std::vector<int>{temperature}, now);
 }
 
