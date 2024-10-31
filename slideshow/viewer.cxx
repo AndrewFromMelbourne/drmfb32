@@ -79,6 +79,11 @@ Viewer::Viewer(
     m_zoom{0}
 {
     readDirectory();
+
+    if (m_files.size() == 0)
+    {
+        throw std::invalid_argument("No files found.");
+    }
 }
 
 // ------------------------------------------------------------------------
@@ -123,7 +128,7 @@ Viewer::annotate()
     }
 
     auto name = m_files[m_current];
-    auto annotation = name.substr(m_directory.length());
+    auto annotation = name.substr(m_directory.length() + 1);
 
     annotation += " ( " +
                   std::to_string(m_image.getWidth()) +
