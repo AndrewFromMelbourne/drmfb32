@@ -51,19 +51,25 @@ namespace
 
 //-------------------------------------------------------------------------
 
-std::string
-getIpAddress(
-    char& interface)
+struct IpAddress
 {
-    interface = 'X';
-    std::string address{"   .   .   .   "};
+    std::string address;
+    char interface;
+};
+
+//-------------------------------------------------------------------------
+
+IpAddress
+getIpAddress()
+{
+    IpAddress result{ .address = "   .   .   .   ", .interface = 'X'};
 
     ifaddrs* ifaddr{};
     ::getifaddrs(&ifaddr);
 
     if (not ifaddr)
     {
-        return address;
+        return result;
     }
 
     for (auto ifa = ifaddr ; ifa != nullptr ; ifa = ifa->ifa_next)
@@ -76,8 +82,8 @@ getIpAddress(
             {
                 char buffer[INET_ADDRSTRLEN];
                 ::inet_ntop(AF_INET, addr, buffer, sizeof(buffer));
-                address = buffer;
-                interface = ifa->ifa_name[0];
+                result.address = buffer;
+                result.interface = ifa->ifa_name[0];
                 break;
             }
         }
@@ -85,7 +91,7 @@ getIpAddress(
 
     ::freeifaddrs(ifaddr);
 
-    return address;
+    return result;
 }
 
 //-------------------------------------------------------------------------
@@ -127,11 +133,10 @@ DynamicInfo::drawIpAddress(
                                m_heading,
                                getImage());
 
-    char interface = ' ';
-    std::string ipaddress = getIpAddress(interface);
+    const auto ipaddress = getIpAddress();
 
     position = font.drawChar(position,
-                             interface,
+                             ipaddress.interface,
                              m_foreground,
                              getImage());
 
@@ -141,7 +146,7 @@ DynamicInfo::drawIpAddress(
                                getImage());
 
     position = font.drawString(position,
-                               ipaddress + " ",
+                               ipaddress.address + " ",
                                m_foreground,
                                getImage());
 
@@ -166,7 +171,8 @@ DynamicInfo::drawTemperature(
                                m_foreground,
                                getImage());
 
-    const auto degreeSymbol = font.getCharacterCode(fb32::Interface8880Font::CharacterCode::DEGREE_SYMBOL);
+    const auto degreeCode{fb32::Interface8880Font::CharacterCode::DEGREE_SYMBOL};
+    const auto degreeSymbol = font.getCharacterCode(degreeCode);
 
     if (degreeSymbol)
     {
