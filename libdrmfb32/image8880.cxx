@@ -180,7 +180,7 @@ fb32::Image8880::resizeBilinearInterpolation(
 
                 typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
 
-                auto weigh = [&a, &b, &c, &d, xWeight, yWeight](RGB8880MemFn get) -> uint8_t
+                auto evaluate = [&a, &b, &c, &d, xWeight, yWeight](RGB8880MemFn get) -> uint8_t
                 {
                     float value = std::invoke(get, a) * (1.0f - xWeight) * (1.0f - yWeight) +
                                   std::invoke(get, b) * xWeight * (1.0f - yWeight) +
@@ -190,9 +190,9 @@ fb32::Image8880::resizeBilinearInterpolation(
                     return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
                 };
 
-                RGB8880 rgb{weigh(&RGB8880::getRed),
-                            weigh(&RGB8880::getGreen),
-                            weigh(&RGB8880::getBlue)};
+                RGB8880 rgb{evaluate(&RGB8880::getRed),
+                            evaluate(&RGB8880::getGreen),
+                            evaluate(&RGB8880::getBlue)};
 
                 image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
             }
