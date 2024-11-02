@@ -232,15 +232,33 @@ main(
         //-----------------------------------------------------------------
 
         fb.clear();
-        textImage = textImage.scaleUp(3);
+        auto textImageZoomed = textImage.scaleUp(3);
 
-        const Interface8880Point textLocation2
+        const Interface8880Point textLocationZoomed
         {
-            (fb.getWidth() - textImage.getWidth()) / 2,
-            (fb.getHeight() - textImage.getHeight()) / 2
+            (fb.getWidth() - textImageZoomed.getWidth()) / 2,
+            (fb.getHeight() - textImageZoomed.getHeight()) / 2
         };
 
-        fb.putImage(textLocation2, textImage);
+        fb.putImage(textLocationZoomed, textImageZoomed);
+
+        //-----------------------------------------------------------------
+
+        std::this_thread::sleep_for(10s);
+        fb.clear();
+
+        //-----------------------------------------------------------------
+
+        fb.clear();
+        textImageZoomed = textImage.resizeBilinearInterpolation(248 * 3, 16 * 3);
+
+        const Interface8880Point textLocationZoomed2
+        {
+            (fb.getWidth() - textImageZoomed.getWidth()) / 2,
+            (fb.getHeight() - textImageZoomed.getHeight()) / 2
+        };
+
+        fb.putImage(textLocationZoomed2, textImageZoomed);
 
         //-----------------------------------------------------------------
 

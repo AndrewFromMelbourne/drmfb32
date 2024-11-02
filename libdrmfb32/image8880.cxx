@@ -25,6 +25,9 @@
 //
 //-------------------------------------------------------------------------
 
+#include <algorithm>
+#include <cmath>
+#include <functional>
 #include <stdexcept>
 
 #include "image8880.h"
@@ -137,6 +140,66 @@ fb32::Image8880::getRow(
     {
         return nullptr;
     }
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::resizeBilinearInterpolation(
+    int width,
+    int height) const
+{
+    if ((width <= 0) or (height <= 0))
+    {
+        throw std::invalid_argument("width and height must be greater than zero");
+    }
+
+    float xRatio = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
+    float yRatio = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
+
+    Image8880 image{width, height, m_numberOfFrames};
+
+    for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        for (int j = 0; j < height; ++j)
+        {
+            for (int i = 0; i < width; ++i)
+            {
+                int xLow = static_cast<int>(std::floor(xRatio * i));
+                int yLow = static_cast<int>(std::floor(yRatio * j));
+                int xHigh = static_cast<int>(std::ceil(xRatio * i));
+                int yHigh = static_cast<int>(std::ceil(yRatio * j));
+
+                float xWeight = (xRatio * i) - xLow;
+                float yWeight = (yRatio * j) - yLow;
+
+                auto a = *getPixelRGB(Interface8880Point{xLow, yLow});
+                auto b = *getPixelRGB(Interface8880Point{xHigh, yLow});
+                auto c = *getPixelRGB(Interface8880Point{xLow, yHigh});
+                auto d = *getPixelRGB(Interface8880Point{xHigh, yHigh});
+
+                typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
+
+                auto weigh = [&a, &b, &c, &d, xWeight, yWeight](RGB8880MemFn get) -> uint8_t
+                {
+                    float value = std::invoke(get, a) * (1.0f - xWeight) * (1.0f - yWeight) +
+                                  std::invoke(get, b) * xWeight * (1.0f - yWeight) +
+                                  std::invoke(get, c) * (1.0f - xWeight) * yWeight +
+                                  std::invoke(get, d) * xWeight * yWeight;
+
+                    return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
+                };
+
+                RGB8880 rgb{weigh(&RGB8880::getRed),
+                            weigh(&RGB8880::getGreen),
+                            weigh(&RGB8880::getBlue)};
+
+                image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
+            }
+        }
+    }
+
+    return image;
 }
 
 //-------------------------------------------------------------------------

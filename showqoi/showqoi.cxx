@@ -197,7 +197,7 @@ main(
                 height = (fb.getWidth() * image.getHeight()) / image.getWidth();
             }
 
-            image = image.resizeNearestNeighbour(width, height);
+            image = image.resizeBilinearInterpolation(width, height);
         }
 
         const Interface8880Point center{

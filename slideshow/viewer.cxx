@@ -128,7 +128,7 @@ Viewer::annotate()
     }
 
     auto name = m_files[m_current];
-    auto annotation = name.substr(m_directory.length() + 1);
+    auto annotation = name.substr(name.find_last_of('/') + 1);
 
     annotation += " ( " +
                   std::to_string(m_image.getWidth()) +
@@ -401,7 +401,7 @@ Viewer::processImage()
                           m_image.getWidth();
             }
 
-            m_imageProcessed = m_image.resizeNearestNeighbour(width, height);
+            m_imageProcessed = m_image.resizeBilinearInterpolation(width, height);
             auto percent = (100.0 * m_imageProcessed.getWidth()) /
                            m_image.getWidth();
             m_percent = static_cast<int>(0.5 + percent);
