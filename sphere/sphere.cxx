@@ -86,14 +86,7 @@ Sphere::update()
                 const vector3 v{x, y, z};
                 double intensity = dot(v, m_light);
 
-                if (intensity < 0.0)
-                {
-                    intensity = 0.0;
-                }
-                else if (intensity > 1.0)
-                {
-                    intensity = 1.0;
-                }
+                intensity = std::clamp(intensity, 0.0, 1.0);
 
                 intensity *= intensity;
                 intensity *= (1.0 - m_ambient);
@@ -115,14 +108,7 @@ Sphere::setLight(
     double inclination,
     double bearing)
 {
-    if (inclination < 0.0)
-    {
-        inclination = 0.0;
-    }
-    else if (inclination > 90.0)
-    {
-        inclination = 90.0;
-    }
+    inclination = std::clamp(inclination, 0.0, 90.0);
 
     auto deg2rad = [](double deg) -> double
     {
