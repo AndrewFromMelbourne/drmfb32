@@ -99,6 +99,7 @@ public:
 
 
     Image8880 resizeBilinearInterpolation(int width, int height) const;
+    Image8880 resizeLanczosInterpolation(int width, int height) const;
     Image8880 resizeNearestNeighbour(int width, int height) const;
 
     Image8880 scaleUp(uint8_t scale) const;

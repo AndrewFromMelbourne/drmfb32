@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <numbers>
 #include <stdexcept>
 
 #include "image8880.h"
@@ -154,8 +155,8 @@ fb32::Image8880::resizeBilinearInterpolation(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    float xRatio = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
-    float yRatio = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
+    float xScale = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
+    float yScale = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
 
     Image8880 image{width, height, m_numberOfFrames};
 
@@ -165,13 +166,13 @@ fb32::Image8880::resizeBilinearInterpolation(
         {
             for (int i = 0; i < width; ++i)
             {
-                int xLow = static_cast<int>(std::floor(xRatio * i));
-                int yLow = static_cast<int>(std::floor(yRatio * j));
-                int xHigh = static_cast<int>(std::ceil(xRatio * i));
-                int yHigh = static_cast<int>(std::ceil(yRatio * j));
+                int xLow = static_cast<int>(std::floor(xScale * i));
+                int yLow = static_cast<int>(std::floor(yScale * j));
+                int xHigh = static_cast<int>(std::ceil(xScale * i));
+                int yHigh = static_cast<int>(std::ceil(yScale * j));
 
-                float xWeight = (xRatio * i) - xLow;
-                float yWeight = (yRatio * j) - yLow;
+                float xWeight = (xScale * i) - xLow;
+                float yWeight = (yScale * j) - yLow;
 
                 auto a = *getPixelRGB(Interface8880Point{xLow, yLow});
                 auto b = *getPixelRGB(Interface8880Point{xHigh, yLow});
@@ -180,13 +181,102 @@ fb32::Image8880::resizeBilinearInterpolation(
 
                 typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
 
-                auto evaluate = [&a, &b, &c, &d, xWeight, yWeight](RGB8880MemFn get) -> uint8_t
+                auto evaluate = [&](RGB8880MemFn get) -> uint8_t
                 {
                     float value = std::invoke(get, a) * (1.0f - xWeight) * (1.0f - yWeight) +
                                   std::invoke(get, b) * xWeight * (1.0f - yWeight) +
                                   std::invoke(get, c) * (1.0f - xWeight) * yWeight +
                                   std::invoke(get, d) * xWeight * yWeight;
 
+                    return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
+                };
+
+                RGB8880 rgb{evaluate(&RGB8880::getRed),
+                            evaluate(&RGB8880::getGreen),
+                            evaluate(&RGB8880::getBlue)};
+
+                image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
+            }
+        }
+    }
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::resizeLanczosInterpolation(
+    int width,
+    int height) const
+{
+    constexpr int a{3};
+
+    if ((width <= 0) or (height <= 0))
+    {
+        throw std::invalid_argument("width and height must be greater than zero");
+    }
+
+    auto kernel = [](float x, int a) -> float
+    {
+        const auto pi = std::numbers::pi_v<float>;
+
+        if (x == 0.0)
+        {
+            return 1.0f;
+        }
+
+        if (x < -a or x > a)
+        {
+            return 0.0;
+        }
+
+        return (a * std::sin(pi * x) * std::sin(pi * x / a)) /
+               (pi * pi * x * x);
+    };
+
+    float xScale = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
+    float yScale = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
+
+    Image8880 image{width, height, m_numberOfFrames};
+
+    for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        for (int j = 0; j < height; ++j)
+        {
+            for (int i = 0; i < width; ++i)
+            {
+                const auto xMid = i * xScale;
+                const auto yMid = j * yScale;
+
+                const auto xLow = std::max(0, static_cast<int>(std::floor(xMid)) - a + 1);
+                const auto xHigh = std::min(m_width - 1, static_cast<int>(std::floor(xMid)) + a);
+                const auto yLow = std::max(0, static_cast<int>(std::floor(yMid)) - a + 1);
+                const auto yHigh = std::min(m_height - 1, static_cast<int>(std::floor(yMid)) + a);
+
+                typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
+
+                auto evaluate = [&](RGB8880MemFn get) -> uint8_t
+                {
+                    float weightsSum{};
+                    float valuesSum{};
+
+                    for (int y = yLow; y <= yHigh; ++y)
+                    {
+                        const auto dy = yMid - y;
+
+                        for (int x = xLow; x <= xHigh; ++x)
+                        {
+                            const auto dx = xMid - x;
+                            const auto weight = kernel(dx, a) * kernel(dy, a);
+                            weightsSum += weight;
+
+                            auto rgb = *getPixelRGB(Interface8880Point{x, y});
+                            valuesSum += std::invoke(get, rgb) * weight;
+                        }
+                    }
+
+                    const auto value = valuesSum / weightsSum;
                     return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
                 };
 
