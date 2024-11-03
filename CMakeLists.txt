@@ -173,6 +173,11 @@ target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(testResize test/testResize.cxx)
+target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 add_executable(joysticktest test/testJoystick.cxx)
 target_link_libraries(joysticktest drmfb32)
 

@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2024 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -45,18 +45,6 @@
 
 using namespace fb32;
 using namespace std::chrono_literals;
-
-//-------------------------------------------------------------------------
-
-#define TEST(expression, message) \
-    if (!expression) \
-    { \
-        std::cerr \
-            << __FILE__ "(" \
-            << __LINE__ \
-            << ") : " message " : " #expression " : test failed\n"; \
-        exit(EXIT_FAILURE); \
-    } \
 
 //-------------------------------------------------------------------------
 
@@ -137,82 +125,13 @@ main(
         FrameBuffer8880 fb{device, connector};
         fb.clear();
 
-        //-----------------------------------------------------------------
-
-        const RGB8880 red{255, 0, 0};
-        const RGB8880 green{0, 255, 0};
-
-        std::cout
-            << "  red: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << red.get8880()
-            << '\n';
-        std::cout
-            << "green: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << green.get8880()
-            << '\n';
-
-        //-----------------------------------------------------------------
-
-        Image8880 image{48, 48};
-        image.clear(red);
-
-        auto rgb = image.getPixelRGB(Interface8880Point(0,0));
-
-        TEST((rgb), "Image8880::getPixelRGB()");
-        TEST((*rgb == red), "Image8880::getPixelRGB()");
-
-        line(image,
-             Interface8880Point(0,0),
-             Interface8880Point(47,47),
-             green);
-
-        const Interface8880Point imageLocation
-        {
-            (fb.getWidth() - image.getWidth()) / 2,
-            (fb.getHeight() - image.getHeight()) / 2
-        };
-
-        fb.putImage(imageLocation, image);
-
-        rgb = fb.getPixelRGB(imageLocation);
-
-        TEST((rgb), "FrameBuffer8880::getPixelRGB()");
-        TEST((*rgb == green), "FrameBuffer8880::getPixelRGB()");
-
-        //-----------------------------------------------------------------
-
         const RGB8880 darkBlue{0, 0, 63};
         const RGB8880 white{255, 255, 255};
 
-        std::cout
-            << "Dblue: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << darkBlue.get8880()
-            << '\n';
-        std::cout
-            << "white: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << white.get8880()
-            << '\n';
+        Image8880 image(248, 16);
+        image.clear(darkBlue);
 
-        Image8880 textImage(248, 16);
-        textImage.clear(darkBlue);
-
-        const Interface8880Point textLocation
-        {
-            (fb.getWidth() - textImage.getWidth()) / 2,
-            (fb.getHeight() - textImage.getHeight()) / 3
-        };
+        //-----------------------------------------------------------------
 
         Image8880Font8x16 font;
 
@@ -220,10 +139,38 @@ main(
             Interface8880Point{4, 0},
             "Lorem ipsum dolor sit amet ...",
             white,
-            textImage);
+            image);
 
-        fb.putImage(textLocation, textImage);
-        fb.update();
+        //-----------------------------------------------------------------
+
+        auto imageSu = image.scaleUp(3);
+        auto imageNn =  image .resizeNearestNeighbour(248 * 3, 16 * 3);
+        auto imageBi = image.resizeBilinearInterpolation(248 * 3, 16 * 3);
+        auto imageLi = image.resizeLanczosInterpolation(248 * 3, 16 * 3);
+
+        Interface8880Point t{0, 0};
+        font.drawString(t, "Scale up:", white, fb);
+
+        Interface8880Point p{ 200, 0 };
+        fb.putImage(p, imageSu);
+
+        t.setY(t.y() + 56);
+        font.drawString(t, "Nearest neighbour:", white, fb);
+
+        p.setY(p.y() + 56);
+        fb.putImage(p, imageNn);
+
+        t.setY(t.y() + 56);
+        font.drawString(t, "Bilinear interpolation:", white, fb);
+
+        p.setY(p.y() + 56);
+        fb.putImage(p, imageBi);
+
+        t.setY(t.y() + 56);
+        font.drawString(t, "Lanczos interpolation:", white, fb);
+
+        p.setY(p.y() + 56);
+        fb.putImage(p, imageLi);
 
         //-----------------------------------------------------------------
 
