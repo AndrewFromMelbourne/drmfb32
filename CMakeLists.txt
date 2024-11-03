@@ -153,7 +153,6 @@ target_link_libraries(testCircle drmfb32 ${DRM_LIBRARIES})
 #--------------------------------------------------------------------------
 
 if (FREETYPE_FOUND)
-
 add_executable(testft test/testft.cxx)
 target_link_libraries(testft drmfb32
                              ${DRM_LIBRARIE}
@@ -163,7 +162,6 @@ add_executable(testft2 test/testft2.cxx)
 target_link_libraries(testft2 drmfb32
                              ${DRM_LIBRARIE}
                              ${FREETYPE_LIBRARIES})
-
 endif()
 
 #--------------------------------------------------------------------------

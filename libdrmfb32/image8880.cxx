@@ -228,7 +228,7 @@ fb32::Image8880::resizeLanczosInterpolation(
 
         if (x < -a or x > a)
         {
-            return 0.0;
+            return 0.0f;
         }
 
         return (a * std::sin(pi * x) * std::sin(pi * x / a)) /
@@ -254,35 +254,36 @@ fb32::Image8880::resizeLanczosInterpolation(
                 const auto yLow = std::max(0, static_cast<int>(std::floor(yMid)) - a + 1);
                 const auto yHigh = std::min(m_height - 1, static_cast<int>(std::floor(yMid)) + a);
 
-                typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
+                float weightsSum{};
+                float redSum{};
+                float greenSum{};
+                float blueSum{};
 
-                auto evaluate = [&](RGB8880MemFn get) -> uint8_t
+                for (int y = yLow; y <= yHigh; ++y)
                 {
-                    float weightsSum{};
-                    float valuesSum{};
+                    const auto dy = yMid - y;
+                    const auto yKernelValue = kernel(dy, a);
 
-                    for (int y = yLow; y <= yHigh; ++y)
+                    for (int x = xLow; x <= xHigh; ++x)
                     {
-                        const auto dy = yMid - y;
+                        const auto dx = xMid - x;
+                        const auto weight = kernel(dx, a) * yKernelValue;
+                        weightsSum += weight;
 
-                        for (int x = xLow; x <= xHigh; ++x)
-                        {
-                            const auto dx = xMid - x;
-                            const auto weight = kernel(dx, a) * kernel(dy, a);
-                            weightsSum += weight;
-
-                            auto rgb = *getPixelRGB(Interface8880Point{x, y});
-                            valuesSum += std::invoke(get, rgb) * weight;
-                        }
+                        auto rgb = *getPixelRGB(Interface8880Point{x, y});
+                        redSum += rgb.getRed() * weight;
+                        greenSum += rgb.getGreen() * weight;
+                        blueSum += rgb.getBlue() * weight;
                     }
+                }
 
-                    const auto value = valuesSum / weightsSum;
-                    return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
-                };
+                const auto red = std::clamp(redSum / weightsSum, 0.0f, 255.0f);
+                const auto green = std::clamp(greenSum / weightsSum, 0.0f, 255.0f);
+                const auto blue = std::clamp(blueSum / weightsSum, 0.0f, 255.0f);
 
-                RGB8880 rgb{evaluate(&RGB8880::getRed),
-                            evaluate(&RGB8880::getGreen),
-                            evaluate(&RGB8880::getBlue)};
+                RGB8880 rgb{static_cast<uint8_t>(red),
+                            static_cast<uint8_t>(green),
+                            static_cast<uint8_t>(blue)};
 
                 image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
             }
