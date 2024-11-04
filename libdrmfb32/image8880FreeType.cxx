@@ -168,7 +168,7 @@ Image8880FreeType::drawWideChar(
     Interface8880& image)
 {
     Interface8880Point position{p};
-    position.setY(position.y() + (m_face->size->metrics.ascender >> 6));
+    position.incrY(m_face->size->metrics.ascender >> 6);
     const auto glyph_index{FT_Get_Char_Index(m_face, c)};
 
     if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
@@ -182,10 +182,10 @@ Image8880FreeType::drawWideChar(
                  image);
 
 
-        position.setX(position.x() + (slot->advance.x >> 6));
+        position.incrX(slot->advance.x >> 6);
     }
 
-    position.setY(position.y() - (m_face->size->metrics.ascender >> 6));
+    position.incrY(-(m_face->size->metrics.ascender >> 6));
     return position;
 }
 
@@ -228,7 +228,7 @@ Image8880FreeType::drawString(
     Interface8880& image)
 {
     Interface8880Point position{p};
-    position.setY(position.y() + (m_face->size->metrics.ascender >> 6));
+    position.incrY(m_face->size->metrics.ascender >> 6);
 
     auto slot{m_face->glyph};
     auto use_kerning{FT_HAS_KERNING(m_face)};
@@ -254,7 +254,7 @@ Image8880FreeType::drawString(
                                ft_kerning_default,
                                &delta);
 
-                position.setX(position.x() + (delta.x >> 6));
+                position.incrX(delta.x >> 6);
             }
 
             if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
@@ -268,7 +268,7 @@ Image8880FreeType::drawString(
                          image);
 
 
-                position.setX(position.x() + (slot->advance.x >> 6));
+                position.incrX(slot->advance.x >> 6);
                 previous = glyph_index;
             }
         }
@@ -280,10 +280,10 @@ Image8880FreeType::drawString(
 
     if (advance > 0)
     {
-        position.setX(position.x() + advance);
+        position.incrX(advance);
     }
 
-    position.setY(position.y() - (m_face->size->metrics.ascender >> 6));
+    position.incrY(-(m_face->size->metrics.ascender >> 6));
 
     return position;
 }

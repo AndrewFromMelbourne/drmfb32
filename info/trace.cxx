@@ -112,7 +112,7 @@ Trace::init(
         }
         else
         {
-            position.setX(position.x() + font.getPixelWidth());
+            position.incrX(font.getPixelWidth());
         }
 
         position = font.drawString(position,
@@ -129,7 +129,7 @@ Trace::init(
         const fb32::Interface8880Point p2{position.x() + 3 * quaterWidth, position.y() + 3 * quaterHeight};
 
         boxFilled(getImage(), p1, p2, trace.m_traceColour);
-        position.setX(position.x() + font.getPixelWidth());
+        position.incrX(font.getPixelWidth());
     }
 
     position = font.drawString(position,

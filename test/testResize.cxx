@@ -128,7 +128,10 @@ main(
         const RGB8880 darkBlue{0, 0, 63};
         const RGB8880 white{255, 255, 255};
 
-        Image8880 image(248, 16);
+        constexpr int width{248};
+        constexpr int height{16};
+
+        Image8880 image(width, height);
         image.clear(darkBlue);
 
         //-----------------------------------------------------------------
@@ -143,33 +146,39 @@ main(
 
         //-----------------------------------------------------------------
 
-        auto imageSu = image.scaleUp(3);
-        auto imageNn =  image .resizeNearestNeighbour(248 * 3, 16 * 3);
-        auto imageBi = image.resizeBilinearInterpolation(248 * 3, 16 * 3);
-        auto imageLi = image.resizeLanczosInterpolation(248 * 3, 16 * 3);
+        constexpr int scale{3};
+        constexpr int swidth{scale * width};
+        constexpr int sheight{scale * height};
+        constexpr int imageOffset{200};
+        constexpr int yStep{sheight + 8};
+
+        auto imageSu = image.scaleUp(scale);
+        auto imageNn =  image.resizeNearestNeighbour(swidth, sheight);
+        auto imageBi = image.resizeBilinearInterpolation(swidth, sheight);
+        auto imageLi = image.resizeLanczosInterpolation(swidth, sheight);
 
         Interface8880Point t{0, 0};
         font.drawString(t, "Scale up:", white, fb);
 
-        Interface8880Point p{ 200, 0 };
+        Interface8880Point p{ imageOffset, 0 };
         fb.putImage(p, imageSu);
 
-        t.setY(t.y() + 56);
+        t.incrY(yStep);
         font.drawString(t, "Nearest neighbour:", white, fb);
 
-        p.setY(p.y() + 56);
+        p.incrY(yStep);
         fb.putImage(p, imageNn);
 
-        t.setY(t.y() + 56);
+        t.incrY(yStep);
         font.drawString(t, "Bilinear interpolation:", white, fb);
 
-        p.setY(p.y() + 56);
+        p.incrY(yStep);
         fb.putImage(p, imageBi);
 
-        t.setY(t.y() + 56);
+        t.incrY(yStep);
         font.drawString(t, "Lanczos interpolation:", white, fb);
 
-        p.setY(p.y() + 56);
+        p.incrY(yStep);
         fb.putImage(p, imageLi);
 
         //-----------------------------------------------------------------

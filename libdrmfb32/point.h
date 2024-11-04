@@ -52,6 +52,29 @@ public:
     T y() const { return m_y; }
 
     void
+    incr(
+        T dx,
+        T dy)
+    {
+        m_x += dx;
+        m_y += dy;
+    }
+
+    void
+    incrX(
+        T dx)
+    {
+        m_x += dx;
+    }
+
+    void
+    incrY(
+        T dy)
+    {
+        m_y += dy;
+    }
+
+    void
     set(
         T x,
         T y)
