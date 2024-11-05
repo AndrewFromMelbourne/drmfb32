@@ -44,6 +44,12 @@ target_include_directories(drmfb32 PUBLIC ${TURBJPEG_INCLUDE_DIRS})
 target_sources(drmfb32 PRIVATE libdrmfb32/image8880Jpeg.cxx)
 endif()
 
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
+set(WITH_BS_THREAD_POOL TRUE)
+set(BS_THREAD_LIBRARIES Threads::Threads)
+add_compile_definitions(WITH_BS_THREAD_POOL)
+endif()
+
 include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32
                     ${PROJECT_SOURCE_DIR}/thread-pool/include)
 target_include_directories(drmfb32 PUBLIC ${DRM_INCLUDE_DIRS})
@@ -87,14 +93,11 @@ target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
-
 add_executable(life life/main.cxx
                     life/life.cxx)
 
-target_link_libraries(life drmfb32 ${DRM_LIBRARIES} Threads::Threads)
-
-endif()
+target_link_libraries(life drmfb32 ${DRM_LIBRARIES}
+                                   ${BS_THREAD_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
