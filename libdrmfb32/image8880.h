@@ -90,6 +90,9 @@ public:
         return getPixel(p, m_frame);
     }
 
+    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p, uint8_t frame) const;
+    std::optional<uint32_t> getPixel(const Interface8880Point& p, uint8_t frame) const;
+
     const uint32_t* getRow(int y) const;
 
     size_t offset(const Interface8880Point& p) const override
@@ -99,7 +102,7 @@ public:
 
 
     Image8880 resizeBilinearInterpolation(int width, int height) const;
-    Image8880 resizeLanczosInterpolation(int width, int height) const;
+    Image8880 resizeLanczos3Interpolation(int width, int height) const;
     Image8880 resizeNearestNeighbour(int width, int height) const;
 
     Image8880 scaleUp(uint8_t scale) const;
@@ -119,13 +122,6 @@ public:
         return setPixel(p, rgb, m_frame);
     }
 
-private:
-
-    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p, uint8_t frame) const;
-    std::optional<uint32_t> getPixel(const Interface8880Point& p, uint8_t frame) const;
-
-    size_t offset(const Interface8880Point& p, uint8_t frame) const;
-
     bool setPixel(const Interface8880Point& p, uint32_t rgb, uint8_t frame);
 
     bool
@@ -137,12 +133,15 @@ private:
         return setPixel(p, rgb.get8880(), frame);
     }
 
+private:
+
+    size_t offset(const Interface8880Point& p, uint8_t frame) const;
+
     bool
     validPixel(const Interface8880Point& p) const
     {
         return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height));
     }
-
 
     int m_width{};
     int m_height{};

@@ -155,8 +155,12 @@ fb32::Image8880::resizeBilinearInterpolation(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    float xScale = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
-    float yScale = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
+    const auto xScale = (width > 1)
+                      ? (m_width - 1.0f) / (width - 1.0f)
+                      : 0.0f;
+    const auto yScale = (height > 1)
+                      ? (m_height - 1.0f) / (height - 1.0f)
+                      : 0.0f;
 
     Image8880 image{width, height, m_numberOfFrames};
 
@@ -171,22 +175,27 @@ fb32::Image8880::resizeBilinearInterpolation(
                 int xHigh = static_cast<int>(std::ceil(xScale * i));
                 int yHigh = static_cast<int>(std::ceil(yScale * j));
 
-                float xWeight = (xScale * i) - xLow;
-                float yWeight = (yScale * j) - yLow;
+                const auto xWeight = (xScale * i) - xLow;
+                const auto yWeight = (yScale * j) - yLow;
 
                 auto a = *getPixelRGB(Interface8880Point{xLow, yLow});
                 auto b = *getPixelRGB(Interface8880Point{xHigh, yLow});
                 auto c = *getPixelRGB(Interface8880Point{xLow, yHigh});
                 auto d = *getPixelRGB(Interface8880Point{xHigh, yHigh});
 
+                const auto aWeight = (1.0f - xWeight) * (1.0f - yWeight);
+                const auto bWeight = xWeight * (1.0f - yWeight);
+                const auto cWeight = (1.0f - xWeight) * yWeight;
+                const auto dWeight = xWeight * yWeight;
+
                 typedef  uint8_t (RGB8880::*RGB8880MemFn)() const;
 
                 auto evaluate = [&](RGB8880MemFn get) -> uint8_t
                 {
-                    float value = std::invoke(get, a) * (1.0f - xWeight) * (1.0f - yWeight) +
-                                  std::invoke(get, b) * xWeight * (1.0f - yWeight) +
-                                  std::invoke(get, c) * (1.0f - xWeight) * yWeight +
-                                  std::invoke(get, d) * xWeight * yWeight;
+                    float value = std::invoke(get, a) * aWeight +
+                                  std::invoke(get, b) * bWeight +
+                                  std::invoke(get, c) * cWeight +
+                                  std::invoke(get, d) * dWeight;
 
                     return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
                 };
@@ -206,7 +215,7 @@ fb32::Image8880::resizeBilinearInterpolation(
 //-------------------------------------------------------------------------
 
 fb32::Image8880
-fb32::Image8880::resizeLanczosInterpolation(
+fb32::Image8880::resizeLanczos3Interpolation(
     int width,
     int height) const
 {
@@ -235,8 +244,12 @@ fb32::Image8880::resizeLanczosInterpolation(
                (pi * pi * x * x);
     };
 
-    float xScale = (width > 1) ? (m_width - 1.0f) / (width - 1.0f) : 0.0f;
-    float yScale = (height > 1) ? (m_height - 1.0f) / (height - 1.0f) : 0.0f;
+    const auto xScale = (width > 1)
+                      ? (m_width - 1.0f) / (width - 1.0f)
+                      : 0.0f;
+    const auto yScale = (height > 1)
+                      ? (m_height - 1.0f) / (height - 1.0f)
+                      : 0.0f;
 
     Image8880 image{width, height, m_numberOfFrames};
 
