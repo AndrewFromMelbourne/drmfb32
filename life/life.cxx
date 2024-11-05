@@ -48,8 +48,12 @@ Life::Life(int size)
     },
     m_cells(size * size),
     m_cellsNext(size * size),
+#ifdef BS_THREAD_POOL
     m_image(size, size),
     m_threadPool()
+#else
+    m_image(size, size)
+#endif
 {
 }
 
@@ -142,6 +146,7 @@ Life::iterateRows(
 void
 Life::iterate()
 {
+#ifdef BS_THREAD_POOL
     auto iterateUpperRows = [this](int start, int end)
     {
         const auto diff = end - start;
@@ -159,6 +164,9 @@ Life::iterate()
 
     m_threadPool.detach_blocks<int>(0, m_size, iterateLowerRows);
     m_threadPool.wait();
+#else
+    iterateRows(0, m_size);
+#endif
 
     m_cells = m_cellsNext;
 }

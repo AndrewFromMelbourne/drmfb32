@@ -134,7 +134,7 @@ main(
     {
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
-        fb.clear(RGB8880{7, 7, 7});
+        fb.clear(RGB8880{11, 11, 11});
 
         std::cout
             << "width = "

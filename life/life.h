@@ -35,7 +35,9 @@
 #include "image8880.h"
 #include "joystick.h"
 
+#ifdef WITH_BS_THREAD_POOL
 #include "BS_thread_pool.hpp"
+#endif
 
 //-------------------------------------------------------------------------
 
@@ -73,6 +75,8 @@ private:
     std::vector<uint8_t> m_cells;
     std::vector<uint8_t> m_cellsNext;
     fb32::Image8880 m_image;
+#ifdef WITH_BS_THREAD_POOL
     BS::thread_pool m_threadPool;
+#endif
 };
 
