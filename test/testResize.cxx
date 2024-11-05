@@ -155,7 +155,7 @@ main(
         auto imageSu = image.scaleUp(scale);
         auto imageNn =  image.resizeNearestNeighbour(swidth, sheight);
         auto imageBi = image.resizeBilinearInterpolation(swidth, sheight);
-        auto imageLi = image.resizeLanczosInterpolation(swidth, sheight);
+        auto imageLi = image.resizeLanczos3Interpolation(swidth, sheight);
 
         Interface8880Point t{0, 0};
         font.drawString(t, "Scale up:", white, fb);
