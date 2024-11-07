@@ -230,7 +230,7 @@ fb32::Image8880::resizeLanczos3Interpolation(
     {
         const auto pi = std::numbers::pi_v<float>;
 
-        if (x == 0.0)
+        if (x == 0.0f)
         {
             return 1.0f;
         }
