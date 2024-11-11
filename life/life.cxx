@@ -48,7 +48,7 @@ Life::Life(int size)
     },
     m_cells(size * size),
     m_cellsNext(size * size),
-#ifdef BS_THREAD_POOL
+#ifdef WITH_BS_THREAD_POOL
     m_image(size, size),
     m_threadPool()
 #else
@@ -146,7 +146,7 @@ Life::iterateRows(
 void
 Life::iterate()
 {
-#ifdef BS_THREAD_POOL
+#ifdef WITH_BS_THREAD_POOL
     auto iterateUpperRows = [this](int start, int end)
     {
         const auto diff = end - start;

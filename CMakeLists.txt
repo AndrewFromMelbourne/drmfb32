@@ -48,6 +48,8 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
 set(WITH_BS_THREAD_POOL TRUE)
 set(BS_THREAD_LIBRARIES Threads::Threads)
 add_compile_definitions(WITH_BS_THREAD_POOL)
+else()
+message(WARNING "Not using BS Thread Pool")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/libdrmfb32
