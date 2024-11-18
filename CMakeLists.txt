@@ -62,6 +62,7 @@ set(EXTRA_LIBS ${EXTRA_LIBS} drmfb32)
 
 #--------------------------------------------------------------------------
 
+if (BSD_FOUND AND FREETYPE_FOUND)
 add_executable(info info/info.cxx
                     info/cpuTrace.cxx
                     info/dynamicInfo.cxx
@@ -82,6 +83,7 @@ target_compile_options(info PUBLIC ${BSD_CFLAGS_OTHER})
 
 set_property(TARGET info PROPERTY SKIP_BUILD_RPATH TRUE)
 install (TARGETS info RUNTIME DESTINATION bin)
+endif()
 
 #--------------------------------------------------------------------------
 
