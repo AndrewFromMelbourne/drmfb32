@@ -239,7 +239,7 @@ Boxworld::drawText(
     const auto& undoRGB = ((m_canUndo) ? m_textRGB : m_disabledRGB);
 
     position = font.drawString(position, "(X): ", m_boldRGB, m_bottomTextImage);
-    position = font.drawString(position, "undox box move", undoRGB, m_bottomTextImage);
+    position = font.drawString(position, "undo box move", undoRGB, m_bottomTextImage);
 
     position = Interface8880Point{ 2, 18 };
 
