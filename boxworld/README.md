@@ -1,6 +1,6 @@
 # Boxworld
 
-A version of Boxworld or Sokoban for the Odroid Super Go, written in C++.
+A version of Boxworld or Sokoban using a DRM/KMS dumbbuffer, written in C++.
 
 This version of Boxworld has the same 100 levels that are found in the Windows 3.1 version of Boxworld from 1992.
 
@@ -9,16 +9,18 @@ The aim of the game is to place all of the yellow boxes on the spaces with the y
 # usage
         boxworld <options>
 
-        --device,-d - framebuffer device to use (default is /dev/fb0)
+        --connector,-c - dri connector to use
+        --device,-d - dri device to use
         --help,-h - print usage and exit
+        --joystick,-j - joystick device
 
 ## Controls:-
-- Move the character via the D-pad.
+- Move the character via a D-pad.
 - (A) move to the next level.
 - (B) move to the previous level.
 - (X) Undo the last box move. There is only one level of undo.
 - (Y) restart the current level from the beginning.
-- [Top right function key] Exit.
+- [Start Button] Exit.
 
 ## Level: 34
 
