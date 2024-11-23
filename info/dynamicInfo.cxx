@@ -29,7 +29,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iomanip>
-#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
