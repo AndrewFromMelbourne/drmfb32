@@ -27,7 +27,6 @@
 
 #include <cstdint>
 #include <fstream>
-#include <regex>
 
 #include "system.h"
 
@@ -45,6 +44,6 @@ inf::getTemperature()
         ifs >> millidegrees;
     }
 
-    return static_cast<int>((millidegrees + 500) / 1000);
+    return (millidegrees + 500) / 1000;
 }
 
