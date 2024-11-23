@@ -29,6 +29,7 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <iomanip>
 #include <iostream>
 #include <system_error>
 
@@ -52,12 +53,12 @@ printUsage(
     std::ostream& os,
     const std::string& name)
 {
-    os << "\n";
+    os << '\n';
     os << "Usage: " << name << " <options>\n";
-    os << "\n";
+    os << '\n';
     os << "    --help,-h - print usage and exit\n";
     os << "    --joystick,-j - joystick device\n";
-    os << "\n";
+    os << '\n';
 }
 
 //-------------------------------------------------------------------------
@@ -120,39 +121,47 @@ main(
 
             for (auto button = 0 ; button < js.numberOfButtons() ; ++button)
             {
+                std::cout << button << '-';
+
                 if (js.buttonPressed(button))
                 {
-                    std::cout << "X";
+                    std::cout << 'X';
                 }
                 else
                 {
-                    std::cout << "O";
+                    std::cout << 'O';
                 }
 
                 if (js.buttonDown(button))
                 {
-                    std::cout << "D";
+                    std::cout << 'D';
                 }
                 else
                 {
-                    std::cout << "U";
+                    std::cout << 'U';
                 }
 
-                std::cout << " ";
+                std::cout << ' ';
             }
 
             for (auto axes = 0 ; axes < js.numberOfAxes() ; ++axes)
             {
-                auto value = js.getAxes(axes);
-                std::cout << value.x << ":" << value.y << " ";
+                auto [x, y] = js.getAxes(axes);
+                std::cout
+                    << std::setw(6)
+                    << x
+                    << ':'
+                    << std::setw(6)
+                    << y <<
+                    ' ';
             }
 
-            std::cout << "\n";
+            std::cout << '\n';
         }
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << "\n";
+        std::cerr << "Error: " << error.what() << '\n';
         exit(EXIT_FAILURE);
     }
 
