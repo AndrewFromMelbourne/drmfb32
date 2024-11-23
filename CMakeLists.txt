@@ -97,6 +97,12 @@ target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(joystickConfigure joystick/joystickConfigure.cxx)
+
+target_link_libraries(joystickConfigure drmfb32)
+
+#--------------------------------------------------------------------------
+
 add_executable(life life/main.cxx
                     life/life.cxx)
 

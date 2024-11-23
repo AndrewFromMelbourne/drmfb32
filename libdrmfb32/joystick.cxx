@@ -31,29 +31,47 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <iostream>
+
+#include <cstdlib>
+#include <fstream>
+#include <map>
+#include <optional>
+#include <regex>
 #include <system_error>
 
 #include "joystick.h"
 
-//-------------------------------------------------------------------------
+//=========================================================================
 
 namespace
 {
 
-bool
-readJoystickEvent(
-    fb32::FileDescriptor& joystickFd,
-    js_event& event)
-{
-    const auto bytes{::read(joystickFd.fd(), &event, sizeof(event))};
-    return (bytes != -1) and (bytes == sizeof(event));
-}
+//-------------------------------------------------------------------------
 
+std::optional<js_event>
+readJoystickEvent(
+    fb32::FileDescriptor& joystickFd)
+{
+    js_event event{};
+    const auto bytes{::read(joystickFd.fd(), &event, sizeof(event))};
+
+    if ((bytes == -1) or (bytes != sizeof(event)))
+    {
+        return {};
+    }
+
+    return event;
 }
 
 //-------------------------------------------------------------------------
 
-fb32::Joystick:: Joystick(bool blocking)
+}
+
+//=========================================================================
+
+
+fb32::Joystick::Joystick(bool blocking)
 :
     Joystick("/dev/input/js0", blocking)
 {
@@ -61,22 +79,77 @@ fb32::Joystick:: Joystick(bool blocking)
 
 //-------------------------------------------------------------------------
 
-fb32::Joystick:: Joystick(const std::string& device, bool blocking)
+fb32::Joystick::Joystick(const std::string& device, bool blocking)
 :
     m_joystickFd{::open(device.c_str(), O_RDONLY | ((blocking) ? 0 : O_NONBLOCK))},
     m_blocking(blocking),
     m_buttonCount(0),
     m_joystickCount(0),
     m_buttons(),
-    m_joysticks()
+    m_joysticks(),
+    m_buttonNumbers{
+        BUTTON_X,
+        BUTTON_A,
+        BUTTON_B,
+        BUTTON_Y,
+        BUTTON_LEFT_SHOULDER,
+        BUTTON_RIGHT_SHOULDER,
+        BUTTON_DPAD_UP,
+        BUTTON_DPAD_DOWN,
+        BUTTON_SELECT,
+        BUTTON_START,
+        BUTTON_DPAD_LEFT,
+        BUTTON_DPAD_RIGHT,
+    }
 {
     init();
 }
 
 //-------------------------------------------------------------------------
 
+bool
+fb32::Joystick::buttonDown(int button) const
+{
+    if (not isValidButton(button))
+    {
+        return false;
+    }
+
+    return m_buttons.at(button).down;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Joystick::buttonPressed(int button)
+{
+    if (not isValidButton(button))
+    {
+        return false;
+    }
+
+    const auto pressed = m_buttons.at(button).pressed;
+
+    if (pressed)
+    {
+        m_buttons[button].pressed = false;
+    }
+
+    return pressed;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::JoystickAxes
+fb32::Joystick::getAxes(int joystickNumber) const
+{
+    return m_joysticks.at(joystickNumber);
+}
+
+//-------------------------------------------------------------------------
+
 void
-fb32::Joystick:: init()
+fb32::Joystick::init()
 {
     if (m_joystickFd.fd() == -1)
     {
@@ -105,12 +178,22 @@ fb32::Joystick:: init()
 
     m_buttons.resize(m_buttonCount, ButtonState{ false, false });
     m_joysticks.resize(m_joystickCount, JoystickAxes{ 0, 0 });
+
+    readConfig();
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Joystick::isValidButton(int button) const
+{
+    return (button >= 0) and (button < numberOfButtons());
 }
 
 //-------------------------------------------------------------------------
 
 int
-fb32::Joystick:: numberOfButtons() const
+fb32::Joystick::numberOfButtons() const
 {
     return m_buttonCount;
 }
@@ -118,95 +201,34 @@ fb32::Joystick:: numberOfButtons() const
 //-------------------------------------------------------------------------
 
 int
-fb32::Joystick:: numberOfAxes() const
+fb32::Joystick::numberOfAxes() const
 {
     return m_joystickCount;
 }
 
 //-------------------------------------------------------------------------
 
-bool
-fb32::Joystick:: buttonPressed(int button)
-{
-    if (button >= numberOfButtons())
-    {
-        return false;
-    }
-
-    const auto pressed = m_buttons.at(button).pressed;
-
-    if (pressed)
-    {
-        m_buttons[button].pressed = false;
-    }
-
-    return pressed;
-}
-
-//-------------------------------------------------------------------------
-
-bool
-fb32::Joystick:: buttonDown(int button) const
-{
-    if (button >= numberOfButtons())
-    {
-        return false;
-    }
-
-    return m_buttons.at(button).down;
-}
-
-//-------------------------------------------------------------------------
-
-fb32::JoystickAxes
-fb32::Joystick:: getAxes(int joystickNumber) const
-{
-    return m_joysticks.at(joystickNumber);
-}
-
-//-------------------------------------------------------------------------
-
 void
-fb32::Joystick:: read()
-{
-    js_event event{};
-
-    if (m_blocking)
-    {
-        if (readJoystickEvent(m_joystickFd, event))
-        {
-            process(event);
-        }
-    }
-    else
-    {
-        while (readJoystickEvent(m_joystickFd, event))
-        {
-            process(event);
-        }
-    }
-}
-
-//-------------------------------------------------------------------------
-
-void
- fb32::Joystick:: process(const js_event& event)
+fb32::Joystick::process(const js_event& event)
 {
     switch (event.type)
     {
         case JS_EVENT_BUTTON:
+        {
+            auto number = m_buttonNumbers[event.number];
 
             if (event.value)
             {
-                m_buttons.at(event.number) = ButtonState{ true, true };
+                m_buttons.at(number) = ButtonState{ .pressed = true,
+                                                    .down = true };
             }
             else
             {
-                m_buttons.at(event.number).down = false;
+                m_buttons.at(number).down = false;
             }
 
             break;
-
+        }
         case JS_EVENT_AXIS:
         {
             const auto axis{event.number / 2};
@@ -228,6 +250,98 @@ void
             }
 
             break;
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+int
+fb32::Joystick::rawButton(int button) const
+{
+    for (int i = 0 ; i < m_buttonNumbers.size() ; ++i)
+    {
+        if (m_buttonNumbers[i] == button)
+        {
+            return i;
+        }
+    }
+
+    return m_buttonCount;
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::Joystick::read()
+{
+    if (m_blocking)
+    {
+        auto event{readJoystickEvent(m_joystickFd)};
+        if (event)
+        {
+            process(*event);
+        }
+    }
+    else
+    {
+        while (auto event = readJoystickEvent(m_joystickFd))
+        {
+            process(*event);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::Joystick::
+readConfig()
+{
+    std::map<std::string, Buttons> stringToButton =
+    {
+        {"BUTTON_X", BUTTON_X},
+        {"BUTTON_A", BUTTON_A},
+        {"BUTTON_B", BUTTON_B},
+        {"BUTTON_Y", BUTTON_Y},
+        {"BUTTON_LEFT_SHOULDER", BUTTON_LEFT_SHOULDER},
+        {"BUTTON_RIGHT_SHOULDER", BUTTON_RIGHT_SHOULDER},
+        {"BUTTON_SELECT", BUTTON_SELECT},
+        {"BUTTON_START", BUTTON_START},
+    };
+
+    std::string configFile{std::getenv("HOME") +
+                           std::string{"/.config/drmfb32/joystickButtons"}};
+
+    std::ifstream ifs{configFile.c_str()};
+
+    if (ifs)
+    {
+        const std::regex pattern{R"((\w+)\s*=\s*(\d+))"};
+        std::string line;
+
+        while (std::getline(ifs, line))
+        {
+            try
+            {
+                std::smatch match;
+
+                if (std::regex_match(line, match, pattern))
+                {
+                    const auto key = match[1].str();
+                    const auto value = std::stoi(match[2].str());
+
+                    if ((value >= 0) and (value < m_buttonNumbers.size()))
+                    {
+                        const auto button = stringToButton.at(key);
+                        m_buttonNumbers[value] = button;
+                    }
+                }
+            }
+            catch (std::exception&)
+            {
+                // ignore
+            }
         }
     }
 }

@@ -77,7 +77,8 @@ public:
         BUTTON_SELECT = 8,
         BUTTON_START = 9,
         BUTTON_DPAD_LEFT = 10,
-        BUTTON_DPAD_RIGHT = 11
+        BUTTON_DPAD_RIGHT = 11,
+        BUTTON_COUNT = 12,
     };
 
     explicit Joystick(bool blocking = false);
@@ -90,12 +91,16 @@ public:
     bool buttonDown(int button) const;
     JoystickAxes getAxes(int joystickNumber) const;
 
+    int rawButton(int button) const;
+
     void read();
 
 private:
 
     void init();
+    bool isValidButton(int button) const;
     void process(const struct js_event& event);
+    void readConfig();
 
     FileDescriptor m_joystickFd;
 
@@ -106,6 +111,7 @@ private:
 
     std::vector<ButtonState> m_buttons;
     std::vector<JoystickAxes> m_joysticks;
+    std::vector<Buttons> m_buttonNumbers;
 };
 
 //-------------------------------------------------------------------------
