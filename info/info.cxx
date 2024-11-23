@@ -119,7 +119,7 @@ messageLog(
             break;
         }
 
-        std::cerr << ":" << message << "\n";
+        std::cerr << ":" << message << '\n';
     }
 }
 
@@ -142,9 +142,9 @@ printUsage(
     std::ostream& os,
     const std::string& name)
 {
-    os << "\n";
+    os << '\n';
     os << "Usage: " << name << " <options>\n";
-    os << "\n";
+    os << '\n';
     os << "    --daemon,-D - start in the background as a daemon\n";
     os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
@@ -152,7 +152,7 @@ printUsage(
     os << "    --help,-h - print usage and exit\n";
     os << "    --pidfile,-p <pidfile> - create and lock PID file";
     os << " (if being run as a daemon)\n";
-    os << "\n";
+    os << '\n';
 }
 
 //-------------------------------------------------------------------------
@@ -278,7 +278,7 @@ main(
                     << program
                     << " is already running "
                     << otherpid
-                    << "\n";
+                    << '\n';
 
                 ::exit(EXIT_FAILURE);
             }
@@ -336,7 +336,7 @@ main(
         }
         catch (std::exception& error)
         {
-            std::cerr << "Warning: " << error.what() << "\n";
+            std::cerr << "Warning: " << error.what() << '\n';
         }
     }
 
@@ -434,7 +434,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << "\n";
+        std::cerr << "Error: " << error.what() << '\n';
         exit(EXIT_FAILURE);
     }
 

@@ -72,15 +72,15 @@ printUsage(
     std::ostream& os,
     const std::string& name)
 {
-    os << "\n";
+    os << '\n';
     os << "Usage: " << name << " <options>\n";
-    os << "\n";
+    os << '\n';
     os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --fit,-f - fit image to screen\n";
     os << "    --help,-h - print usage and exit\n";
     os << "    --jpeg,-j - jpeg file to display\n";
-    os << "\n";
+    os << '\n';
 }
 
 //-------------------------------------------------------------------------
@@ -218,7 +218,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << "\n";
+        std::cerr << "Error: " << error.what() << '\n';
         exit(EXIT_FAILURE);
     }
 

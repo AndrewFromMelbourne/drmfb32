@@ -72,13 +72,13 @@ printUsage(
     std::ostream& os,
     const std::string& name)
 {
-    os << "\n";
+    os << '\n';
     os << "Usage: " << name << " <options>\n";
-    os << "\n";
+    os << '\n';
     os << "    --connector,-c - dri connector to use\n";
     os << "    --device,-d - dri device to use\n";
     os << "    --help,-h - print usage and exit\n";
-    os << "\n";
+    os << '\n';
 }
 
 //-------------------------------------------------------------------------
@@ -163,7 +163,7 @@ main(
             << fb.getWidth()
             << " height = "
             << fb.getHeight()
-            << "\n";
+            << '\n';
 
         Sphere sphere(fb.getHeight() - 10);
         sphere.setAmbient(0.1);
@@ -187,7 +187,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << "\n";
+        std::cerr << "Error: " << error.what() << '\n';
         exit(EXIT_FAILURE);
     }
 
