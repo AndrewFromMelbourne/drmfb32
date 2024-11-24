@@ -47,6 +47,10 @@ The programs are written for a SNES style controller with
 
 These programs are marked with a [J]
 
+### [Joystick configuration](joystick/README.md)
+
+One of the problems with using SNES style controllers is that there is no standard mapping of the buttons to the button numbers in the Linux Kernel API. I have created a text configuration program that will write a configuration filed `${HOME}/.config/drmfb32/joystickButtons` that holds the mapping from the button names to the button numbers.
+
 ## Programs and examples
 
 ### [Boxworld](boxworld/README.md) [J]
