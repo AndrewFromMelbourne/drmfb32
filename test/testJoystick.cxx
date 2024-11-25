@@ -148,11 +148,15 @@ main(
             {
                 auto [x, y] = js.getAxes(axes);
                 std::cout
-                    << std::setw(6)
-                    << x
+                    << std::setw(4)
+                    << std::setfill('0')
+                    << std::hex
+                    << static_cast<uint16_t>(x)
                     << ':'
-                    << std::setw(6)
-                    << y <<
+                    << std::setw(4)
+                    << std::setfill('0')
+                    << std::hex
+                    << static_cast<uint16_t>(y) <<
                     ' ';
             }
 
