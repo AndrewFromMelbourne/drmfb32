@@ -29,6 +29,7 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <system_error>
@@ -146,18 +147,37 @@ main(
 
             for (auto axes = 0 ; axes < js.numberOfAxes() ; ++axes)
             {
+                auto signCharacter = [](int value) -> char
+                {
+                    if (value < 0)
+                    {
+                        return '-';
+                    }
+                    else if (value > 0)
+                    {
+                        return '+';
+                    }
+
+                    return ' ';
+                };
+
                 auto [x, y] = js.getAxes(axes);
+                char xSign = signCharacter(x);
+                char ySign = signCharacter(y);
+
                 std::cout
+                    << xSign
                     << std::setw(4)
                     << std::setfill('0')
                     << std::hex
-                    << static_cast<uint16_t>(x)
+                    << static_cast<uint16_t>(std::abs(x))
                     << ':'
+                    << ySign
                     << std::setw(4)
                     << std::setfill('0')
                     << std::hex
-                    << static_cast<uint16_t>(y) <<
-                    ' ';
+                    << static_cast<uint16_t>(std::abs(y))
+                    << ' ';
             }
 
             std::cout << '\n';
