@@ -78,7 +78,7 @@ TraceStack::draw()
 
             for (auto v = 0 ; v < value ; ++v)
             {
-                if (((j % m_gridHeight) == 0) or (m_time[i] == 0))
+                if (((j % m_gridHeight) == 0) or ((m_time[i] % 60) == 0))
                 {
                     getImage().setPixelRGB(
                         fb32::Interface8880Point{i, j--},
@@ -95,7 +95,7 @@ TraceStack::draw()
 
         for ( ; j >= 0 ; --j)
         {
-            if (((j % m_gridHeight) == 0) or (m_time[i] == 0))
+            if (((j % m_gridHeight) == 0) or ((m_time[i] % 60) == 0))
             {
                 getImage().setPixelRGB(
                     fb32::Interface8880Point{i, j},

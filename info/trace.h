@@ -95,11 +95,15 @@ protected:
     bool m_autoScale;
 
     std::vector<TraceData> m_traceData;
-    std::vector<int8_t> m_time;
+    std::vector<time_t> m_time;
 
     static const fb32::RGB8880 sc_foreground;
     static const fb32::RGB8880 sc_background;
     static const fb32::RGB8880 sc_gridColour;
+
+private:
+
+    void addDataPoint(const std::vector<int>& data, time_t now);
 };
 
 //-------------------------------------------------------------------------

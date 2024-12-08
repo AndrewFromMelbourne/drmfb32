@@ -427,7 +427,9 @@ main(
             }
 
             fb.update();
-            std::this_thread::sleep_for(1s);
+
+            const auto nextSecond = now + 1s;
+            std::this_thread::sleep_until(nextSecond);
         }
 
         fb.clear();

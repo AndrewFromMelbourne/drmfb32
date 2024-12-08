@@ -90,7 +90,7 @@ TraceGraph::draw()
 
     for (auto i = 0 ; i < m_columns ; ++i)
     {
-        if (m_time[i] == 0)
+        if ((m_time[i] % 60) == 0)
         {
             verticalLine(
                 getImage(),
