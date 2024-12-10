@@ -44,10 +44,8 @@ TraceStack::TraceStack(
     int traceScale,
     int yPosition,
     int gridHeight,
-    int traces,
     const std::string& title,
-    const std::vector<std::string>& traceNames,
-    const std::vector<fb32::RGB8880>& traceColours)
+    const std::vector<TraceConfiguration>& traces)
 :
     Trace(
         width,
@@ -56,10 +54,8 @@ TraceStack::TraceStack(
         traceScale,
         yPosition,
         gridHeight,
-        traces,
         title,
-        traceNames,
-        traceColours)
+        traces)
 {
 }
 
@@ -74,7 +70,7 @@ TraceStack::draw()
 
         for (auto& trace : m_traceData)
         {
-            auto value = (trace.m_values[i] * m_traceHeight) / m_traceScale;
+            auto value = (trace.value(i) * m_traceHeight) / m_traceScale;
 
             for (auto v = 0 ; v < value ; ++v)
             {
@@ -82,13 +78,13 @@ TraceStack::draw()
                 {
                     getImage().setPixelRGB(
                         fb32::Interface8880Point{i, j--},
-                        trace.m_gridColour);
+                        trace.gridColour());
                 }
                 else
                 {
                     getImage().setPixelRGB(
                         fb32::Interface8880Point{i, j--},
-                        trace.m_traceColour);
+                        trace.traceColour());
                 }
             }
         }

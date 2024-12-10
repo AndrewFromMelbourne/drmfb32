@@ -46,10 +46,8 @@ TraceGraph::TraceGraph(
     int traceScale,
     int yPosition,
     int gridHeight,
-    int traces,
     const std::string& title,
-    const std::vector<std::string>& traceNames,
-    const std::vector<fb32::RGB8880>& traceColours)
+    const std::vector<TraceConfiguration>& traces)
 :
     Trace(
         width,
@@ -58,10 +56,8 @@ TraceGraph::TraceGraph(
         traceScale,
         yPosition,
         gridHeight,
-        traces,
         title,
-        traceNames,
-        traceColours)
+        traces)
 {
 }
 
@@ -109,14 +105,14 @@ TraceGraph::draw()
         {
             auto i1 = i2 - 1;
 
-            int y1 = (trace.m_values[i1] * m_traceHeight) / m_traceScale;
-            int y2 = (trace.m_values[i2] * m_traceHeight) / m_traceScale;
+            int y1 = (trace.value(i1) * m_traceHeight) / m_traceScale;
+            int y2 = (trace.value(i2) * m_traceHeight) / m_traceScale;
 
             line(
                 getImage(),
                 fb32::Interface8880Point(i1, m_traceHeight - y1),
                 fb32::Interface8880Point(i2, m_traceHeight - y2),
-                trace.m_traceColour);
+                trace.traceColour());
         }
     }
 }

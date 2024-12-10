@@ -51,10 +51,8 @@ TemperatureTrace::TemperatureTrace(
         100,
         yPosition,
         gridHeight,
-        1,
         "Temperature",
-        std::vector<std::string>{"temperature"},
-        std::vector<fb32::RGB8880>{{102, 167, 225}})
+        std::vector<TraceConfiguration>{{"temperature", {102, 167, 225}}})
 {
 }
 

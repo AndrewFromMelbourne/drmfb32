@@ -71,7 +71,7 @@ CpuStats::CpuStats()
 
 //-------------------------------------------------------------------------
 
-uint32_t
+int
 CpuStats::total() const
 {
     return m_user +
@@ -132,12 +132,11 @@ CpuTrace::CpuTrace(
         100,
         yPosition,
         gridHeight,
-        3,
         "CPU",
-        std::vector<std::string>{"user", "nice", "system"},
-        std::vector<fb32::RGB8880>{{4, 90, 141},
-                                   {116, 169, 207},
-                                   {241, 238, 246}}),
+        std::vector<TraceConfiguration>{
+            {"user", {4, 90, 141}},
+            {"nice", {116, 169, 207}},
+            {"system", {241, 238, 246}}}),
     m_previousStats{}
 {
 }
@@ -152,7 +151,7 @@ CpuTrace::update(
     const CpuStats currentStats;
     const CpuStats diff{currentStats - m_previousStats};
 
-    const uint32_t totalCpu = diff.total();
+    const int totalCpu = diff.total();
 
     int user = (diff.user() * m_traceScale) / totalCpu;
     int nice = (diff.nice() * m_traceScale) / totalCpu;

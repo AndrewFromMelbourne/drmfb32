@@ -50,17 +50,17 @@ public:
 
     MemoryStats();
 
-    uint64_t total() const { return m_total; }
-    uint64_t buffers() const { return m_buffers; }
-    uint64_t cached() const { return m_cached; }
-    uint64_t used() const { return m_used; }
+    int total() const { return m_total; }
+    int buffers() const { return m_buffers; }
+    int cached() const { return m_cached; }
+    int used() const { return m_used; }
 
 private:
 
-    uint64_t m_total;
-    uint64_t m_buffers;
-    uint64_t m_cached;
-    uint64_t m_used;
+    int m_total;
+    int m_buffers;
+    int m_cached;
+    int m_used;
 };
 
 //-------------------------------------------------------------------------

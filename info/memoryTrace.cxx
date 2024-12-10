@@ -100,12 +100,11 @@ MemoryTrace::MemoryTrace(
         100,
         yPosition,
         gridHeight,
-        3,
         "Memory",
-        std::vector<std::string>{"used", "buffers", "cached"},
-        std::vector<fb32::RGB8880>{{0, 109, 44},
-                                   {102, 194, 164},
-                                   {237, 248, 251}})
+        std::vector<TraceConfiguration>{
+            {"used", {0, 109, 44}},
+            {"buffers", {102, 194, 164}},
+            {"cached", {237, 248, 251}}})
 {
 }
 

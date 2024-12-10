@@ -50,10 +50,8 @@ public:
         int traceScale,
         int yPosition,
         int gridHeight,
-        int traces,
         const std::string& title,
-        const std::vector<std::string>& traceNames,
-        const std::vector<fb32::RGB8880>& traceColours);
+        const std::vector<TraceConfiguration>& traces);
 
     void update(time_t now, fb32::Interface8880Font& font) override = 0;
 

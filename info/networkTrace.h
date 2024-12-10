@@ -50,15 +50,15 @@ public:
 
     NetworkStats();
 
-    uint32_t tx() const { return m_tx; }
-    uint32_t rx() const { return m_rx; }
+    int tx() const { return m_tx; }
+    int rx() const { return m_rx; }
 
     NetworkStats& operator-=(const NetworkStats& rhs);
 
 private:
 
-    uint32_t m_tx;
-    uint32_t m_rx;
+    int m_tx;
+    int m_rx;
 };
 
 NetworkStats operator-(const NetworkStats& lhs, const NetworkStats& rhs);
