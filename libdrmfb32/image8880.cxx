@@ -155,20 +155,66 @@ fb32::Image8880::resizeBilinearInterpolation(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    const auto xScale = (width > 1)
-                      ? (m_width - 1.0f) / (width - 1.0f)
-                      : 0.0f;
-    const auto yScale = (height > 1)
-                      ? (m_height - 1.0f) / (height - 1.0f)
-                      : 0.0f;
+    Image8880 image{width, height, m_numberOfFrames};
+    resizeToBilinearInterpolation(image);
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::resizeLanczos3Interpolation(
+    int width,
+    int height) const
+{
+    if ((width <= 0) or (height <= 0))
+    {
+        throw std::invalid_argument("width and height must be greater than zero");
+    }
 
     Image8880 image{width, height, m_numberOfFrames};
+    resizeToLanczos3Interpolation(image);
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::resizeNearestNeighbour(
+    int width,
+    int height) const
+{
+    if ((width <= 0) or (height <= 0))
+    {
+        throw std::invalid_argument("width and height must be greater than zero");
+    }
+
+    Image8880 image{width, height, m_numberOfFrames};
+    resizeToNearestNeighbour(image);
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880&
+fb32::Image8880::resizeToBilinearInterpolation(
+    fb32::Image8880& image) const
+{
+    const auto xScale = (image.getWidth() > 1)
+                      ? (m_width - 1.0f) / (image.getWidth() - 1.0f)
+                      : 0.0f;
+    const auto yScale = (image.getHeight() > 1)
+                      ? (m_height - 1.0f) / (image.getHeight() - 1.0f)
+                      : 0.0f;
 
     for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
     {
-        for (int j = 0; j < height; ++j)
+        for (int j = 0; j < image.getHeight(); ++j)
         {
-            for (int i = 0; i < width; ++i)
+            for (int i = 0; i < image.getWidth(); ++i)
             {
                 int xLow = static_cast<int>(std::floor(xScale * i));
                 int yLow = static_cast<int>(std::floor(yScale * j));
@@ -213,18 +259,11 @@ fb32::Image8880::resizeBilinearInterpolation(
 }
 
 //-------------------------------------------------------------------------
-
-fb32::Image8880
-fb32::Image8880::resizeLanczos3Interpolation(
-    int width,
-    int height) const
+fb32::Image8880&
+fb32::Image8880::resizeToLanczos3Interpolation(
+    fb32::Image8880& image) const
 {
     constexpr int a{3};
-
-    if ((width <= 0) or (height <= 0))
-    {
-        throw std::invalid_argument("width and height must be greater than zero");
-    }
 
     auto kernel = [](float x, int a) -> float
     {
@@ -244,20 +283,18 @@ fb32::Image8880::resizeLanczos3Interpolation(
                (pi * pi * x * x);
     };
 
-    const auto xScale = (width > 1)
-                      ? (m_width - 1.0f) / (width - 1.0f)
+    const auto xScale = (image.getWidth() > 1)
+                      ? (m_width - 1.0f) / (image.getWidth() - 1.0f)
                       : 0.0f;
-    const auto yScale = (height > 1)
-                      ? (m_height - 1.0f) / (height - 1.0f)
+    const auto yScale = (image.getHeight() > 1)
+                      ? (m_height - 1.0f) / (image.getHeight() - 1.0f)
                       : 0.0f;
-
-    Image8880 image{width, height, m_numberOfFrames};
 
     for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
     {
-        for (int j = 0; j < height; ++j)
+        for (int j = 0; j < image.getHeight(); ++j)
         {
-            for (int i = 0; i < width; ++i)
+            for (int i = 0; i < image.getWidth(); ++i)
             {
                 const auto xMid = i * xScale;
                 const auto yMid = j * yScale;
@@ -308,29 +345,22 @@ fb32::Image8880::resizeLanczos3Interpolation(
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880
-fb32::Image8880::resizeNearestNeighbour(
-    int width,
-    int height) const
+fb32::Image8880&
+fb32::Image8880::resizeToNearestNeighbour(
+    fb32::Image8880& image) const
 {
-    if ((width <= 0) or (height <= 0))
-    {
-        throw std::invalid_argument("width and height must be greater than zero");
-    }
+    const int a = (image.getWidth() > m_width) ? 0 : 1;
+    const int b = (image.getHeight() > m_height) ? 0 : 1;
 
-    const int a = (width > m_width) ? 0 : 1;
-    const int b = (height > m_height) ? 0 : 1;
-
-    Image8880 image{width, height, m_numberOfFrames};
 
     for (uint8_t frame = 0 ; frame < m_numberOfFrames ; ++frame)
     {
-        for (int j = 0 ; j < height ; ++j)
+        for (int j = 0 ; j < image.getHeight() ; ++j)
         {
-            const int y = (j * (m_height - b)) / (height - b);
-            for (int i = 0 ; i < width ; ++i)
+            const int y = (j * (m_height - b)) / (image.getHeight() - b);
+            for (int i = 0 ; i < image.getWidth() ; ++i)
             {
-                const int x = (i * (m_width - a)) / (width - a);
+                const int x = (i * (m_width - a)) / (image.getWidth() - a);
                 auto pixel{getPixel(Interface8880Point{x, y}, frame)};
 
                 if (pixel.has_value())

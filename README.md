@@ -71,6 +71,10 @@ A version of Conway's Game of Life.
 
 Sliding 15 puzzle.
 
+### [Showcam](showcam/README.md)
+
+Display a webcam stream.
+
 ### [Showjpeg](showjpeg/README.md)
 
 Display a jpeg image.

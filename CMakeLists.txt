@@ -126,6 +126,15 @@ target_link_libraries(puzzle-15 drmfb32 ${DRM_LIBRARIES})
 #--------------------------------------------------------------------------
 
 if (TURBOJPEG_FOUND)
+add_executable(showcam showcam/showcam.cxx
+                       showcam/webcam.cxx)
+target_link_libraries(showcam drmfb32 ${DRM_LIBRARIES}
+                                      ${TURBOJPEG_LIBRARIES})
+endif()
+
+#--------------------------------------------------------------------------
+
+if (TURBOJPEG_FOUND)
 add_executable(showjpeg showjpeg/showjpeg.cxx)
 target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
                                        ${TURBOJPEG_LIBRARIES})

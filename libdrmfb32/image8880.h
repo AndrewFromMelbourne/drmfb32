@@ -105,6 +105,10 @@ public:
     Image8880 resizeLanczos3Interpolation(int width, int height) const;
     Image8880 resizeNearestNeighbour(int width, int height) const;
 
+    Image8880& resizeToBilinearInterpolation(Image8880& image) const;
+    Image8880& resizeToLanczos3Interpolation(Image8880& image) const;
+    Image8880& resizeToNearestNeighbour(Image8880& image) const;
+
     Image8880 scaleUp(uint8_t scale) const;
 
     bool
