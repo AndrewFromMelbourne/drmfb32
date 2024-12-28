@@ -108,7 +108,10 @@ Trace::init(
         }
         else
         {
-            position.incrX(font.getPixelWidth());
+            position = font.drawString(position,
+                                       " ",
+                                       sc_foreground,
+                                       getImage());
         }
 
         position = font.drawString(position,
