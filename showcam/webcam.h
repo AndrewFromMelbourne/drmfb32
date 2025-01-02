@@ -74,6 +74,16 @@ public:
     Webcam(Webcam&& wc) = delete;
     Webcam& operator=(Webcam&& wc) = delete;
 
+    const Dimensions& dimensions() const
+    {
+        return m_dimensions;
+    }
+
+    std::string formatName() const
+    {
+        return m_formatName;
+    }
+
     bool showFrame(Interface8880& image);
     bool startStream() const;
     bool stopStream() const;

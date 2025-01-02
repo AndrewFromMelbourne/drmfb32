@@ -190,6 +190,18 @@ main(
 
         //-----------------------------------------------------------------
 
+        const auto [ width, height ] = wc.dimensions();
+
+        std::cout
+            << wc.formatName()
+            << " ["
+            << width
+            << "x"
+            << height
+            << "]\n";
+
+        //-----------------------------------------------------------------
+
         wc.startStream();
 
         while (run)

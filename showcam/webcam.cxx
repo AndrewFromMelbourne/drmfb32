@@ -234,22 +234,27 @@ fb32::Webcam::chooseBestFit(
 
             dimensions.emplace_back(width, height);
         }
+        else
+        {
+            break;
+        }
+
         ++frmsize.index;
     }
-
-    auto reverseSort = [](const Dimensions& a, const Dimensions& b) -> bool
-    {
-        return (a.height > b.height) or
-                ((a.height == b.height) and (a.width > b.width));
-    };
-
-    std::sort(dimensions.begin(), dimensions.end(), reverseSort);
 
     m_dimensions = Dimensions{ 0, 0 };
     bool result = false;
 
     if (dimensions.size() > 0)
     {
+        auto reverseSort = [](const Dimensions& a, const Dimensions& b) -> bool
+        {
+            return (a.height > b.height) or
+                    ((a.height == b.height) and (a.width > b.width));
+        };
+
+        std::sort(dimensions.begin(), dimensions.end(), reverseSort);
+
         for (const auto d : dimensions)
         {
             if ((d.width <= image.getWidth()) and
@@ -268,6 +273,33 @@ fb32::Webcam::chooseBestFit(
             m_dimensions = dimensions.back();
             result = true;
         }
+    }
+    else if ((frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) or
+             (frmsize.type == V4L2_FRMSIZE_TYPE_CONTINUOUS))
+    {
+        const auto& sw = frmsize.stepwise;
+
+        if ((image.getWidth() < sw.min_width) or
+            (image.getHeight() < sw.min_height))
+        {
+            m_dimensions.width = sw.min_width;
+            m_dimensions.height = sw.min_height;
+        }
+        else if ((image.getWidth() > sw.max_width) or
+                 (image.getHeight() > sw.max_height))
+        {
+            m_dimensions.width = sw.max_width;
+            m_dimensions.height = sw.max_height;
+        }
+        else
+        {
+            m_dimensions.width = image.getWidth() -
+                                 (image.getWidth() % sw.step_width);
+            m_dimensions.height = image.getHeight() -
+                                  (image.getHeight() % sw.step_height);
+        }
+
+        result = true;
     }
 
     return result;
