@@ -80,7 +80,7 @@ fb32::Webcam::Webcam(
     {
         throw std::invalid_argument("Device " +
                                     device +
-                                    " no discrete frame sizes found");
+                                    " no frame sizes found");
     }
 
     if (m_fitToScreen)
