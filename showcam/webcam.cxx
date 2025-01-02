@@ -76,7 +76,12 @@ fb32::Webcam::Webcam(
                                     " does not support YUYV or MJPEG");
     }
 
-    chooseBestFit(image);
+    if (not chooseBestFit(image))
+    {
+        throw std::invalid_argument("Device " +
+                                    device +
+                                    " no discrete frame sizes found");
+    }
 
     if (m_fitToScreen)
     {
@@ -243,23 +248,26 @@ fb32::Webcam::chooseBestFit(
     m_dimensions = Dimensions{ 0, 0 };
     bool result = false;
 
-    for (const auto d : dimensions)
+    if (dimensions.size() > 0)
     {
-        if ((d.width <= image.getWidth()) and
-            (d.height <= image.getHeight()) and
-            (d.width > m_dimensions.width) and
-            (d.height > m_dimensions.height))
+        for (const auto d : dimensions)
         {
-            m_dimensions = d;
-            result = true;
-            break;
+            if ((d.width <= image.getWidth()) and
+                (d.height <= image.getHeight()) and
+                (d.width > m_dimensions.width) and
+                (d.height > m_dimensions.height))
+            {
+                m_dimensions = d;
+                result = true;
+                break;
+            }
         }
-    }
 
-    if (not result)
-    {
-        m_dimensions = dimensions.back();
-        result = true;
+        if (not result)
+        {
+            m_dimensions = dimensions.back();
+            result = true;
+        }
     }
 
     return result;
