@@ -53,7 +53,7 @@ volatile static std::sig_atomic_t run{1};
 
 static void
 signalHandler(
-    int signalNumber)
+    int signalNumber) noexcept
 {
     switch (signalNumber)
     {

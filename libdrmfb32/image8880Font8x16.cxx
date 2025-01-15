@@ -4659,7 +4659,7 @@ constexpr uint8_t font[256][sc_fontHeight] =
 //-------------------------------------------------------------------------
 
 int
-Image8880Font8x16::getPixelHeight() const
+Image8880Font8x16::getPixelHeight() const noexcept
 {
     return sc_fontHeight;
 }
@@ -4667,7 +4667,7 @@ Image8880Font8x16::getPixelHeight() const
 //-------------------------------------------------------------------------
 
 int
-Image8880Font8x16::getPixelWidth() const
+Image8880Font8x16::getPixelWidth() const noexcept
 {
     return sc_fontWidth;
 }
@@ -4675,7 +4675,7 @@ Image8880Font8x16::getPixelWidth() const
 //-------------------------------------------------------------------------
 
 std::optional<char>
-Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const
+Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const noexcept
 {
     switch (code)
     {
@@ -4738,11 +4738,11 @@ Image8880Font8x16::drawChar(
 Interface8880Point
 Image8880Font8x16::drawString(
     const Interface8880Point& p,
-    const char* string,
+    std::string_view sv,
     const RGB8880& rgb,
     Interface8880& image)
 {
-    return drawString(p, std::string(string), rgb, image);
+    return drawString(p, sv, rgb.get8880(), image);
 }
 
 //-------------------------------------------------------------------------
@@ -4750,38 +4750,14 @@ Image8880Font8x16::drawString(
 Interface8880Point
 Image8880Font8x16::drawString(
     const Interface8880Point& p,
-    const char* string,
-    uint32_t rgb,
-    Interface8880& image)
-{
-    return drawString(p, std::string(string), rgb, image);
-}
-
-//-------------------------------------------------------------------------
-
-Interface8880Point
-Image8880Font8x16::drawString(
-    const Interface8880Point& p,
-    const std::string& string,
-    const RGB8880& rgb,
-    Interface8880& image)
-{
-    return drawString(p, string, rgb.get8880(), image);
-}
-
-//-------------------------------------------------------------------------
-
-Interface8880Point
-Image8880Font8x16::drawString(
-    const Interface8880Point& p,
-    const std::string& string,
+    std::string_view sv,
     uint32_t rgb,
     Interface8880& image)
 {
     Interface8880Point position{p};
     Interface8880Point start{p};
 
-    for (const auto c : string)
+    for (const auto c : sv)
     {
         if (c == '\n')
         {

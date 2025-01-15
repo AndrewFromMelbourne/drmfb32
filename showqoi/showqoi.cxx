@@ -200,10 +200,7 @@ main(
             image = image.resizeBilinearInterpolation(width, height);
         }
 
-        const Interface8880Point center{
-            (fb.getWidth() - image.getWidth()) / 2,
-            (fb.getHeight() - image.getHeight()) / 2};
-        fb.putImage(center, image);
+        fb.putImage(center(fb, image), image);
         fb.update();
 
         //-----------------------------------------------------------------

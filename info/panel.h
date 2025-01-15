@@ -53,12 +53,12 @@ public:
 
     virtual ~Panel() = default;
 
-    int getBottom() const { return m_yPosition + m_image.getHeight(); }
+    int getBottom() const noexcept { return m_yPosition + m_image.getHeight(); }
 
-    fb32::Image8880& getImage() { return m_image; }
-    const fb32::Image8880& getImage() const { return m_image; }
+    fb32::Image8880& getImage() noexcept { return m_image; }
+    const fb32::Image8880& getImage() const noexcept { return m_image; }
 
-    void show(fb32::FrameBuffer8880& fb)const;
+    void show(fb32::FrameBuffer8880& fb) const;
     virtual void init(fb32::Interface8880Font& font) = 0;
     virtual void update(time_t now, fb32::Interface8880Font& font) = 0;
 

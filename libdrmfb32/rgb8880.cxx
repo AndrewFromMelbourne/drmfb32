@@ -32,7 +32,7 @@
 fb32::RGB8880::RGB8880(
     uint8_t red,
     uint8_t green,
-    uint8_t blue)
+    uint8_t blue) noexcept
 :
     m_rgb{0}
 {
@@ -42,7 +42,7 @@ fb32::RGB8880::RGB8880(
 //-------------------------------------------------------------------------
 
 fb32::RGB8880::RGB8880(
-    uint32_t rgb)
+    uint32_t rgb) noexcept
 :
     m_rgb{rgb}
 {
@@ -51,7 +51,7 @@ fb32::RGB8880::RGB8880(
 //-------------------------------------------------------------------------
 
 uint8_t
-fb32::RGB8880::getRed() const
+fb32::RGB8880::getRed() const noexcept
 {
     return (m_rgb >> 16) & 0xFF;
 }
@@ -59,7 +59,7 @@ fb32::RGB8880::getRed() const
 //-------------------------------------------------------------------------
 
 uint8_t
-fb32::RGB8880::getGreen() const
+fb32::RGB8880::getGreen() const noexcept
 {
     return (m_rgb >> 8) & 0xFF;
 }
@@ -67,7 +67,7 @@ fb32::RGB8880::getGreen() const
 //-------------------------------------------------------------------------
 
 uint8_t
-fb32::RGB8880::getBlue() const
+fb32::RGB8880::getBlue() const noexcept
 {
     return m_rgb & 0xFF;
 }
@@ -78,7 +78,7 @@ void
 fb32::RGB8880::setRGB(
     uint8_t red,
     uint8_t green,
-    uint8_t blue)
+    uint8_t blue) noexcept
 {
     m_rgb = (red << 16) | (green << 8) | blue;
 }
@@ -89,7 +89,7 @@ fb32::RGB8880
 fb32::RGB8880::blend(
     uint8_t alpha,
     const RGB8880& a,
-    const RGB8880& b)
+    const RGB8880& b) noexcept
 {
     auto blendChannel = [](uint8_t alpha, int a, int b) -> int
     {

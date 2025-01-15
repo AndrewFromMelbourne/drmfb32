@@ -74,31 +74,31 @@ public:
     Webcam(Webcam&& wc) = delete;
     Webcam& operator=(Webcam&& wc) = delete;
 
-    const Dimensions& dimensions() const
+    const Dimensions& dimensions() const noexcept
     {
         return m_dimensions;
     }
 
-    std::string formatName() const
+    std::string formatName() const noexcept
     {
         return m_formatName;
     }
 
     bool showFrame(Interface8880& image);
-    bool startStream() const;
-    bool stopStream() const;
+    bool startStream() const noexcept;
+    bool stopStream() const noexcept;
 
 private:
 
     bool chooseBestFit(Interface8880& image);
-    bool chooseFormat();
+    bool chooseFormat() noexcept;
     bool convertMjpeg(const uint8_t* data, int length);
     bool convertYuyv(const uint8_t* data, int length);
-    bool hasVideoCapabilities() const;
-    bool initBuffers();
+    bool hasVideoCapabilities() const noexcept;
+    bool initBuffers() noexcept;
     void initResizedImage(Interface8880& image);
-    bool initVideo();
-    bool setFPS(int fps) const;
+    bool initVideo() noexcept;
+    bool setFPS(int fps) const noexcept;
 
     Dimensions m_dimensions;
     FileDescriptor m_fd;

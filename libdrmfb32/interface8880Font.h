@@ -30,7 +30,7 @@
 //-------------------------------------------------------------------------
 
 #include <optional>
-#include <string>
+#include <string_view>
 
 #include "interface8880.h"
 #include "point.h"
@@ -63,10 +63,10 @@ public:
     Interface8880Font& operator=(const Interface8880Font&) = delete;
     Interface8880Font& operator=(Interface8880Font&&) = delete;
 
-    virtual int getPixelHeight() const = 0;
-    virtual int getPixelWidth() const = 0;
+    virtual int getPixelHeight() const noexcept = 0;
+    virtual int getPixelWidth() const noexcept = 0;
 
-    virtual std::optional<char> getCharacterCode(CharacterCode code) const = 0;
+    virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
 
     virtual Interface8880Point
     drawChar(
@@ -85,28 +85,14 @@ public:
     virtual Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
+        std::string_view sv,
         const RGB8880& rgb,
         Interface8880& image) = 0;
 
     virtual Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
-        uint32_t rgb,
-        Interface8880& image) = 0;
-
-    virtual Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
-        const RGB8880& rgb,
-        Interface8880& image) = 0;
-
-    virtual Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
+        std::string_view sv,
         uint32_t rgb,
         Interface8880& image) = 0;
 };

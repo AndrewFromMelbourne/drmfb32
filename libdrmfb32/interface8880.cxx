@@ -135,4 +135,15 @@ fb32::Interface8880::putImagePartial(
 
 //-------------------------------------------------------------------------
 
+Interface8880Point
+center(
+    const Interface8880& frame,
+    const Interface8880& image) noexcept
+{
+    return {(frame.getWidth() - image.getWidth()) / 2,
+            (frame.getHeight() - image.getHeight()) / 2};
+}
+
+//-------------------------------------------------------------------------
+
 } // namespace fb32

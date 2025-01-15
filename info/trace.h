@@ -67,9 +67,9 @@ public:
         m_values.reserve(width);
     }
 
-    const std::string& name() const{ return m_name; }
-    fb32::RGB8880 traceColour() const { return m_traceColour; }
-    fb32::RGB8880 gridColour() const { return m_gridColour; }
+    const std::string& name() const noexcept { return m_name; }
+    fb32::RGB8880 traceColour() const noexcept { return m_traceColour; }
+    fb32::RGB8880 gridColour() const noexcept { return m_gridColour; }
 
     void addData(int value);
     int max() const;

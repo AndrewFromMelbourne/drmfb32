@@ -311,7 +311,7 @@ Viewer::openImage()
 // ------------------------------------------------------------------------
 
 bool
-Viewer::oversize() const
+Viewer::oversize() const noexcept
 {
     if ((zoomedWidth() > m_buffer.getWidth()) or
         (zoomedHeight() > m_buffer.getHeight()))
@@ -349,7 +349,7 @@ Viewer::paint()
 // ------------------------------------------------------------------------
 
 void
-Viewer::pan(int x, int y)
+Viewer::pan(int x, int y) noexcept
 {
     if (oversize() and (m_zoom != SCALE_OVERSIZED))
     {
@@ -362,16 +362,12 @@ Viewer::pan(int x, int y)
 
 fb32::Interface8880Point
 Viewer::placeImage(
-    const fb32::Image8880& image) const
+    const fb32::Image8880& image) const noexcept
 {
-    const auto x = (m_buffer.getWidth() / 2) -
-                   (image.getWidth() / 2) +
-                   m_xOffset;
-    const auto y = (m_buffer.getHeight() / 2) -
-                   (image.getHeight() / 2) +
-                   m_yOffset;
+    auto p = center(m_buffer, image);
+    p.incr(m_xOffset, m_yOffset);
 
-    return fb32::Interface8880Point{x, y};
+    return p;
 }
 
 // ------------------------------------------------------------------------
@@ -454,7 +450,7 @@ Viewer::readDirectory()
 // ------------------------------------------------------------------------
 
 int
-Viewer::zoomedHeight() const
+Viewer::zoomedHeight() const noexcept
 {
     const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 
@@ -464,7 +460,7 @@ Viewer::zoomedHeight() const
 // ------------------------------------------------------------------------
 
 int
-Viewer::zoomedWidth() const
+Viewer::zoomedWidth() const noexcept
 {
     const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 

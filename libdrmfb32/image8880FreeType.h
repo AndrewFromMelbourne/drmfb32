@@ -69,15 +69,15 @@ public:
     Image8880FreeType& operator=(const Image8880FreeType&) = delete;
     Image8880FreeType& operator=(Image8880FreeType&&) = delete;
 
-    std::string getFontFamilyName() const;
-    std::string getFontStyleName() const;
+    std::string getFontFamilyName() const noexcept;
+    std::string getFontStyleName() const noexcept;
 
-    int getPixelHeight() const override;
-    int getPixelWidth() const override;
+    int getPixelHeight() const noexcept override;
+    int getPixelWidth() const noexcept override;
 
-    std::optional<char> getCharacterCode(CharacterCode code) const override;
+    std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 
-    int getPixelSize() const
+    int getPixelSize() const noexcept
     {
         return m_pixelSize;
     }
@@ -108,33 +108,18 @@ public:
     Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
+        std::string_view sv,
         const RGB8880& rgb,
         Interface8880& image) override;
 
     Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
-        uint32_t rgb,
-        Interface8880& image) override;
-
-    Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
-        const RGB8880& rgb,
-        Interface8880& image) override;
-
-    Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
+        std::string_view sv,
         uint32_t rgb,
         Interface8880& image) override;
 
 private:
-
 
     void
     drawChar(

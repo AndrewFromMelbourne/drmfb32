@@ -33,6 +33,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -159,7 +160,7 @@ printUsage(
 
 static void
 signalHandler(
-    int signalNumber)
+    int signalNumber) noexcept
 {
     switch (signalNumber)
     {

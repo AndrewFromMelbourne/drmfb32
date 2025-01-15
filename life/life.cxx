@@ -352,9 +352,6 @@ void
 Life::draw(
     fb32::FrameBuffer8880& fb)
 {
-    const int xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
-    const int yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
-
-    fb.putImage(fb32::Interface8880Point(xOffset, yOffset), m_image);
+    fb.putImage(center(fb, m_image), m_image);
 }
 

@@ -40,7 +40,7 @@ using namespace fb32;
 
 //-------------------------------------------------------------------------
 
-double dot(vector3 a, vector3 b)
+double dot(vector3 a, vector3 b) noexcept
 {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
@@ -107,7 +107,7 @@ Sphere::update()
 void
 Sphere::setLight(
     double inclination,
-    double bearing)
+    double bearing) noexcept
 {
     inclination = std::clamp(inclination, 0.0, 90.0);
 
@@ -129,9 +129,6 @@ void
 Sphere::draw(
     fb32::FrameBuffer8880& fb)
 {
-    const auto xOffset = (fb.getWidth() - m_image.getWidth()) / 2;
-    const auto yOffset = (fb.getHeight() - m_image.getHeight()) / 2;
-
-    fb.putImage(fb32::Interface8880Point(xOffset, yOffset), m_image);
+    fb.putImage(center(fb, m_image), m_image);
 }
 

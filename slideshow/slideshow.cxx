@@ -53,7 +53,7 @@ const char* defaultJoystick = "/dev/input/js0";
 
 static void
 signalHandler(
-    int signalNumber)
+    int signalNumber) noexcept
 {
     switch (signalNumber)
     {

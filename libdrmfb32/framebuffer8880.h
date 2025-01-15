@@ -76,17 +76,17 @@ public:
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0) override;
 
-    uint32_t* getBuffer() override { return m_fbp; };
-    const uint32_t* getBuffer() const override { return m_fbp; }
+    uint32_t* getBuffer() noexcept override { return m_fbp; };
+    const uint32_t* getBuffer() const noexcept override { return m_fbp; }
 
 
     std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
     std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
 
-    int getWidth() const override { return m_width; }
-    int getHeight() const override { return m_height; }
+    int getWidth() const noexcept override { return m_width; }
+    int getHeight() const noexcept override { return m_height; }
 
-    size_t offset(const Interface8880Point& p) const override;
+    size_t offset(const Interface8880Point& p) const noexcept override;
 
     bool
     setPixelRGB(

@@ -161,22 +161,11 @@ fb32::Webcam::showFrame(
         if (m_fitToScreen)
         {
             m_image.resizeToNearestNeighbour(m_resizedImage);
-
-            const Interface8880Point p{
-                (image.getWidth() - m_resizedImage.getWidth()) / 2,
-                (image.getHeight() - m_resizedImage.getHeight()) / 2
-            };
-
-            image.putImage(p, m_resizedImage);
+            image.putImage(center(image, m_resizedImage), m_resizedImage);
         }
         else
         {
-            const Interface8880Point p{
-                (image.getWidth() - m_image.getWidth()) / 2,
-                (image.getHeight() - m_image.getHeight()) / 2
-            };
-
-            image.putImage(p, m_image);
+            image.putImage(center(image, m_image), m_image);
         }
     }
 
@@ -188,7 +177,7 @@ fb32::Webcam::showFrame(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::startStream() const
+fb32::Webcam::startStream() const noexcept
 {
     enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -203,7 +192,7 @@ fb32::Webcam::startStream() const
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::stopStream() const
+fb32::Webcam::stopStream() const noexcept
 {
     enum v4l2_buf_type buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -308,7 +297,7 @@ fb32::Webcam::chooseBestFit(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::chooseFormat()
+fb32::Webcam::chooseFormat() noexcept
 {
     bool result = false;
     v4l2_fmtdesc fmtdesc{ .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
@@ -435,7 +424,7 @@ fb32::Webcam::convertYuyv(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::hasVideoCapabilities() const
+fb32::Webcam::hasVideoCapabilities() const noexcept
 {
     v4l2_capability cap;
 
@@ -451,7 +440,7 @@ fb32::Webcam::hasVideoCapabilities() const
 
 //-------------------------------------------------------------------------
 
-bool fb32::Webcam::initBuffers()
+bool fb32::Webcam::initBuffers() noexcept
 {
     constexpr int NUMBER_OF_BUFFERS_TO_REQUEST{4};
     constexpr int MINIMUM_BUFFERS{2};
@@ -550,7 +539,7 @@ fb32::Webcam::initResizedImage(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::initVideo()
+fb32::Webcam::initVideo() noexcept
 {
     v4l2_format fmt{};
 
@@ -580,7 +569,7 @@ fb32::Webcam::initVideo()
 
 bool
 fb32::Webcam::setFPS(
-    int fps) const
+    int fps) const noexcept
 {
     if (fps <= 0)
     {

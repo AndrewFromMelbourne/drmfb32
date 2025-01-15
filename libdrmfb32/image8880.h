@@ -66,8 +66,8 @@ public:
     Image8880(Image8880&& image) = default;
     Image8880& operator=(Image8880&& image) = default;
 
-    int getWidth() const override { return m_width; }
-    int getHeight() const override { return m_height; }
+    int getWidth() const noexcept override { return m_width; }
+    int getHeight() const noexcept override { return m_height; }
 
     uint8_t getFrame() const { return m_frame; }
     uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
@@ -76,8 +76,8 @@ public:
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb) override;
 
-    uint32_t* getBuffer() override { return m_buffer.data(); };
-    const uint32_t* getBuffer() const override { return m_buffer.data(); }
+    uint32_t* getBuffer() noexcept override { return m_buffer.data(); };
+    const uint32_t* getBuffer() const noexcept override { return m_buffer.data(); }
 
     std::optional<RGB8880> getPixelRGB(
         const Interface8880Point& p) const override
@@ -95,7 +95,7 @@ public:
 
     const uint32_t* getRow(int y) const;
 
-    size_t offset(const Interface8880Point& p) const override
+    size_t offset(const Interface8880Point& p) const noexcept override
     {
         return offset(p, m_frame);
     }
@@ -139,10 +139,10 @@ public:
 
 private:
 
-    size_t offset(const Interface8880Point& p, uint8_t frame) const;
+    size_t offset(const Interface8880Point& p, uint8_t frame) const noexcept;
 
     bool
-    validPixel(const Interface8880Point& p) const
+    validPixel(const Interface8880Point& p) const noexcept
     {
         return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height));
     }

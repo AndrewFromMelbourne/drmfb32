@@ -185,7 +185,7 @@ fb32::Joystick::init()
 //-------------------------------------------------------------------------
 
 bool
-fb32::Joystick::isValidButton(int button) const
+fb32::Joystick::isValidButton(int button) const noexcept
 {
     return (button >= 0) and (button < numberOfButtons());
 }
@@ -193,7 +193,7 @@ fb32::Joystick::isValidButton(int button) const
 //-------------------------------------------------------------------------
 
 int
-fb32::Joystick::numberOfButtons() const
+fb32::Joystick::numberOfButtons() const noexcept
 {
     return m_buttonCount;
 }
@@ -201,7 +201,7 @@ fb32::Joystick::numberOfButtons() const
 //-------------------------------------------------------------------------
 
 int
-fb32::Joystick::numberOfAxes() const
+fb32::Joystick::numberOfAxes() const noexcept
 {
     return m_joystickCount;
 }

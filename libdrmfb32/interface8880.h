@@ -54,11 +54,11 @@ public:
 
     virtual ~Interface8880() = 0;
 
-    virtual uint32_t* getBuffer() = 0;
-    virtual const uint32_t* getBuffer() const = 0;
+    virtual uint32_t* getBuffer() noexcept = 0;
+    virtual const uint32_t* getBuffer() const  noexcept = 0;
 
-    virtual int getWidth() const = 0;
-    virtual int getHeight() const = 0;
+    virtual int getWidth() const noexcept = 0;
+    virtual int getHeight() const noexcept = 0;
 
     virtual void clear(const RGB8880& rgb) = 0;
     virtual void clear(uint32_t rgb = 0) = 0;
@@ -66,7 +66,7 @@ public:
     virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
     virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
 
-    virtual size_t offset(const Interface8880Point& p) const = 0;
+    virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
 
     virtual bool
     setPixelRGB(
@@ -81,6 +81,13 @@ private:
 
     bool putImagePartial(const Interface8880Point& p, const Image8880& image);
 };
+
+//-------------------------------------------------------------------------
+
+Interface8880Point
+center(
+    const Interface8880& frame,
+    const Interface8880& image) noexcept;
 
 //-------------------------------------------------------------------------
 

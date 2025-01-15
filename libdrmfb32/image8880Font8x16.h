@@ -65,10 +65,10 @@ public:
     Image8880Font8x16& operator=(const Image8880Font8x16&) = default;
     Image8880Font8x16& operator=(Image8880Font8x16&&) = default;
 
-    int getPixelHeight() const override;
-    int getPixelWidth() const override;
+    int getPixelHeight() const noexcept override;
+    int getPixelWidth() const noexcept override;
 
-    std::optional<char> getCharacterCode(CharacterCode code) const override;
+    std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 
     Interface8880Point
     drawChar(
@@ -87,28 +87,14 @@ public:
     Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
+        std::string_view cv,
         const RGB8880& rgb,
         Interface8880& image) override;
 
     Interface8880Point
     drawString(
         const Interface8880Point& p,
-        const char* string,
-        uint32_t rgb,
-        Interface8880& image) override;
-
-    Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
-        const RGB8880& rgb,
-        Interface8880& image) override;
-
-    Interface8880Point
-    drawString(
-        const Interface8880Point& p,
-        const std::string& string,
+        std::string_view sv,
         uint32_t rgb,
         Interface8880& image) override;
 };

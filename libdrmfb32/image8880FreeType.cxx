@@ -66,7 +66,7 @@ Image8880FreeType::~Image8880FreeType()
 //-------------------------------------------------------------------------
 
 std::string
-Image8880FreeType::getFontFamilyName() const
+Image8880FreeType::getFontFamilyName() const noexcept
 {
     return m_face->family_name;
 }
@@ -74,7 +74,7 @@ Image8880FreeType::getFontFamilyName() const
 //-------------------------------------------------------------------------
 
 std::string
-Image8880FreeType::getFontStyleName() const
+Image8880FreeType::getFontStyleName() const noexcept
 {
     return m_face->style_name;
 }
@@ -82,7 +82,7 @@ Image8880FreeType::getFontStyleName() const
 //-------------------------------------------------------------------------
 
 int
-Image8880FreeType::getPixelHeight() const
+Image8880FreeType::getPixelHeight() const noexcept
 {
     return (m_face->size->metrics.ascender +
             abs(m_face->size->metrics.descender)) >> 6;
@@ -91,7 +91,7 @@ Image8880FreeType::getPixelHeight() const
 //-------------------------------------------------------------------------
 
 int
-Image8880FreeType::getPixelWidth() const
+Image8880FreeType::getPixelWidth() const noexcept
 {
     return m_face->size->metrics.max_advance >> 6;
 }
@@ -99,7 +99,7 @@ Image8880FreeType::getPixelWidth() const
 //-------------------------------------------------------------------------
 
 std::optional<char>
-Image8880FreeType::getCharacterCode(Interface8880Font::CharacterCode code) const
+Image8880FreeType::getCharacterCode(Interface8880Font::CharacterCode code) const noexcept
 {
     switch (code)
     {
@@ -194,36 +194,7 @@ Image8880FreeType::drawWideChar(
 Interface8880Point
 Image8880FreeType::drawString(
     const Interface8880Point& p,
-    const char* string,
-    const RGB8880& rgb,
-    Interface8880& image)
-{
-    if (not string)
-    {
-        return p;
-    }
-
-    return drawString(p, std::string(string), rgb, image);
-}
-
-//-------------------------------------------------------------------------
-
-Interface8880Point
-Image8880FreeType::drawString(
-    const Interface8880Point& p,
-    const char* string,
-    uint32_t rgb,
-    Interface8880& image)
-{
-    return drawString(p, string, RGB8880(rgb), image);
-}
-
-//-------------------------------------------------------------------------
-
-Interface8880Point
-Image8880FreeType::drawString(
-    const Interface8880Point& p,
-    const std::string& string,
+    std::string_view sv,
     const RGB8880& rgb,
     Interface8880& image)
 {
@@ -234,7 +205,7 @@ Image8880FreeType::drawString(
     auto use_kerning{FT_HAS_KERNING(m_face)};
     FT_UInt previous{0};
 
-    for (const auto c : string)
+    for (const auto c : sv)
     {
         if (c == '\n')
         {
@@ -293,11 +264,11 @@ Image8880FreeType::drawString(
 Interface8880Point
 Image8880FreeType::drawString(
     const Interface8880Point& p,
-    const std::string& string,
+    std::string_view sv,
     uint32_t rgb,
     Interface8880& image)
 {
-    return drawString(p, string, RGB8880(rgb), image);
+    return drawString(p, sv, RGB8880(rgb), image);
 }
 
 //-------------------------------------------------------------------------

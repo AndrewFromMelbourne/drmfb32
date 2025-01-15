@@ -57,9 +57,9 @@ public:
 
 private:
 
-    bool haveImages() const { return m_current != INVALID_INDEX; }
-    bool originalSize() const { return m_percent == 100; }
-    bool viewingImage() const { return not m_isBlank; }
+    bool haveImages() const noexcept { return m_current != INVALID_INDEX; }
+    bool originalSize() const noexcept { return m_percent == 100; }
+    bool viewingImage() const noexcept { return not m_isBlank; }
 
     void annotate();
     bool handleGeneral(fb32::Joystick& js);
@@ -67,14 +67,14 @@ private:
     void imageNext();
     void imagePrevious();
     void openImage();
-    bool oversize() const;
+    bool oversize() const noexcept;
     void paint();
-    void pan(int dx, int dy);
-    fb32::Interface8880Point placeImage(const fb32::Image8880& image) const;
+    void pan(int dx, int dy) noexcept;
+    fb32::Interface8880Point placeImage(const fb32::Image8880& image) const noexcept;
     void processImage();
     void readDirectory();
-    int zoomedHeight() const;
-    int zoomedWidth() const;
+    int zoomedHeight() const noexcept;
+    int zoomedWidth() const noexcept;
 
     static const int INVALID_INDEX{-1};
     static const int MAX_ZOOM{5};

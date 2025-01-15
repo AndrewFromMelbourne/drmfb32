@@ -42,33 +42,33 @@ class RGB8880
 {
 public:
 
-    RGB8880(uint8_t red, uint8_t green, uint8_t blue);
+    RGB8880(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
-    explicit RGB8880(uint32_t rgb);
+    explicit RGB8880(uint32_t rgb) noexcept;
 
-    uint8_t getRed() const;
-    uint8_t getGreen() const;
-    uint8_t getBlue() const;
+    uint8_t getRed() const noexcept;
+    uint8_t getGreen() const noexcept;
+    uint8_t getBlue() const noexcept;
 
-    uint32_t get8880() const { return m_rgb; }
+    uint32_t get8880() const noexcept { return m_rgb; }
 
-    void setRGB(uint8_t red, uint8_t green, uint8_t blue);
+    void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
-    void set8880(uint32_t rgb) { m_rgb = rgb; }
+    void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
 
-    static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b);
+    static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b) noexcept;
 
 private:
 
     uint32_t m_rgb;
 };
 
-inline bool operator != (const RGB8880& lhs, const RGB8880& rhs)
+inline bool operator != (const RGB8880& lhs, const RGB8880& rhs) noexcept
 {
     return lhs.get8880() != rhs.get8880();
 }
 
-inline bool operator == (const RGB8880& lhs, const RGB8880& rhs)
+inline bool operator == (const RGB8880& lhs, const RGB8880& rhs) noexcept
 {
     return !(lhs != rhs);
 }

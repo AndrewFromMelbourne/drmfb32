@@ -82,7 +82,7 @@ fb32::FileDescriptor::operator= (
 //-------------------------------------------------------------------------
 
 void
-fb32::FileDescriptor::closeFd()
+fb32::FileDescriptor::closeFd() noexcept
 {
     if (m_close_if(m_fd))
     {

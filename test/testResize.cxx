@@ -158,28 +158,21 @@ main(
         auto imageLi = image.resizeLanczos3Interpolation(swidth, sheight);
 
         Interface8880Point t{0, 0};
-        font.drawString(t, "Scale up:", white, fb);
-
         Interface8880Point p{ imageOffset, 0 };
-        fb.putImage(p, imageSu);
 
-        t.incrY(yStep);
-        font.drawString(t, "Nearest neighbour:", white, fb);
+        auto show = [&](std::string_view title, Image8880& image)
+        {
+            font.drawString(t, title, white, fb);
+            fb.putImage(p, image);
+            t.incrY(yStep);
+            p.incrY(yStep);
+        };
 
-        p.incrY(yStep);
-        fb.putImage(p, imageNn);
+        show("Scale up:", imageSu);
+        show("Nearest neighbour:", imageNn);
+        show("Bilinear interpolation:", imageBi);
+        show("Lanczos3 interpolation:", imageLi);
 
-        t.incrY(yStep);
-        font.drawString(t, "Bilinear interpolation:", white, fb);
-
-        p.incrY(yStep);
-        fb.putImage(p, imageBi);
-
-        t.incrY(yStep);
-        font.drawString(t, "Lanczos interpolation:", white, fb);
-
-        p.incrY(yStep);
-        fb.putImage(p, imageLi);
         fb.update();
 
         //-----------------------------------------------------------------

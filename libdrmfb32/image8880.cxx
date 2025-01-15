@@ -427,7 +427,7 @@ fb32::Image8880::setPixel(
 size_t
 fb32::Image8880::offset(
     const Interface8880Point& p,
-    uint8_t frame) const
+    uint8_t frame) const noexcept
 {
     return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
 }

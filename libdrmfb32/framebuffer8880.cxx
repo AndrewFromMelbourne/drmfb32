@@ -70,7 +70,7 @@ FoundDrmResource
 findDrmResourcesForConnector(
     fb32::FileDescriptor& fd,
     uint32_t connectorId,
-    const drm::drmModeRes_ptr& resources)
+    const drm::drmModeRes_ptr& resources) noexcept
 {
     const auto connector{drm::drmModeGetConnector(fd, connectorId)};
     const bool connected{connector->connection == DRM_MODE_CONNECTED};
@@ -112,7 +112,7 @@ findDrmResourcesForConnector(
 FoundDrmResource
 findDrmResourcesForConnector(
     fb32::FileDescriptor& fd,
-    uint32_t connectorId)
+    uint32_t connectorId) noexcept
 {
     return findDrmResourcesForConnector(fd,
                                         connectorId,
@@ -125,7 +125,7 @@ findDrmResourcesForConnector(
 FoundDrmResource
 findDrmResources(
     fb32::FileDescriptor& fd,
-    uint32_t connectorId)
+    uint32_t connectorId) noexcept
 {
     if (connectorId)
     {
@@ -155,7 +155,7 @@ findDrmResources(
 //-------------------------------------------------------------------------
 
 std::string
-findDrmDevice()
+findDrmDevice() noexcept
 {
     drm::DrmDevices devices;
 
@@ -182,7 +182,7 @@ findDrmDevice()
 
 std::string
 findDrmDeviceWithConnector(
-    uint32_t connectorId)
+    uint32_t connectorId) noexcept
 {
     drm::DrmDevices devices;
 
@@ -487,7 +487,7 @@ fb32::FrameBuffer8880::getPixel(
 
 size_t
 fb32::FrameBuffer8880::offset(
-    const Interface8880Point& p) const
+    const Interface8880Point& p) const noexcept
 {
     return p.x() + p.y() * m_lineLengthPixels;
 }

@@ -172,11 +172,7 @@ main(
              Interface8880Point(47,47),
              green);
 
-        const Interface8880Point imageLocation
-        {
-            (fb.getWidth() - image.getWidth()) / 2,
-            (fb.getHeight() - image.getHeight()) / 2
-        };
+        const auto imageLocation = center(fb, image);
 
         fb.putImage(imageLocation, image);
 
