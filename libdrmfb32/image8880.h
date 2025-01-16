@@ -31,7 +31,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <utility>
+#include <span>
 #include <vector>
 
 #include "interface8880.h"
@@ -55,7 +57,11 @@ public:
     Image8880(int width, int height, uint8_t numberOfFrames = 1);
     Image8880(int width,
               int height,
-              const std::vector<uint32_t>& buffer,
+              std::initializer_list<uint32_t> buffer,
+              uint8_t numberOfFrames = 1);
+    Image8880(int width,
+              int height,
+              std::span<const uint32_t> buffer,
               uint8_t numberOfFrames = 1);
 
     ~Image8880() override = default;

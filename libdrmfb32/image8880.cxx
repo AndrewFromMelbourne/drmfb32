@@ -57,15 +57,38 @@ fb32::Image8880::Image8880(
 fb32::Image8880::Image8880(
     int width,
     int height,
-    const std::vector<uint32_t>& buffer,
+    std::initializer_list<uint32_t> buffer,
     uint8_t numberOfFrames)
 :
     m_width{width},
     m_height{height},
     m_frame{0},
     m_numberOfFrames{numberOfFrames},
-    m_buffer(buffer)
+    m_buffer{buffer}
 {
+    size_t minBufferSize = width * height * numberOfFrames;
+
+    if (m_buffer.size() < minBufferSize)
+    {
+        m_buffer.resize(minBufferSize);
+    }
+}
+
+//-------------------------------------------------------------------------
+fb32::Image8880::Image8880(
+    int width,
+    int height,
+    std::span<const uint32_t> buffer,
+    uint8_t numberOfFrames)
+:
+    m_width{width},
+    m_height{height},
+    m_frame{0},
+    m_numberOfFrames{numberOfFrames},
+    m_buffer{}
+{
+    m_buffer.assign(buffer.begin(), buffer.end());
+
     size_t minBufferSize = width * height * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
