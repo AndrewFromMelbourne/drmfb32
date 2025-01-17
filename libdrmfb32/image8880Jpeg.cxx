@@ -1,4 +1,3 @@
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -30,7 +29,6 @@
 
 //-------------------------------------------------------------------------
 
-#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -47,59 +45,95 @@ namespace
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880
-decodeJpeg(
-    const std::vector<uint8_t>& data)
+struct JpegDetails
 {
-    tjhandle tjInstance = tjInitDecompress();
+    int m_width{0};
+    int m_height{0};
+    int m_subsamp{0};
+    int m_colourspace{0};
+};
 
-    if (tjInstance == nullptr)
+//-------------------------------------------------------------------------
+
+class TurboJpegDecode
+{
+public:
+
+    explicit TurboJpegDecode(std::span<const uint8_t> data);
+    ~TurboJpegDecode();
+
+    TurboJpegDecode(const TurboJpegDecode& fb) = delete;
+    TurboJpegDecode& operator=(const TurboJpegDecode& fb) = delete;
+
+    TurboJpegDecode(TurboJpegDecode&& fb) = delete;
+    TurboJpegDecode& operator=(TurboJpegDecode&& fb) = delete;
+
+    void decode(fb32::Image8880& image);
+    JpegDetails details() const noexcept { return m_details; }
+    tjhandle instance() const noexcept { return m_instance; }
+
+private:
+
+    std::span<const uint8_t> m_data;
+    tjhandle m_instance;
+    JpegDetails m_details;
+};
+
+//-------------------------------------------------------------------------
+
+TurboJpegDecode::TurboJpegDecode(
+    std::span<const uint8_t> data)
+:
+    m_data{data},
+    m_instance{tjInitDecompress()},
+    m_details{}
+{
+    if (m_instance == nullptr)
     {
-        tjDestroy(tjInstance);
         throw std::logic_error("Unable to create JPEG Decompressor");
     }
 
-    int width{};
-    int height{};
-    int subsamp{};
-    int colourspace{};
-    int result{};
-
-    result = tjDecompressHeader3(tjInstance,
-                                 data.data(),
-                                 data.size(),
-                                 &width,
-                                 &height,
-                                 &subsamp,
-                                 &colourspace);
+    int result = tjDecompressHeader3(m_instance,
+                                     m_data.data(),
+                                     m_data.size(),
+                                     &m_details.m_width,
+                                     &m_details.m_height,
+                                     &m_details.m_subsamp,
+                                     &m_details.m_colourspace);
 
     if (result < 0)
     {
-        tjDestroy(tjInstance);
         throw std::invalid_argument("Invalid JPEG header");
     }
+}
 
-    fb32::Image8880 image(width, height);
+//-------------------------------------------------------------------------
 
-    result = tjDecompress2(tjInstance,
-                           data.data(),
-                           data.size(),
-                           reinterpret_cast<unsigned char*>(image.getBuffer()),
-                           width,
-                           width * 4,
-                           height,
-                           TJPF_BGRX,
-                           TJFLAG_ACCURATEDCT);
+TurboJpegDecode::~TurboJpegDecode()
+{
+    tjDestroy(m_instance);
+}
+
+//-------------------------------------------------------------------------
+
+void
+TurboJpegDecode::decode(
+    fb32::Image8880& image)
+{
+    int result = tjDecompress2(m_instance,
+                               m_data.data(),
+                               m_data.size(),
+                               reinterpret_cast<unsigned char*>(image.getBuffer()),
+                               m_details.m_width,
+                               m_details.m_width * 4,
+                               m_details.m_height,
+                               TJPF_BGRX,
+                               TJFLAG_ACCURATEDCT);
 
     if (result < 0)
     {
-        tjDestroy(tjInstance);
         throw std::invalid_argument("Unable to decode JPEG");
     }
-
-    tjDestroy(tjInstance);
-
-    return image;
 }
 
 //-------------------------------------------------------------------------
@@ -113,6 +147,17 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
+void
+decodeJpeg(
+    Image8880& image,
+    std::span<const uint8_t> data)
+{
+    TurboJpegDecode tjd{data};
+    tjd.decode(image);
+}
+
+//-------------------------------------------------------------------------
+
 Image8880
 readJpeg(
     const std::string& name)
@@ -123,9 +168,16 @@ readJpeg(
     std::vector<uint8_t> buffer(length);
     ifs.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
 
-    return decodeJpeg(buffer);
+    TurboJpegDecode tjd{buffer};
+    auto details{tjd.details()};
+    fb32::Image8880 image{details.m_width, details.m_height};
+
+    tjd.decode(image);
+
+    return image;
 }
 
 //-------------------------------------------------------------------------
 
 }
+

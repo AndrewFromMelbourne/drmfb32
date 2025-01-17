@@ -34,8 +34,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include <turbojpeg.h>
-
+#include "image8880Jpeg.h"
 #include "webcam.h"
 
 //-------------------------------------------------------------------------
@@ -329,41 +328,18 @@ fb32::Webcam::chooseFormat() noexcept
 bool
 fb32::Webcam::convertMjpeg(
     const uint8_t* data,
-    int length)
+    size_t length)
 {
     bool result = false;
-    tjhandle tjInstance = tjInitDecompress();
 
-    if (tjInstance != NULL)
+    try
     {
-        int jpegWidth = 0;
-        int jpegHeight = 0;
-        int jpegSubsamp = 0;
-        int jpegColorspace = 0;
-
-        if (tjDecompressHeader3(tjInstance,
-                                data,
-                                length,
-                                &jpegWidth,
-                                &jpegHeight,
-                                &jpegSubsamp,
-                                &jpegColorspace) >= 0)
-        {
-            if (tjDecompress2(tjInstance,
-                              data,
-                              length,
-                              reinterpret_cast<unsigned char*>(m_image.getBuffer()),
-                              m_image.getWidth(),
-                              m_image.getWidth() * 4,
-                              m_image.getHeight(),
-                              TJPF_BGRX,
-                              TJFLAG_FASTDCT) >= 0)
-            {
-                result = true;
-            }
-        }
-
-        tjDestroy(tjInstance);
+        decodeJpeg(m_image, std::span<const uint8_t>{data, length});
+        result = true;
+    }
+    catch(const std::exception& e)
+    {
+        // do nothing
     }
 
     return result;
@@ -383,11 +359,11 @@ fb32::Webcam::convertMjpeg(
 bool
 fb32::Webcam::convertYuyv(
     const uint8_t* data,
-    int length)
+    size_t length)
 {
     uint32_t* buffer = m_image.getBuffer();
 
-    for (int i = 0 ; i < length ; i += 4)
+    for (size_t i = 0 ; i < length ; i += 4)
     {
         const int y1 = data[0] - 16;
         const int u = data[1] - 128;
