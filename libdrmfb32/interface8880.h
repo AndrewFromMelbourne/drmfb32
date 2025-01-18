@@ -52,6 +52,8 @@ class Interface8880
 {
 public:
 
+    static constexpr auto BytesPerPixel{4};
+
     virtual ~Interface8880() = 0;
 
     virtual uint32_t* getBuffer() noexcept = 0;
