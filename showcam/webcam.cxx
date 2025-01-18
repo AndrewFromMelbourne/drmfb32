@@ -365,7 +365,7 @@ fb32::Webcam::convertYuyv(
     constexpr size_t BytesPerYuyv{4};
     constexpr size_t PixelsPerYuyv{2};
 
-    for (size_t i = 0 ; i < length ; i += BYTES_PER_YUYV)
+    for (size_t i = 0 ; i < length ; i += BytesPerYuyv)
     {
         const int y1 = data[0] - 16;
         const int u = data[1] - 128;
