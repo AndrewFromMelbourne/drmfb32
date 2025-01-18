@@ -40,7 +40,10 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-Image8880 readQoi(const std::string& name);
+Image8880
+readQoi(
+    const std::string& name,
+    const fb32::RGB8880& background = fb32::RGB8880{0, 0, 0});
 
 //-------------------------------------------------------------------------
 

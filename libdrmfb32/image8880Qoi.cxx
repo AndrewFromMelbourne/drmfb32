@@ -173,7 +173,8 @@ rgbaHashQoi(
 fb32::Image8880
 decodeQoi(
     const QoiHeader& header,
-    const std::vector<uint8_t>& data)
+    const std::vector<uint8_t>& data,
+    const fb32::RGB8880& background)
 {
 
     fb32::Image8880 image(header.getWidth(), header.getHeight());
@@ -266,6 +267,12 @@ decodeQoi(
         const int y = i / header.getWidth();
 
         fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
+
+        if (currentRGBA.a != 255)
+        {
+            rgb = fb32::RGB8880::blend(currentRGBA.a, rgb, background);
+        }
+
         image.setPixelRGB(fb32::Interface8880Point{x, y}, rgb);
     }
 
@@ -285,7 +292,8 @@ namespace fb32
 
 Image8880
 readQoi(
-    const std::string& name)
+    const std::string& name,
+    const fb32::RGB8880& background)
 {
     const auto length{std::filesystem::file_size(std::filesystem::path(name))};
 
@@ -302,7 +310,7 @@ readQoi(
     ifs.read(reinterpret_cast<char*>(rawFooter.data()), rawFooter.size());
     checkFooter(rawFooter);
 
-    return decodeQoi(header, buffer);
+    return decodeQoi(header, buffer, background);
 }
 
 //-------------------------------------------------------------------------
