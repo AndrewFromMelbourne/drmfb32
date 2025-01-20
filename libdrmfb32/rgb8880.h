@@ -46,6 +46,8 @@ public:
 
     explicit RGB8880(uint32_t rgb) noexcept;
 
+    RGB8880 blend(uint8_t alpha, const RGB8880& background) const noexcept;
+
     uint8_t getRed() const noexcept;
     uint8_t getGreen() const noexcept;
     uint8_t getBlue() const noexcept;

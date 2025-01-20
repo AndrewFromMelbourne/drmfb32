@@ -265,15 +265,10 @@ decodeQoi(
 
         const int x = i % header.getWidth();
         const int y = i / header.getWidth();
+        const fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
 
-        fb32::RGB8880 rgb{currentRGBA.r, currentRGBA.g, currentRGBA.b};
-
-        if (currentRGBA.a != 255)
-        {
-            rgb = fb32::RGB8880::blend(currentRGBA.a, rgb, background);
-        }
-
-        image.setPixelRGB(fb32::Interface8880Point{x, y}, rgb);
+        image.setPixelRGB(fb32::Interface8880Point{x, y},
+                          rgb.blend(currentRGBA.a, background));
     }
 
     return image;

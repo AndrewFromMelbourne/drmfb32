@@ -50,6 +50,16 @@ fb32::RGB8880::RGB8880(
 
 //-------------------------------------------------------------------------
 
+fb32::RGB8880
+fb32::RGB8880::blend(
+    uint8_t alpha,
+    const RGB8880& background) const noexcept
+{
+    return blend(alpha, *this, background);
+}
+
+//-------------------------------------------------------------------------
+
 uint8_t
 fb32::RGB8880::getRed() const noexcept
 {

@@ -172,6 +172,11 @@ target_link_libraries(testCircle drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(testColourBlend test/testColourBlend.cxx)
+target_link_libraries(testColourBlend drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 if (FREETYPE_FOUND)
 add_executable(testft test/testft.cxx)
 target_link_libraries(testft drmfb32
