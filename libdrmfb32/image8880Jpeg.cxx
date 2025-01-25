@@ -123,7 +123,7 @@ TurboJpegDecode::decode(
     int result = tjDecompress2(m_instance,
                                m_data.data(),
                                m_data.size(),
-                               reinterpret_cast<unsigned char*>(image.getBuffer()),
+                               reinterpret_cast<unsigned char*>(image.getBuffer().data()),
                                m_details.m_width,
                                m_details.m_width * fb32::Interface8880::BytesPerPixel,
                                m_details.m_height,

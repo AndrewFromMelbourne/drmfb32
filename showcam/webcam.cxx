@@ -361,9 +361,8 @@ fb32::Webcam::convertYuyv(
     const uint8_t* data,
     size_t length)
 {
-    uint32_t* buffer = m_image.getBuffer();
+    auto buffer = m_image.getBuffer().begin();
     constexpr size_t BytesPerYuyv{4};
-    constexpr size_t PixelsPerYuyv{2};
 
     for (size_t i = 0 ; i < length ; i += BytesPerYuyv)
     {
@@ -389,11 +388,10 @@ fb32::Webcam::convertYuyv(
             static_cast<uint8_t>(std::clamp((y2Part + gPart) / 1024, 0, 255)),
             static_cast<uint8_t>(std::clamp((y2Part + bPart) / 1024, 0, 255))};
 
-        buffer[0] = rgb1.get8880();
-        buffer[1] = rgb2.get8880();
+        *(buffer++) = rgb1.get8880();
+        *(buffer++) = rgb2.get8880();
 
         data += BytesPerYuyv;
-        buffer += PixelsPerYuyv;
     }
 
     return true;

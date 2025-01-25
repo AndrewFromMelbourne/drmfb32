@@ -82,7 +82,7 @@ public:
         return m_pixelSize;
     }
 
-    bool setPixelSize(int pixelSize);
+    bool setPixelSize(int pixelSize) noexcept;
 
     Interface8880Point
     drawChar(

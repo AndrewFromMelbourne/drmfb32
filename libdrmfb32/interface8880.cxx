@@ -62,11 +62,10 @@ fb32::Interface8880::putImage(
 
     for (int j = 0 ; j < image.getHeight() ; ++j)
     {
-        auto start = image.getRow(j);
+        auto row = image.getRow(j);
+        const auto ost = offset(Interface8880Point{p.x(), j + p.y()});
 
-        std::copy(start,
-                  start + image.getWidth(),
-                  getBuffer() + offset(Interface8880Point{p.x(), j + p.y()}));
+        std::copy(row.begin(), row.end(), getBuffer().subspan(ost).begin());
     }
 
     return true;
@@ -123,11 +122,10 @@ fb32::Interface8880::putImagePartial(
 
     for (auto j = yStart ; j <= yEnd ; ++j)
     {
-        auto start = image.getRow(j) + xStart;
+        auto row = image.getRow(j).subspan(xStart, xLength);
+        const auto ost = offset(Interface8880Point{x, j - yStart + y});
 
-        std::copy(start,
-                  start + xLength,
-                  getBuffer() + offset(Interface8880Point{x, j - yStart + y}));
+        std::copy(row.begin(), row.end(), getBuffer().subspan(ost).begin());
     }
 
     return true;

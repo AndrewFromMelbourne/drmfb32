@@ -150,7 +150,7 @@ fb32::Image8880::getPixel(
 
 //-------------------------------------------------------------------------
 
-const uint32_t*
+std::span<const uint32_t>
 fb32::Image8880::getRow(
     int y) const
 {
@@ -158,11 +158,11 @@ fb32::Image8880::getRow(
 
     if (validPixel(p))
     {
-        return  m_buffer.data() + offset(p);
+        return  getBuffer().subspan(offset(p), m_width);
     }
     else
     {
-        return nullptr;
+        return {};
     }
 }
 

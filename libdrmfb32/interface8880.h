@@ -31,6 +31,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 
 #include "point.h"
 #include "rgb8880.h"
@@ -56,8 +57,8 @@ public:
 
     virtual ~Interface8880() = 0;
 
-    virtual uint32_t* getBuffer() noexcept = 0;
-    virtual const uint32_t* getBuffer() const  noexcept = 0;
+    virtual std::span<uint32_t> getBuffer() noexcept = 0;
+    virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
 
     virtual int getWidth() const noexcept = 0;
     virtual int getHeight() const noexcept = 0;

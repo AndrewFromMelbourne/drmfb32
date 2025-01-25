@@ -150,7 +150,7 @@ main(
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{font, 32};
-        Interface8880Point p = ft.drawWideChar(p, c, white, image);
+        ft.drawWideChar(Interface8880Point{0, 0}, c, white, image);
 
         //-----------------------------------------------------------------
 
@@ -160,7 +160,6 @@ main(
         //-----------------------------------------------------------------
 
         std::this_thread::sleep_for(10s);
-
         fb.clear();
 
     }

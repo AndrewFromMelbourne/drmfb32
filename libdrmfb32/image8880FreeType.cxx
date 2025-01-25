@@ -117,7 +117,7 @@ Image8880FreeType::getCharacterCode(Interface8880Font::CharacterCode code) const
 
 bool
 Image8880FreeType::setPixelSize(
-    int pixelSize)
+    int pixelSize) noexcept
 {
     if (pixelSize == m_pixelSize)
     {
@@ -181,7 +181,6 @@ Image8880FreeType::drawWideChar(
                  rgb,
                  image);
 
-
         position.incrX(slot->advance.x >> 6);
     }
 
@@ -201,8 +200,8 @@ Image8880FreeType::drawString(
     Interface8880Point position{p};
     position.incrY(m_face->size->metrics.ascender >> 6);
 
-    auto slot{m_face->glyph};
-    auto use_kerning{FT_HAS_KERNING(m_face)};
+    const auto slot{m_face->glyph};
+    const auto use_kerning{FT_HAS_KERNING(m_face)};
     FT_UInt previous{0};
 
     for (const auto c : sv)
@@ -237,7 +236,6 @@ Image8880FreeType::drawString(
                          slot->bitmap,
                          rgb,
                          image);
-
 
                 position.incrX(slot->advance.x >> 6);
                 previous = glyph_index;
