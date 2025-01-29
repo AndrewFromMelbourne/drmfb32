@@ -42,7 +42,7 @@ namespace fb32
 //-------------------------------------------------------------------------
 
 void decodeJpeg(Image8880& image, std::span<const uint8_t> data);
-Image8880 readJpeg(const std::string& name);
+[[nodiscard]] Image8880 readJpeg(const std::string& name);
 
 //-------------------------------------------------------------------------
 

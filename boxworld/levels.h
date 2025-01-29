@@ -1,5 +1,3 @@
-#pragma once
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -27,6 +25,10 @@
 //
 //-------------------------------------------------------------------------
 
+#pragma once
+
+//-------------------------------------------------------------------------
+
 #include <array>
 
 #include "level.h"
@@ -39,10 +41,10 @@ public:
 
     Levels();
 
-    const Level::LevelType level(int number) const;
+    [[nodiscard]] const Level::LevelType level(int number) const;
 
 private:
 
-    const std::array<Level, Level::levelCount> m_levels;
+    const std::array<Level, Level::c_levelCount> m_levels;
 };
 

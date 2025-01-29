@@ -69,15 +69,15 @@ public:
     Image8880FreeType& operator=(const Image8880FreeType&) = delete;
     Image8880FreeType& operator=(Image8880FreeType&&) = delete;
 
-    std::string getFontFamilyName() const noexcept;
-    std::string getFontStyleName() const noexcept;
+    [[nodiscard]] std::string getFontFamilyName() const noexcept;
+    [[nodiscard]] std::string getFontStyleName() const noexcept;
 
-    int getPixelHeight() const noexcept override;
-    int getPixelWidth() const noexcept override;
+    [[nodiscard]] int getPixelHeight() const noexcept override;
+    [[nodiscard]] int getPixelWidth() const noexcept override;
 
-    std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
+    [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 
-    int getPixelSize() const noexcept
+    [[nodiscard]] int getPixelSize() const noexcept
     {
         return m_pixelSize;
     }

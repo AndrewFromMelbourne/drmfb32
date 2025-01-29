@@ -338,7 +338,7 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     //---------------------------------------------------------------------
 
     m_length = dmcb.size;
-    m_lineLengthPixels = dmcb.pitch / bytesPerPixel;
+    m_lineLengthPixels = dmcb.pitch / c_bytesPerPixel;
     m_fbHandle = dmcb.handle;
 
     uint32_t handles[4] = { dmcb.handle };
@@ -435,7 +435,7 @@ void
 fb32::FrameBuffer8880::clear(
     uint32_t rgb)
 {
-    std::fill(m_fbp, m_fbp + (m_length / bytesPerPixel), rgb);
+    std::fill(m_fbp, m_fbp + (m_length / c_bytesPerPixel), rgb);
 }
 
 //-------------------------------------------------------------------------

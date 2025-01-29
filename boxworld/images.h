@@ -1,5 +1,3 @@
-#pragma once
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -27,18 +25,22 @@
 //
 //-------------------------------------------------------------------------
 
+#pragma once
+
+//-------------------------------------------------------------------------
+
 #include <array>
 #include <cstdint>
 
 //-------------------------------------------------------------------------
 
-static constexpr int tileWidth = 30;
-static constexpr int tileHeight = 30;
-static constexpr int tileCount = 15;
+static constexpr int c_tileWidth{30};
+static constexpr int c_tileHeight{30};
+static constexpr int c_tileCount{15};
 
 //-------------------------------------------------------------------------
 
-constexpr std::array<uint32_t, 900> emptyImage =
+constexpr std::array<uint32_t, 900> c_emptyImage =
 {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -132,7 +134,7 @@ constexpr std::array<uint32_t, 900> emptyImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 900> passageImage =
+constexpr std::array<uint32_t, 900> c_passageImage =
 {
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x00000000, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
@@ -226,7 +228,7 @@ constexpr std::array<uint32_t, 900> passageImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 900> boxImage =
+constexpr std::array<uint32_t, 900> c_boxImage =
 {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -320,7 +322,7 @@ constexpr std::array<uint32_t, 900> boxImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 1800> playerImage =
+constexpr std::array<uint32_t, 1800> c_playerImage =
 {
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x00000000, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
@@ -504,7 +506,7 @@ constexpr std::array<uint32_t, 1800> playerImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 900> wallImage =
+constexpr std::array<uint32_t, 900> c_wallImage =
 {
     0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff,
     0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff,
@@ -598,7 +600,7 @@ constexpr std::array<uint32_t, 900> wallImage =
     0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080, 0x00808080,
 };
 
-constexpr std::array<uint32_t, 900> passageWithTargetImage =
+constexpr std::array<uint32_t, 900> c_passageWithTargetImage =
 {
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x00000000, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
@@ -692,7 +694,7 @@ constexpr std::array<uint32_t, 900> passageWithTargetImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 900> boxOnTargetImage =
+constexpr std::array<uint32_t, 900> c_boxOnTargetImage =
 {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -786,7 +788,7 @@ constexpr std::array<uint32_t, 900> boxOnTargetImage =
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-constexpr std::array<uint32_t, 1800> playerOnTargetImage =
+constexpr std::array<uint32_t, 1800> c_playerOnTargetImage =
 {
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,
     0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x00000000, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff,

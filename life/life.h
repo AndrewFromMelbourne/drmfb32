@@ -1,5 +1,3 @@
-#pragma once
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -27,6 +25,10 @@
 //
 //-------------------------------------------------------------------------
 
+#pragma once
+
+//-------------------------------------------------------------------------
+
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -45,8 +47,8 @@ class Life
 {
 public:
 
-    static constexpr size_t aliveCellShift{4};
-    static constexpr uint8_t aliveCellMask{1 << aliveCellShift};
+    static constexpr size_t c_aliveCellShift{4};
+    static constexpr uint8_t c_aliveCellMask{1 << c_aliveCellShift};
 
     enum CellState
     {

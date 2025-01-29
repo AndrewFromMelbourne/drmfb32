@@ -48,17 +48,17 @@ public:
 
     RGB8880 blend(uint8_t alpha, const RGB8880& background) const noexcept;
 
-    uint8_t getRed() const noexcept;
-    uint8_t getGreen() const noexcept;
-    uint8_t getBlue() const noexcept;
+    [[nodiscard]] uint8_t getRed() const noexcept;
+    [[nodiscard]] uint8_t getGreen() const noexcept;
+    [[nodiscard]] uint8_t getBlue() const noexcept;
 
-    uint32_t get8880() const noexcept { return m_rgb; }
+    [[nodiscard]] uint32_t get8880() const noexcept { return m_rgb; }
 
     void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
     void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
 
-    static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b) noexcept;
+    [[nodiscard]] static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b) noexcept;
 
 private:
 

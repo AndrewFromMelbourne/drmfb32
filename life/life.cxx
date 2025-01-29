@@ -94,7 +94,7 @@ Life::setCell(
     int row)
 {
     updateCell(col, row, 1);
-    m_cellsNext[col + (row * m_size)] |= aliveCellMask;
+    m_cellsNext[col + (row * m_size)] |= c_aliveCellMask;
 
     const fb32::Interface8880Point p{ col, row };
     m_image.setPixel(p, m_cellColours[1]);
@@ -108,7 +108,7 @@ Life::clearCell(
     int row)
 {
     updateCell(col, row, -1);
-    m_cellsNext[col + (row * m_size)] &= ~aliveCellMask;
+    m_cellsNext[col + (row * m_size)] &= ~c_aliveCellMask;
 
     const fb32::Interface8880Point p{ col, row };
     m_image.setPixel(p, m_cellColours[0]);
@@ -126,8 +126,8 @@ Life::iterateRows(
         for (auto col = 0 ; col < m_size ; ++col)
         {
             auto cell = m_cells[col + (row * m_size)];
-            auto neighbours = cell & ~aliveCellMask;
-            auto alive = cell & aliveCellMask;
+            auto neighbours = cell & ~c_aliveCellMask;
+            auto alive = cell & c_aliveCellMask;
 
             if (alive and (neighbours != 2) and (neighbours != 3))
             {

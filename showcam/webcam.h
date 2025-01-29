@@ -74,12 +74,12 @@ public:
     Webcam(Webcam&& wc) = delete;
     Webcam& operator=(Webcam&& wc) = delete;
 
-    const Dimensions& dimensions() const noexcept
+    [[nodiscard]] const Dimensions& dimensions() const noexcept
     {
         return m_dimensions;
     }
 
-    std::string formatName() const noexcept
+    [[nodiscard]] std::string formatName() const noexcept
     {
         return m_formatName;
     }

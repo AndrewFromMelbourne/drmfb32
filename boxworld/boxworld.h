@@ -1,5 +1,3 @@
-#pragma once
-
 //-------------------------------------------------------------------------
 //
 // The MIT License (MIT)
@@ -25,6 +23,10 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+//-------------------------------------------------------------------------
+
+#pragma once
+
 //-------------------------------------------------------------------------
 
 #include "framebuffer8880.h"
@@ -64,10 +66,10 @@ public:
 
     //---------------------------------------------------------------------
 
-    static constexpr uint8_t targetMask = 0x04;
+    static constexpr uint8_t c_targetMask{0x04};
 
-    static constexpr int boardYoffset = 10;
-    static constexpr int boardYend = boardYoffset + (tileHeight * Level::levelHeight);
+    static constexpr int c_boardYoffset{10};
+    static constexpr int c_boardYend{c_boardYoffset + (c_tileHeight * Level::c_levelHeight)};
 
     //---------------------------------------------------------------------
 
@@ -96,7 +98,7 @@ private:
     Level::LevelType m_boardPrevious;
     const Levels m_levels;
 
-    std::array<fb32::Image8880, tileCount> m_tileBuffers;
+    std::array<fb32::Image8880, c_tileCount> m_tileBuffers;
     fb32::Image8880 m_topTextImage;
     fb32::Image8880 m_bottomTextImage;
 

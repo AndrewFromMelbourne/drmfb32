@@ -63,10 +63,10 @@ public:
     Interface8880Font& operator=(const Interface8880Font&) = delete;
     Interface8880Font& operator=(Interface8880Font&&) = delete;
 
-    virtual int getPixelHeight() const noexcept = 0;
-    virtual int getPixelWidth() const noexcept = 0;
+    [[nodiscard]] virtual int getPixelHeight() const noexcept = 0;
+    [[nodiscard]] virtual int getPixelWidth() const noexcept = 0;
 
-    virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
+    [[nodiscard]] virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
 
     virtual Interface8880Point
     drawChar(

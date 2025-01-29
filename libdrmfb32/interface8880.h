@@ -53,23 +53,23 @@ class Interface8880
 {
 public:
 
-    static constexpr auto BytesPerPixel{4};
+    static constexpr auto c_bytesPerPixel{4};
 
     virtual ~Interface8880() = 0;
 
-    virtual std::span<uint32_t> getBuffer() noexcept = 0;
-    virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
+    [[nodiscard]] virtual std::span<uint32_t> getBuffer() noexcept = 0;
+    [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
 
-    virtual int getWidth() const noexcept = 0;
-    virtual int getHeight() const noexcept = 0;
+    [[nodiscard]] virtual int getWidth() const noexcept = 0;
+    [[nodiscard]] virtual int getHeight() const noexcept = 0;
 
     virtual void clear(const RGB8880& rgb) = 0;
     virtual void clear(uint32_t rgb = 0) = 0;
 
-    virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
-    virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
+    [[nodiscard]] virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
 
-    virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
+    [[nodiscard]] virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
 
     virtual bool
     setPixelRGB(

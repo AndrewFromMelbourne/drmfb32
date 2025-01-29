@@ -125,7 +125,7 @@ TurboJpegDecode::decode(
                                m_data.size(),
                                reinterpret_cast<unsigned char*>(image.getBuffer().data()),
                                m_details.m_width,
-                               m_details.m_width * fb32::Interface8880::BytesPerPixel,
+                               m_details.m_width * fb32::Interface8880::c_bytesPerPixel,
                                m_details.m_height,
                                TJPF_BGRX,
                                TJFLAG_ACCURATEDCT);

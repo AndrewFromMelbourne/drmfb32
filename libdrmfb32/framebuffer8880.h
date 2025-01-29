@@ -59,7 +59,7 @@ class FrameBuffer8880
 {
 public:
 
-    static constexpr size_t bytesPerPixel{4};
+    static constexpr size_t c_bytesPerPixel{4};
 
     explicit FrameBuffer8880(
         const std::string& device = "",
@@ -76,18 +76,18 @@ public:
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0) override;
 
-    std::span<uint32_t> getBuffer() noexcept override { return {m_fbp, getBufferSize()}; };
-    std::span<const uint32_t> getBuffer() const noexcept override { return {m_fbp, getBufferSize()}; }
+    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return {m_fbp, getBufferSize()}; };
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return {m_fbp, getBufferSize()}; }
 
-    size_t getBufferSize() const noexcept { return m_lineLengthPixels * m_height;}
+    [[nodiscard]] size_t getBufferSize() const noexcept { return m_lineLengthPixels * m_height;}
 
-    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
-    std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
+    [[nodiscard]] std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
+    [[nodiscard]] std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
 
-    int getWidth() const noexcept override { return m_width; }
-    int getHeight() const noexcept override { return m_height; }
+    [[nodiscard]] int getWidth() const noexcept override { return m_width; }
+    [[nodiscard]] int getHeight() const noexcept override { return m_height; }
 
-    size_t offset(const Interface8880Point& p) const noexcept override;
+    [[nodiscard]] size_t offset(const Interface8880Point& p) const noexcept override;
 
     bool
     setPixelRGB(
