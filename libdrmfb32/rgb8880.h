@@ -57,8 +57,13 @@ public:
     void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
     void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
+    void setGrey(uint8_t grey) noexcept { setRGB(grey, grey, grey); }
 
     [[nodiscard]] static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b) noexcept;
+    [[nodiscard]] static uint32_t rgbTo8880(uint8_t red, uint8_t green, uint8_t blue) noexcept
+    {
+        return (red << 16) | (green << 8) | blue;
+    }
 
 private:
 

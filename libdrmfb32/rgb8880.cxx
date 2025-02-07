@@ -90,7 +90,7 @@ fb32::RGB8880::setRGB(
     uint8_t green,
     uint8_t blue) noexcept
 {
-    m_rgb = (red << 16) | (green << 8) | blue;
+    m_rgb = rgbTo8880(red, green, blue);
 }
 
 //-------------------------------------------------------------------------
