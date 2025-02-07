@@ -34,6 +34,10 @@
 
 //-------------------------------------------------------------------------
 
+using Point = fb32::Interface8880Point;
+
+//-------------------------------------------------------------------------
+
 namespace fb32
 {
 
@@ -70,6 +74,34 @@ boxFilled(
     {
         y += sign_y;
         horizontalLine(image, p1.x(), p2.x(), y, rgb);
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+boxFilled(
+    Interface8880& image,
+    const Interface8880Point& p1,
+    const Interface8880Point& p2,
+    const RGB8880& rgb,
+    uint8_t alpha)
+{
+    const auto sign_x = (p1.x() <= p2.x()) ? 1 : -1;
+    const auto sign_y = (p1.y() <= p2.y()) ? 1 : -1;
+
+    for (auto j = p1.y() ; j <= p2.y() ; j += sign_y)
+    {
+        for (auto i = p1.x() ; i <= p2.x() ; i += sign_x)
+        {
+            const Point p{i, j};
+            auto background = image.getPixelRGB(p);
+
+            if (background.has_value())
+            {
+                image.setPixelRGB(p, rgb.blend(alpha, *background));
+            }
+        }
     }
 }
 
@@ -123,7 +155,7 @@ line(
                     y += sign_y;
                 }
 
-                image.setPixel(Interface8880Point(x, y), rgb);
+                image.setPixel(Point(x, y), rgb);
             }
         }
         else
@@ -146,7 +178,7 @@ line(
                     x += sign_x;
                 }
 
-                image.setPixel(Interface8880Point(x, y), rgb);
+                image.setPixel(Point(x, y), rgb);
             }
         }
     }
@@ -165,12 +197,12 @@ horizontalLine(
     const auto sign_x = (x1 <= x2) ? 1 : -1;
     auto x = x1;
 
-    image.setPixel(Interface8880Point(x, y), rgb);
+    image.setPixel(Point(x, y), rgb);
 
     while (x != x2)
     {
         x += sign_x;
-        image.setPixel(Interface8880Point(x, y), rgb);
+        image.setPixel(Point(x, y), rgb);
     }
 }
 
@@ -187,12 +219,12 @@ verticalLine(
     const auto sign_y = (y1 <= y2) ? 1 : -1;
     auto y = y1;
 
-    image.setPixel(Interface8880Point(x, y), rgb);
+    image.setPixel(Point(x, y), rgb);
 
     while (y != y2)
     {
         y += sign_y;
-        image.setPixel(Interface8880Point(x, y), rgb);
+        image.setPixel(Point(x, y), rgb);
     }
 }
 
@@ -222,17 +254,17 @@ circlePoints(
     int j,
     uint32_t rgb)
 {
-    image.setPixel(Interface8880Point(x + i, y + j), rgb);
-    image.setPixel(Interface8880Point(x - i, y + j), rgb);
-    image.setPixel(Interface8880Point(x + i, y - j), rgb);
-    image.setPixel(Interface8880Point(x - i, y - j), rgb);
+    image.setPixel(Point(x + i, y + j), rgb);
+    image.setPixel(Point(x - i, y + j), rgb);
+    image.setPixel(Point(x + i, y - j), rgb);
+    image.setPixel(Point(x - i, y - j), rgb);
 
     if (i != j)
     {
-        image.setPixel(Interface8880Point(x + j, y + i), rgb);
-        image.setPixel(Interface8880Point(x + j, y - i), rgb);
-        image.setPixel(Interface8880Point(x - j, y + i), rgb);
-        image.setPixel(Interface8880Point(x - j, y - i), rgb);
+        image.setPixel(Point(x + j, y + i), rgb);
+        image.setPixel(Point(x + j, y - i), rgb);
+        image.setPixel(Point(x - j, y + i), rgb);
+        image.setPixel(Point(x - j, y - i), rgb);
     }
 }
 
