@@ -59,10 +59,8 @@ private:
 
     [[nodiscard]] bool haveImages() const noexcept { return m_current != INVALID_INDEX; }
     [[nodiscard]] bool originalSize() const noexcept { return m_percent == 100; }
-    [[nodiscard]] bool viewingImage() const noexcept { return not m_isBlank; }
 
     void annotate();
-    bool handleGeneral(fb32::Joystick& js);
     bool handleImageViewing(fb32::Joystick& js);
     void imageNext();
     void imagePrevious();
@@ -84,11 +82,11 @@ private:
     fb32::Image8880 m_buffer;
     int m_current;
     std::string m_directory;
+    int m_enlighten;
     std::vector<std::string> m_files;
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
-    bool m_isBlank;
     int m_percent;
     int m_xOffset;
     int m_yOffset;

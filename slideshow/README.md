@@ -12,7 +12,7 @@ Display a slide show of jpeg images from a directory and its sub-directories.
         --joystick,-j - joystick device
 ## controls
         Start Button - exit
-        Select Button - toggle screen blanking
+        Select Button - enlighten
         A Button - next image
         Y Button - previous image
         X Button - increase zoom

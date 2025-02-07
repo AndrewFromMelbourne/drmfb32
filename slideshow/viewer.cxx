@@ -31,12 +31,14 @@
 #include <iostream>
 
 #include "image8880Font8x16.h"
+#include "image8880Graphics.h"
 #include "image8880Jpeg.h"
 #include "viewer.h"
 
 // ------------------------------------------------------------------------
 
 namespace fs = std::filesystem;
+using Point = fb32::Interface8880Point;
 
 // ========================================================================
 
@@ -57,6 +59,7 @@ std::string tolower(std::string s)
 // ------------------------------------------------------------------------
 
 }
+
 // ========================================================================
 
 
@@ -68,11 +71,11 @@ Viewer::Viewer(
     m_buffer{interface.getWidth(), interface.getHeight()},
     m_current{-1},
     m_directory{folder},
+    m_enlighten{0},
     m_files{},
     m_fitToScreen{false},
     m_image{},
     m_imageProcessed{},
-    m_isBlank{false},
     m_percent{100},
     m_xOffset{0},
     m_yOffset{0},
@@ -98,7 +101,7 @@ void
 Viewer::draw(
     fb32::FrameBuffer8880& fb) const
 {
-    fb.putImage(fb32::Interface8880Point{0, 0}, m_buffer);
+    fb.putImage(Point{0, 0}, m_buffer);
 }
 
 // ------------------------------------------------------------------------
@@ -107,14 +110,7 @@ bool
 Viewer::update(
     fb32::Joystick& js)
 {
-    auto result = handleGeneral(js);
-
-    if (viewingImage() and handleImageViewing(js))
-    {
-        result = true;
-    }
-
-    return result;
+    return handleImageViewing(js);
 }
 
 // ------------------------------------------------------------------------
@@ -157,28 +153,23 @@ Viewer::annotate()
         annotation += " [ FOS ]";
     }
 
+    annotation += " [ enlighten "  + std::to_string(m_enlighten * 10) + "% ]";
+
     fb32::Image8880Font8x16 font;
+    constexpr int padding{4};
+    const auto length = static_cast<int>(annotation.length());
+
+    Point p1{0, 0};
+    Point p2{length * font.getPixelWidth() + 2 * padding,
+             font.getPixelHeight() + 2 * padding};
+
+    fb32::boxFilled(m_buffer, p1, p2, fb32::RGB8880{0}, 127);
+
     font.drawString(
-        fb32::Interface8880Point{0, 0},
+        Point{padding, padding},
         annotation,
         fb32::RGB8880{0, 255, 0},
         m_buffer);
-}
-
-// ------------------------------------------------------------------------
-
-bool
-Viewer::handleGeneral(
-    fb32::Joystick& js)
-{
-    if (js.buttonPressed(fb32::Joystick::BUTTON_SELECT))
-    {
-        m_isBlank = not m_isBlank;
-        paint();
-        return true;
-    }
-
-    return false;
 }
 
 // ------------------------------------------------------------------------
@@ -192,11 +183,13 @@ Viewer::handleImageViewing(
         imagePrevious();
         return true;
     }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_A))
     {
         imageNext();
         return true;
     }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_X))
     {
         if (m_zoom < MAX_ZOOM)
@@ -207,6 +200,7 @@ Viewer::handleImageViewing(
             return true;
         }
     }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_B))
     {
         if (m_zoom > 0)
@@ -224,6 +218,23 @@ Viewer::handleImageViewing(
             return true;
         }
     }
+
+    if (js.buttonPressed(fb32::Joystick::BUTTON_SELECT))
+    {
+        if (m_enlighten < 10)
+        {
+            ++m_enlighten;
+        }
+        else
+        {
+            m_enlighten = 0;
+        }
+
+        processImage();
+        paint();
+        return true;
+    }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_LEFT_SHOULDER))
     {
             m_fitToScreen = !m_fitToScreen;
@@ -231,6 +242,7 @@ Viewer::handleImageViewing(
             paint();
             return true;
     }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_RIGHT_SHOULDER))
     {
         m_annotate = not m_annotate;
@@ -301,6 +313,8 @@ Viewer::openImage()
 {
     m_image = fb32::readJpeg(m_files[m_current]);
 
+    m_enlighten = 0;
+
     m_xOffset = 0;
     m_yOffset = 0;
 
@@ -330,11 +344,6 @@ void
 Viewer::paint()
 {
     m_buffer.clear(0);
-
-    if (m_isBlank)
-    {
-        return;
-    }
 
     if (not oversize())
     {
@@ -375,11 +384,19 @@ Viewer::placeImage(
 void
 Viewer::processImage()
 {
+    if (m_enlighten)
+    {
+        m_imageProcessed = m_image.enlighten(m_enlighten / 10.0);
+    }
+    else
+    {
+        m_imageProcessed = m_image;
+    }
+
     if (((m_zoom == SCALE_OVERSIZED) and
          not oversize() and
          not m_fitToScreen) or (m_zoom == 1))
     {
-        m_imageProcessed = m_image;
         m_percent = 100;
     }
     else
@@ -397,14 +414,14 @@ Viewer::processImage()
                           m_image.getWidth();
             }
 
-            m_imageProcessed = m_image.resizeBilinearInterpolation(width, height);
+            m_imageProcessed = m_imageProcessed.resizeBilinearInterpolation(width, height);
             auto percent = (100.0 * m_imageProcessed.getWidth()) /
                            m_image.getWidth();
             m_percent = static_cast<int>(0.5 + percent);
         }
         else
         {
-            m_imageProcessed = m_image.scaleUp(m_zoom);
+            m_imageProcessed = m_imageProcessed.scaleUp(m_zoom);
             m_percent = m_zoom * 100;
         }
     }
