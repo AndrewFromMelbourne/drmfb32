@@ -36,7 +36,53 @@
 //-------------------------------------------------------------------------
 
 using size_type = std::vector<uint32_t>::size_type;
+using Point = fb32::Interface8880Point;
 
+//=========================================================================
+
+namespace {
+
+//-------------------------------------------------------------------------
+
+
+class AccumulateRGB8880
+{
+public:
+
+    void add(const fb32::RGB8880& rgb) noexcept
+    {
+        m_red += rgb.getRed();
+        m_green += rgb.getGreen();
+        m_blue += rgb.getBlue();
+    }
+
+    void subtract(const fb32::RGB8880& rgb) noexcept
+    {
+        m_red -= rgb.getRed();
+        m_green -= rgb.getGreen();
+        m_blue -= rgb.getBlue();
+    }
+
+    [[nodiscard]] fb32::RGB8880 average(int count) noexcept
+    {
+        return fb32::RGB8880{static_cast<uint8_t>(m_red / count),
+                             static_cast<uint8_t>(m_green / count),
+                             static_cast<uint8_t>(m_blue / count)};
+    }
+
+private:
+
+    int m_red{0};
+    int m_green{0};
+    int m_blue{0};
+};
+
+//-------------------------------------------------------------------------
+
+}
+
+//=========================================================================
+// constructors, destructors and assignment
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
@@ -75,6 +121,7 @@ fb32::Image8880::Image8880(
 }
 
 //-------------------------------------------------------------------------
+
 fb32::Image8880::Image8880(
     int width,
     int height,
@@ -97,27 +144,8 @@ fb32::Image8880::Image8880(
     }
 }
 
-//-------------------------------------------------------------------------
-
-void
-fb32::Image8880::setFrame(
-    uint8_t frame)
-{
-    if (frame < m_numberOfFrames)
-    {
-        m_frame = frame;
-    }
-}
-
-//-------------------------------------------------------------------------
-
-void
-fb32::Image8880::clear(
-    uint32_t rgb)
-{
-    std::fill(m_buffer.begin(), m_buffer.end(), rgb);
-}
-
+//=========================================================================
+// getters and setters
 //-------------------------------------------------------------------------
 
 std::optional<fb32::RGB8880>
@@ -164,6 +192,200 @@ fb32::Image8880::getRow(
     {
         return {};
     }
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::Image8880::setFrame(
+    uint8_t frame)
+{
+    if (frame < m_numberOfFrames)
+    {
+        m_frame = frame;
+    }
+}
+//-------------------------------------------------------------------------
+
+bool
+fb32::Image8880::setPixel(
+    const Interface8880Point& p,
+    uint32_t rgb,
+    uint8_t frame)
+{
+    bool isValid{validPixel(p)};
+
+    if (isValid)
+    {
+        m_buffer[offset(p, frame)] = rgb;
+    }
+
+    return isValid;
+}
+
+//-------------------------------------------------------------------------
+
+size_t
+fb32::Image8880::offset(
+    const Interface8880Point& p,
+    uint8_t frame) const noexcept
+{
+    return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
+}
+
+//=========================================================================
+// image manipulation
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::boxBlur(
+    int radius) const
+{
+    auto clamp = [](int value, int end) -> int
+    {
+        return std::clamp(value, 0, end - 1);
+    };
+
+    const auto diameter = 2 * radius + 1;
+
+    // row blurred image
+    Image8880 rb{m_width, m_height, m_numberOfFrames};
+
+    auto input = getBuffer().begin();
+    auto rbi = rb.getBuffer().begin();
+
+    for (auto frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        for (auto j = 0 ; j < m_height ; ++j)
+        {
+            AccumulateRGB8880 argb;
+
+            for (auto k = -radius - 1 ; k < radius ; ++k)
+            {
+                const Point p{clamp(k, m_width), j};
+                argb.add(RGB8880(*(input + offset(p, frame))));
+            }
+
+            for (auto i = 0 ; i < m_width ; ++i)
+            {
+                Point p{clamp(i + radius, m_width), j};
+                argb.add(RGB8880(*(input + offset(p, frame))));
+
+                p = Point(clamp(i - radius - 1, m_width), j);
+                argb.subtract(RGB8880(*(input + offset(p, frame))));
+
+                p = Point(i, j);
+                *(rbi + offset(p, frame)) = argb.average(diameter).get8880();
+            }
+        }
+    }
+
+    Image8880 image{m_width, m_height, m_numberOfFrames};
+    auto output = image.getBuffer().begin();
+
+    for (auto frame = 0 ; frame < m_numberOfFrames ; ++frame)
+    {
+        for (auto i = 0 ; i < m_width ; ++i)
+        {
+            AccumulateRGB8880 argb;
+
+            for (auto k = -radius - 1 ; k < radius ; ++k)
+            {
+                const Point p{i, clamp(k, m_height)};
+                argb.add(RGB8880(*(rbi + offset(p, frame))));
+            }
+
+            for (auto j = 0 ; j < m_height ; ++j)
+            {
+                Point p{i, clamp(j + radius, m_height)};
+                argb.add(RGB8880(*(rbi + offset(p, frame))));
+
+                p = Point(i, clamp(j - radius - 1, m_height));
+                argb.subtract(RGB8880(*(rbi + offset(p, frame))));
+
+                p = Point(i, j);
+                *(output + offset(p, frame)) = argb.average(diameter).get8880();
+            }
+        }
+    }
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::Image8880::clear(
+    uint32_t rgb)
+{
+    std::fill(m_buffer.begin(), m_buffer.end(), rgb);
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::enlighten(double strength) const
+{
+    auto flerp = [](double value1, double value2, double alpha)->double
+    {
+        return (value1 * (1.0 - alpha)) + (value2 * alpha);
+    };
+
+    auto scaled = [](uint8_t channel, double scale)->uint8_t
+    {
+        return static_cast<uint8_t>(std::clamp(channel * scale, 0.0, 255.0));
+    };
+
+    const auto mb = maxRGB().boxBlur(12);
+
+    Image8880 image{m_width, m_height, m_numberOfFrames};
+
+    const auto strength2 = strength * strength;
+    const auto minI = 1.0 / flerp(1.0, 10.0, strength2);
+    const auto maxI = 1.0 / flerp(1.0, 1.111, strength2);
+
+    auto mbi = mb.getBuffer().begin();
+    auto input = m_buffer.cbegin();
+    auto output = image.getBuffer().begin();
+
+    for (auto pixel : m_buffer)
+    {
+        auto c = RGB8880(pixel);
+        auto max = RGB8880(*(mbi++)).getRed();
+        const auto illumination = std::clamp(max / 255.0, minI, maxI);
+
+        if (illumination < maxI)
+        {
+            const auto r = illumination / maxI;
+            const auto scale = (0.4 + (r * 0.6)) / r;
+
+            c.setRGB(scaled(c.getRed(), scale),
+                     scaled(c.getGreen(), scale),
+                     scaled(c.getBlue(), scale));
+        }
+
+        *(output++) = c.get8880();
+    }
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::Image8880::maxRGB() const
+{
+    Image8880 image{m_width, m_height, m_numberOfFrames};
+    auto* buffer = image.getBuffer().data();
+
+    for (const auto pixel : m_buffer)
+    {
+        RGB8880 rgb(pixel);
+        rgb.setGrey(std::max({rgb.getRed(), rgb.getGreen(), rgb.getBlue()}));
+        *(buffer++) = rgb.get8880();
+    }
+
+    return image;
 }
 
 //-------------------------------------------------------------------------
@@ -247,10 +469,10 @@ fb32::Image8880::resizeToBilinearInterpolation(
                 const auto xWeight = (xScale * i) - xLow;
                 const auto yWeight = (yScale * j) - yLow;
 
-                auto a = *getPixelRGB(Interface8880Point{xLow, yLow});
-                auto b = *getPixelRGB(Interface8880Point{xHigh, yLow});
-                auto c = *getPixelRGB(Interface8880Point{xLow, yHigh});
-                auto d = *getPixelRGB(Interface8880Point{xHigh, yHigh});
+                auto a = *getPixelRGB(Point{xLow, yLow});
+                auto b = *getPixelRGB(Point{xHigh, yLow});
+                auto c = *getPixelRGB(Point{xLow, yHigh});
+                auto d = *getPixelRGB(Point{xHigh, yHigh});
 
                 const auto aWeight = (1.0f - xWeight) * (1.0f - yWeight);
                 const auto bWeight = xWeight * (1.0f - yWeight);
@@ -273,7 +495,7 @@ fb32::Image8880::resizeToBilinearInterpolation(
                             evaluate(&RGB8880::getGreen),
                             evaluate(&RGB8880::getBlue)};
 
-                image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
+                image.setPixelRGB(Point{i, j}, rgb, frame);
             }
         }
     }
@@ -282,6 +504,7 @@ fb32::Image8880::resizeToBilinearInterpolation(
 }
 
 //-------------------------------------------------------------------------
+
 fb32::Image8880&
 fb32::Image8880::resizeToLanczos3Interpolation(
     fb32::Image8880& image) const
@@ -343,7 +566,7 @@ fb32::Image8880::resizeToLanczos3Interpolation(
                         const auto weight = kernel(dx, a) * yKernelValue;
                         weightsSum += weight;
 
-                        auto rgb = *getPixelRGB(Interface8880Point{x, y});
+                        auto rgb = *getPixelRGB(Point{x, y});
                         redSum += rgb.getRed() * weight;
                         greenSum += rgb.getGreen() * weight;
                         blueSum += rgb.getBlue() * weight;
@@ -358,7 +581,7 @@ fb32::Image8880::resizeToLanczos3Interpolation(
                             static_cast<uint8_t>(green),
                             static_cast<uint8_t>(blue)};
 
-                image.setPixelRGB(Interface8880Point{i, j}, rgb, frame);
+                image.setPixelRGB(Point{i, j}, rgb, frame);
             }
         }
     }
@@ -384,11 +607,11 @@ fb32::Image8880::resizeToNearestNeighbour(
             for (int i = 0 ; i < image.getWidth() ; ++i)
             {
                 const int x = (i * (m_width - a)) / (image.getWidth() - a);
-                auto pixel{getPixel(Interface8880Point{x, y}, frame)};
+                auto pixel{getPixel(Point{x, y}, frame)};
 
                 if (pixel.has_value())
                 {
-                    image.setPixel(Interface8880Point{i, j}, pixel.value(), frame);
+                    image.setPixel(Point{i, j}, pixel.value(), frame);
                 }
             }
         }
@@ -411,12 +634,12 @@ fb32::Image8880::scaleUp(
         {
             for (int i = 0 ; i < m_width ; ++i)
             {
-                auto pixel = getPixel(Interface8880Point{i, j}, frame);
+                auto pixel = getPixel(Point{i, j}, frame);
                 for (int b = 0 ; b < scale ; ++b)
                 {
                     for (int a = 0 ; a < scale ; ++a)
                     {
-                        Interface8880Point p{ (i * scale) + a, (j * scale) + b};
+                        Point p{ (i * scale) + a, (j * scale) + b};
                         image.setPixel(p, *pixel, frame);
                     }
                 }
@@ -426,32 +649,3 @@ fb32::Image8880::scaleUp(
 
     return image;
 }
-
-//-------------------------------------------------------------------------
-
-bool
-fb32::Image8880::setPixel(
-    const Interface8880Point& p,
-    uint32_t rgb,
-    uint8_t frame)
-{
-    bool isValid{validPixel(p)};
-
-    if (isValid)
-    {
-        m_buffer[offset(p, frame)] = rgb;
-    }
-
-    return isValid;
-}
-
-//-------------------------------------------------------------------------
-
-size_t
-fb32::Image8880::offset(
-    const Interface8880Point& p,
-    uint8_t frame) const noexcept
-{
-    return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
-}
-

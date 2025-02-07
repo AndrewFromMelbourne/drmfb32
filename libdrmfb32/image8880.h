@@ -53,6 +53,9 @@ class Image8880
 {
 public:
 
+    //---------------------------------------------------------------------
+    // constructors, destructors and assignment
+
     Image8880() = default;
     Image8880(int width, int height, uint8_t numberOfFrames = 1);
     Image8880(int width,
@@ -72,15 +75,14 @@ public:
     Image8880(Image8880&& image) = default;
     Image8880& operator=(Image8880&& image) = default;
 
+    //---------------------------------------------------------------------
+    // getters and setters
+
     [[nodiscard]] int getWidth() const noexcept override { return m_width; }
     [[nodiscard]] int getHeight() const noexcept override { return m_height; }
 
     [[nodiscard]] uint8_t getFrame() const { return m_frame; }
     [[nodiscard]] uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
-    void setFrame(uint8_t frame);
-
-    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
-    void clear(uint32_t rgb) override;
 
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
@@ -101,21 +103,7 @@ public:
 
     std::span<const uint32_t> getRow(int y) const;
 
-    size_t offset(const Interface8880Point& p) const noexcept override
-    {
-        return offset(p, m_frame);
-    }
-
-
-    [[nodiscard]] Image8880 resizeBilinearInterpolation(int width, int height) const;
-    [[nodiscard]] Image8880 resizeLanczos3Interpolation(int width, int height) const;
-    [[nodiscard]] Image8880 resizeNearestNeighbour(int width, int height) const;
-
-    Image8880& resizeToBilinearInterpolation(Image8880& image) const;
-    Image8880& resizeToLanczos3Interpolation(Image8880& image) const;
-    Image8880& resizeToNearestNeighbour(Image8880& image) const;
-
-    [[nodiscard]] Image8880 scaleUp(uint8_t scale) const;
+    void setFrame(uint8_t frame);
 
     bool
     setPixelRGB(
@@ -142,6 +130,34 @@ public:
     {
         return setPixel(p, rgb.get8880(), frame);
     }
+
+    size_t offset(const Interface8880Point& p) const noexcept override
+    {
+        return offset(p, m_frame);
+    }
+
+    //---------------------------------------------------------------------
+    // image manipulaiton
+
+    [[nodiscard]] Image8880 boxBlur(int radius) const;
+
+    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
+    void clear(uint32_t rgb) override;
+
+    [[nodiscard]] Image8880 enlighten(double strength) const;
+
+    [[nodiscard]] Image8880 maxRGB() const;
+
+    [[nodiscard]] Image8880 resizeBilinearInterpolation(int width, int height) const;
+    [[nodiscard]] Image8880 resizeLanczos3Interpolation(int width, int height) const;
+    [[nodiscard]] Image8880 resizeNearestNeighbour(int width, int height) const;
+
+    Image8880& resizeToBilinearInterpolation(Image8880& image) const;
+    Image8880& resizeToLanczos3Interpolation(Image8880& image) const;
+    Image8880& resizeToNearestNeighbour(Image8880& image) const;
+
+    [[nodiscard]] Image8880 scaleUp(uint8_t scale) const;
+
 
 private:
 
