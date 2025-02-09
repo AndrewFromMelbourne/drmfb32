@@ -31,6 +31,7 @@
 
 #include "framebuffer8880.h"
 #include "image8880.h"
+#include "image8880Frames.h"
 #include "interface8880Font.h"
 #include "joystick.h"
 
@@ -98,7 +99,7 @@ private:
     Level::LevelType m_boardPrevious;
     const Levels m_levels;
 
-    std::array<fb32::Image8880, c_tileCount> m_tileBuffers;
+    std::array<fb32::Image8880Frames, c_tileCount> m_tileBuffers;
     fb32::Image8880 m_topTextImage;
     fb32::Image8880 m_bottomTextImage;
 

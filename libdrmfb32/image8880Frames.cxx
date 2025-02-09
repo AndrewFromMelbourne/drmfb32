@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2025 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -31,7 +31,7 @@
 #include <numbers>
 #include <stdexcept>
 
-#include "image8880.h"
+#include "image8880Frames.h"
 
 //-------------------------------------------------------------------------
 
@@ -42,28 +42,34 @@ using Point = fb32::Interface8880Point;
 // constructors, destructors and assignment
 //-------------------------------------------------------------------------
 
-fb32::Image8880::Image8880(
+fb32::Image8880Frames::Image8880Frames(
     int width,
-    int height)
+    int height,
+    uint8_t numberOfFrames)
 :
     m_width{width},
     m_height{height},
-    m_buffer(width * height)
+    m_frame{0},
+    m_numberOfFrames{numberOfFrames},
+    m_buffer(width * height * numberOfFrames)
 {
 }
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880::Image8880(
+fb32::Image8880Frames::Image8880Frames(
     int width,
     int height,
-    std::initializer_list<uint32_t> buffer)
+    std::initializer_list<uint32_t> buffer,
+    uint8_t numberOfFrames)
 :
     m_width{width},
     m_height{height},
+    m_frame{0},
+    m_numberOfFrames{numberOfFrames},
     m_buffer{buffer}
 {
-    size_t minBufferSize = width * height;
+    size_t minBufferSize = width * height * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -73,18 +79,21 @@ fb32::Image8880::Image8880(
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880::Image8880(
+fb32::Image8880Frames::Image8880Frames(
     int width,
     int height,
-    std::span<const uint32_t> buffer)
+    std::span<const uint32_t> buffer,
+    uint8_t numberOfFrames)
 :
     m_width{width},
     m_height{height},
+    m_frame{0},
+    m_numberOfFrames{numberOfFrames},
     m_buffer{}
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    size_t minBufferSize = width * height;
+    size_t minBufferSize = width * height * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -97,35 +106,37 @@ fb32::Image8880::Image8880(
 //-------------------------------------------------------------------------
 
 std::optional<fb32::RGB8880>
-fb32::Image8880::getPixelRGB(
-    const Interface8880Point& p) const
+fb32::Image8880Frames::getPixelRGB(
+    const Interface8880Point& p,
+    uint8_t frame) const
 {
     if (not validPixel(p))
     {
         return {};
     }
 
-    return RGB8880(m_buffer[offset(p)]);
+    return RGB8880(m_buffer[offset(p, frame)]);
 }
 
 //-------------------------------------------------------------------------
 
 std::optional<uint32_t>
-fb32::Image8880::getPixel(
-    const Interface8880Point& p) const
+fb32::Image8880Frames::getPixel(
+    const Interface8880Point& p,
+    uint8_t frame) const
 {
     if (not validPixel(p))
     {
         return {};
     }
 
-    return m_buffer[offset(p)];
+    return m_buffer[offset(p, frame)];
 }
 
 //-------------------------------------------------------------------------
 
 std::span<const uint32_t>
-fb32::Image8880::getRow(
+fb32::Image8880Frames::getRow(
     int y) const
 {
     const Interface8880Point p{0, y};
@@ -142,16 +153,29 @@ fb32::Image8880::getRow(
 
 //-------------------------------------------------------------------------
 
+void
+fb32::Image8880Frames::setFrame(
+    uint8_t frame)
+{
+    if (frame < m_numberOfFrames)
+    {
+        m_frame = frame;
+    }
+}
+
+//-------------------------------------------------------------------------
+
 bool
-fb32::Image8880::setPixel(
+fb32::Image8880Frames::setPixel(
     const Interface8880Point& p,
-    uint32_t rgb)
+    uint32_t rgb,
+    uint8_t frame)
 {
     bool isValid{validPixel(p)};
 
     if (isValid)
     {
-        m_buffer[offset(p)] = rgb;
+        m_buffer[offset(p, frame)] = rgb;
     }
 
     return isValid;
@@ -160,10 +184,11 @@ fb32::Image8880::setPixel(
 //-------------------------------------------------------------------------
 
 size_t
-fb32::Image8880::offset(
-    const Interface8880Point& p) const noexcept
+fb32::Image8880Frames::offset(
+    const Interface8880Point& p,
+    uint8_t frame) const noexcept
 {
-    return p.x() + (p.y() * m_width);
+    return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
 }
 
 //=========================================================================
@@ -171,9 +196,8 @@ fb32::Image8880::offset(
 //-------------------------------------------------------------------------
 
 void
-fb32::Image8880::clear(
+fb32::Image8880Frames::clear(
     uint32_t rgb)
 {
     std::fill(m_buffer.begin(), m_buffer.end(), rgb);
 }
-

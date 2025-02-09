@@ -83,6 +83,7 @@ public:
 
     [[nodiscard]] std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const override;
     [[nodiscard]] std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
+    [[nodiscard]] std::span<const uint32_t> getRow(int y) const override;
 
     [[nodiscard]] int getWidth() const noexcept override { return m_width; }
     [[nodiscard]] int getHeight() const noexcept override { return m_height; }

@@ -485,6 +485,24 @@ fb32::FrameBuffer8880::getPixel(
 
 //-------------------------------------------------------------------------
 
+std::span<const uint32_t>
+fb32::FrameBuffer8880::getRow(
+    int y) const
+{
+    const Interface8880Point p{0, y};
+
+    if (validPixel(p))
+    {
+        return  getBuffer().subspan(offset(p), m_width);
+    }
+    else
+    {
+        return {};
+    }
+}
+
+//-------------------------------------------------------------------------
+
 size_t
 fb32::FrameBuffer8880::offset(
     const Interface8880Point& p) const noexcept

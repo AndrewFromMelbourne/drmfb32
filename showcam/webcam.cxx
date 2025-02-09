@@ -35,6 +35,7 @@
 #include <sys/mman.h>
 
 #include "image8880Jpeg.h"
+#include "image8880Process.h"
 #include "webcam.h"
 
 //-------------------------------------------------------------------------
@@ -159,7 +160,7 @@ fb32::Webcam::showFrame(
 
         if (m_fitToScreen)
         {
-            m_image.resizeToNearestNeighbour(m_resizedImage);
+            resizeToNearestNeighbour(m_image, m_resizedImage);
             image.putImage(center(image, m_resizedImage), m_resizedImage);
         }
         else

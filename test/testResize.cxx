@@ -39,6 +39,7 @@
 #include "image8880.h"
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
+#include "image8880Process.h"
 #include "point.h"
 
 //-------------------------------------------------------------------------
@@ -152,10 +153,10 @@ main(
         constexpr int imageOffset{200};
         constexpr int yStep{sheight + 8};
 
-        auto imageSu = image.scaleUp(scale);
-        auto imageNn =  image.resizeNearestNeighbour(swidth, sheight);
-        auto imageBi = image.resizeBilinearInterpolation(swidth, sheight);
-        auto imageLi = image.resizeLanczos3Interpolation(swidth, sheight);
+        auto imageSu = scaleUp(image, scale);
+        auto imageNn = resizeNearestNeighbour(image, swidth, sheight);
+        auto imageBi = resizeBilinearInterpolation(image, swidth, sheight);
+        auto imageLi = resizeLanczos3Interpolation(image, swidth, sheight);
 
         Interface8880Point t{0, 0};
         Interface8880Point p{ imageOffset, 0 };

@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2025 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -47,7 +47,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-class Image8880
+class Image8880Frames
 :
     public Interface8880
 {
@@ -56,51 +56,85 @@ public:
     //---------------------------------------------------------------------
     // constructors, destructors and assignment
 
-    Image8880() = default;
-    Image8880(int width, int height);
-    Image8880(int width,
-              int height,
-              std::initializer_list<uint32_t> buffer);
-    Image8880(int width,
-              int height,
-              std::span<const uint32_t> buffer);
+    Image8880Frames() = default;
+    Image8880Frames(int width, int height, uint8_t numberOfFrames = 1);
+    Image8880Frames(int width,
+                    int height,
+                    std::initializer_list<uint32_t> buffer,
+                    uint8_t numberOfFrames = 1);
+    Image8880Frames(int width,
+                    int height,
+                    std::span<const uint32_t> buffer,
+                    uint8_t numberOfFrames = 1);
 
-    ~Image8880() override = default;
+    ~Image8880Frames() override = default;
 
-    Image8880(const Image8880&) = default;
-    Image8880& operator=(const Image8880&) = default;
+    Image8880Frames(const Image8880Frames&) = default;
+    Image8880Frames& operator=(const Image8880Frames&) = default;
 
-    Image8880(Image8880&& image) = default;
-    Image8880& operator=(Image8880&& image) = default;
+    Image8880Frames(Image8880Frames&& image) = default;
+    Image8880Frames& operator=(Image8880Frames&& image) = default;
 
     //---------------------------------------------------------------------
     // getters and setters
 
     [[nodiscard]] int getWidth() const noexcept override { return m_width; }
-    [[nodiscard]] int getHeight() const noexcept override { return m_height; }
+    [[nodiscard]] int getHeight() const noexcept override  { return m_height; }
+
+    [[nodiscard]] uint8_t getFrame() const { return m_frame; }
+    [[nodiscard]] uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
 
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
 
     [[nodiscard]] std::optional<RGB8880> getPixelRGB(
-        const Interface8880Point& p) const override;
+        const Interface8880Point& p) const override
+    {
+        return getPixelRGB(p, m_frame);
+    }
 
-    [[nodiscard]] std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
+    [[nodiscard]] std::optional<uint32_t> getPixel(const Interface8880Point& p) const override
+    {
+        return getPixel(p, m_frame);
+    }
+
+    std::optional<RGB8880> getPixelRGB(const Interface8880Point& p, uint8_t frame) const;
+    std::optional<uint32_t> getPixel(const Interface8880Point& p, uint8_t frame) const;
+
     [[nodiscard]] std::span<const uint32_t> getRow(int y) const override;
+
+    void setFrame(uint8_t frame);
 
     bool
     setPixelRGB(
         const Interface8880Point& p,
         const RGB8880& rgb) override
     {
-        return setPixel(p, rgb.get8880());
+        return setPixel(p, rgb.get8880(), m_frame);
     }
 
     bool setPixel(
         const Interface8880Point& p,
-        uint32_t rgb) override;
+        uint32_t rgb) override
+    {
+        return setPixel(p, rgb, m_frame);
+    }
 
-    size_t offset(const Interface8880Point& p) const noexcept override;
+    bool setPixel(const Interface8880Point& p, uint32_t rgb, uint8_t frame);
+
+    bool
+    setPixelRGB(
+        const Interface8880Point& p,
+        const RGB8880& rgb,
+        uint8_t frame)
+    {
+        return setPixel(p, rgb.get8880(), frame);
+    }
+
+    size_t offset(const Interface8880Point& p) const noexcept override
+    {
+        return offset(p, m_frame);
+    }
 
     //---------------------------------------------------------------------
     // image manipulaiton
@@ -110,6 +144,8 @@ public:
 
 private:
 
+    [[nodiscard]] size_t offset(const Interface8880Point& p, uint8_t frame) const noexcept;
+
     [[nodiscard]] bool
     validPixel(const Interface8880Point& p) const noexcept
     {
@@ -118,6 +154,9 @@ private:
 
     int m_width{};
     int m_height{};
+
+    uint8_t m_frame;
+    uint8_t m_numberOfFrames{};
 
     std::vector<uint32_t> m_buffer{};
 };

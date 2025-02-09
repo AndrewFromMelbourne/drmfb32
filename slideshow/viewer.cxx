@@ -32,6 +32,7 @@
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
+#include "image8880Process.h"
 #include "image8880Jpeg.h"
 #include "viewer.h"
 
@@ -386,7 +387,7 @@ Viewer::processImage()
 {
     if (m_enlighten)
     {
-        m_imageProcessed = m_image.enlighten(m_enlighten / 10.0);
+        m_imageProcessed = enlighten(m_image, m_enlighten / 10.0);
     }
     else
     {
@@ -414,14 +415,14 @@ Viewer::processImage()
                           m_image.getWidth();
             }
 
-            m_imageProcessed = m_imageProcessed.resizeBilinearInterpolation(width, height);
+            m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
             auto percent = (100.0 * m_imageProcessed.getWidth()) /
                            m_image.getWidth();
             m_percent = static_cast<int>(0.5 + percent);
         }
         else
         {
-            m_imageProcessed = m_imageProcessed.scaleUp(m_zoom);
+            m_imageProcessed = scaleUp(m_imageProcessed, m_zoom);
             m_percent = m_zoom * 100;
         }
     }

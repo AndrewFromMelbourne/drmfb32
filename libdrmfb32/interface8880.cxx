@@ -44,7 +44,7 @@ Interface8880::~Interface8880()
 bool
 fb32::Interface8880::putImage(
     const Interface8880Point& p_left,
-    const Image8880& image)
+    const Interface8880& image)
 {
     Interface8880Point p{ p_left.x(), p_left.y() };
 
@@ -76,7 +76,7 @@ fb32::Interface8880::putImage(
 bool
 fb32::Interface8880::putImagePartial(
     const Interface8880Point& p,
-    const Image8880& image)
+    const Interface8880& image)
 {
     auto x = p.x();
     auto xStart = 0;

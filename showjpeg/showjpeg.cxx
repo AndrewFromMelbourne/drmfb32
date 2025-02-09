@@ -36,6 +36,7 @@
 
 #include "framebuffer8880.h"
 #include "image8880Jpeg.h"
+#include "image8880Process.h"
 
 //-------------------------------------------------------------------------
 
@@ -197,7 +198,7 @@ main(
                 height = (fb.getWidth() * image.getHeight()) / image.getWidth();
             }
 
-            image = image.resizeBilinearInterpolation(width, height);
+            image = resizeBilinearInterpolation(image, width, height);
         }
 
         fb.putImage(center(fb, image), image);

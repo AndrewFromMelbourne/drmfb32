@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2023 Andrew Duncan
+// Copyright (c) 2025 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -29,12 +29,17 @@
 
 //-------------------------------------------------------------------------
 
+#include <cstddef>
 #include <cstdint>
-#include <optional>
+#include <initializer_list>
+#include <utility>
 #include <span>
+#include <vector>
 
-#include "point.h"
+#include "image8880.h"
+#include "interface8880.h"
 #include "rgb8880.h"
+#include "point.h"
 
 //-------------------------------------------------------------------------
 
@@ -43,54 +48,57 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Interface8880Point = Point<int>;
+[[nodiscard]] Image8880
+boxBlur(
+    const Interface8880& input,
+    int radius);
 
-//-------------------------------------------------------------------------
+[[nodiscard]] Image8880
+enlighten(
+    const Interface8880& input,
+    double strength);
 
-class Interface8880
-{
-public:
+[[nodiscard]]
+Image8880 maxRGB(
+    const Interface8880& input);
 
-    static constexpr auto c_bytesPerPixel{4};
+[[nodiscard]] Image8880
+resizeBilinearInterpolation(
+    const Interface8880& input,
+    int width,
+    int height);
 
-    virtual ~Interface8880() = 0;
+[[nodiscard]] Image8880
+resizeLanczos3Interpolation(
+    const Interface8880& input,
+    int width,
+    int height);
 
-    [[nodiscard]] virtual std::span<uint32_t> getBuffer() noexcept = 0;
-    [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
+[[nodiscard]] Image8880
+resizeNearestNeighbour(
+    const Interface8880& input,
+    int width,
+    int height);
 
-    [[nodiscard]] virtual int getWidth() const noexcept = 0;
-    [[nodiscard]] virtual int getHeight() const noexcept = 0;
+Image8880&
+resizeToBilinearInterpolation(
+    const Interface8880& input,
+    Image8880& output);
 
-    virtual void clear(const RGB8880& rgb) = 0;
-    virtual void clear(uint32_t rgb = 0) = 0;
+Image8880&
+resizeToLanczos3Interpolation(
+    const Interface8880& input,
+    Image8880& output);
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
-    [[nodiscard]] virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
+Image8880&
+resizeToNearestNeighbour(
+    const Interface8880& input,
+    Image8880& output);
 
-    [[nodiscard]] virtual std::span<const uint32_t> getRow(int y) const = 0;
-
-    [[nodiscard]] virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
-
-    virtual bool
-    setPixelRGB(
-        const Interface8880Point& p,
-        const RGB8880& rgb) = 0;
-
-    virtual bool setPixel(const Interface8880Point& p, uint32_t rgb) = 0;
-
-    virtual bool putImage(const Interface8880Point& p, const Interface8880& image);
-
-private:
-
-    bool putImagePartial(const Interface8880Point& p, const Interface8880& image);
-};
-
-//-------------------------------------------------------------------------
-
-Interface8880Point
-center(
-    const Interface8880& frame,
-    const Interface8880& image) noexcept;
+[[nodiscard]] Image8880
+scaleUp(
+    const Interface8880& input,
+    uint8_t scale);
 
 //-------------------------------------------------------------------------
 

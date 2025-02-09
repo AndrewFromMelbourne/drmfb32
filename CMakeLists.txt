@@ -27,7 +27,9 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/framebuffer8880.cxx
                            libdrmfb32/image8880.cxx
                            libdrmfb32/image8880Font8x16.cxx
+                           libdrmfb32/image8880Frames.cxx
                            libdrmfb32/image8880Graphics.cxx
+                           libdrmfb32/image8880Process.cxx
                            libdrmfb32/image8880Qoi.cxx
                            libdrmfb32/interface8880.cxx
                            libdrmfb32/interface8880Font.cxx
