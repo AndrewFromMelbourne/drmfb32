@@ -104,12 +104,6 @@ public:
 
 private:
 
-    bool
-    validPixel(const Interface8880Point& p) const
-    {
-        return (p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height);
-    }
-
     int m_width;
     int m_height;
     int m_length;

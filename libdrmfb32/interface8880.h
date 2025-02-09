@@ -71,6 +71,12 @@ public:
 
     [[nodiscard]] virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
 
+    [[nodiscard]] bool
+    validPixel(const Interface8880Point& p) const noexcept
+    {
+        return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < getWidth()) and (p.y() < getHeight()));
+    }
+
     virtual bool
     setPixelRGB(
         const Interface8880Point& p,

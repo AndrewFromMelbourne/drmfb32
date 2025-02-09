@@ -146,12 +146,6 @@ private:
 
     [[nodiscard]] size_t offset(const Interface8880Point& p, uint8_t frame) const noexcept;
 
-    [[nodiscard]] bool
-    validPixel(const Interface8880Point& p) const noexcept
-    {
-        return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < m_width) and (p.y() < m_height));
-    }
-
     int m_width{};
     int m_height{};
 
