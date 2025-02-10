@@ -170,7 +170,7 @@ fb32::enlighten(
         return static_cast<uint8_t>(std::clamp(channel * scale, 0.0, 255.0));
     };
 
-    const auto mb = fb32::maxRGB(fb32::boxBlur(input, 12));
+    const auto mb = fb32::boxBlur(fb32::maxRGB(input), 12);
 
     fb32::Image8880 output{input.getWidth(), input.getHeight()};
 
