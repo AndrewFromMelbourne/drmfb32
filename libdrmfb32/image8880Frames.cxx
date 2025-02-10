@@ -38,8 +38,6 @@
 using size_type = std::vector<uint32_t>::size_type;
 using Point = fb32::Interface8880Point;
 
-//=========================================================================
-// constructors, destructors and assignment
 //-------------------------------------------------------------------------
 
 fb32::Image8880Frames::Image8880Frames(
@@ -101,56 +99,6 @@ fb32::Image8880Frames::Image8880Frames(
     }
 }
 
-//=========================================================================
-// getters and setters
-//-------------------------------------------------------------------------
-
-std::optional<fb32::RGB8880>
-fb32::Image8880Frames::getPixelRGB(
-    const Interface8880Point& p,
-    uint8_t frame) const
-{
-    if (not validPixel(p))
-    {
-        return {};
-    }
-
-    return RGB8880(m_buffer[offset(p, frame)]);
-}
-
-//-------------------------------------------------------------------------
-
-std::optional<uint32_t>
-fb32::Image8880Frames::getPixel(
-    const Interface8880Point& p,
-    uint8_t frame) const
-{
-    if (not validPixel(p))
-    {
-        return {};
-    }
-
-    return m_buffer[offset(p, frame)];
-}
-
-//-------------------------------------------------------------------------
-
-std::span<const uint32_t>
-fb32::Image8880Frames::getRow(
-    int y) const
-{
-    const Interface8880Point p{0, y};
-
-    if (validPixel(p))
-    {
-        return  getBuffer().subspan(offset(p), m_width);
-    }
-    else
-    {
-        return {};
-    }
-}
-
 //-------------------------------------------------------------------------
 
 void
@@ -191,13 +139,3 @@ fb32::Image8880Frames::offset(
     return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
 }
 
-//=========================================================================
-// image manipulation
-//-------------------------------------------------------------------------
-
-void
-fb32::Image8880Frames::clear(
-    uint32_t rgb)
-{
-    std::fill(m_buffer.begin(), m_buffer.end(), rgb);
-}

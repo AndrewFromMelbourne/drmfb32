@@ -61,30 +61,34 @@ public:
     [[nodiscard]] virtual int getWidth() const noexcept = 0;
     [[nodiscard]] virtual int getHeight() const noexcept = 0;
 
-    virtual void clear(const RGB8880& rgb) = 0;
-    virtual void clear(uint32_t rgb = 0) = 0;
+    void clear(const RGB8880& rgb) { clear(rgb.get8880()); }
+    void clear(uint32_t rgb = 0);
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const = 0;
-    [[nodiscard]] virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const = 0;
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const;
+    [[nodiscard]] virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const;
 
-    [[nodiscard]] virtual std::span<const uint32_t> getRow(int y) const = 0;
+    [[nodiscard]] std::span<uint32_t> getRow(int y);
+    [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
 
     [[nodiscard]] virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
+
+    bool
+    setPixelRGB(
+        const Interface8880Point& p,
+        const RGB8880& rgb)
+    {
+        return setPixel(p, rgb.get8880());
+    }
+
+    bool setPixel(const Interface8880Point& p, uint32_t rgb);
+
+    virtual bool putImage(const Interface8880Point& p, const Interface8880& image);
 
     [[nodiscard]] bool
     validPixel(const Interface8880Point& p) const noexcept
     {
         return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < getWidth()) and (p.y() < getHeight()));
     }
-
-    virtual bool
-    setPixelRGB(
-        const Interface8880Point& p,
-        const RGB8880& rgb) = 0;
-
-    virtual bool setPixel(const Interface8880Point& p, uint32_t rgb) = 0;
-
-    virtual bool putImage(const Interface8880Point& p, const Interface8880& image);
 
 private:
 

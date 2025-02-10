@@ -41,6 +41,82 @@ Interface8880::~Interface8880()
 
 //-------------------------------------------------------------------------
 
+void
+fb32::Interface8880::clear(
+    uint32_t rgb)
+{
+    auto buffer = getBuffer();
+    std::fill(buffer.begin(), buffer.end(), rgb);
+}
+
+//-------------------------------------------------------------------------
+
+std::optional<fb32::RGB8880>
+fb32::Interface8880::getPixelRGB(
+    const Interface8880Point& p) const
+{
+    if (not validPixel(p))
+    {
+        return {};
+    }
+
+    auto buffer = getBuffer();
+    return RGB8880(buffer[offset(p)]);
+}
+
+//-------------------------------------------------------------------------
+
+std::optional<uint32_t>
+fb32::Interface8880::getPixel(
+    const Interface8880Point& p) const
+{
+    if (not validPixel(p))
+    {
+        return {};
+    }
+
+    auto buffer = getBuffer();
+    return buffer[offset(p)];
+}
+
+//-------------------------------------------------------------------------
+
+std::span<uint32_t>
+fb32::Interface8880::getRow(
+    int y)
+{
+    const Interface8880Point p{0, y};
+
+    if (validPixel(p))
+    {
+        return  getBuffer().subspan(offset(p), getWidth());
+    }
+    else
+    {
+        return {};
+    }
+}
+
+//-------------------------------------------------------------------------
+
+std::span<const uint32_t>
+fb32::Interface8880::getRow(
+    int y) const
+{
+    const Interface8880Point p{0, y};
+
+    if (validPixel(p))
+    {
+        return  getBuffer().subspan(offset(p), getWidth());
+    }
+    else
+    {
+        return {};
+    }
+}
+
+//-------------------------------------------------------------------------
+
 bool
 fb32::Interface8880::putImage(
     const Interface8880Point& p_left,
@@ -133,6 +209,24 @@ fb32::Interface8880::putImagePartial(
 
 //-------------------------------------------------------------------------
 
+bool
+fb32::Interface8880::setPixel(
+    const Interface8880Point& p,
+    uint32_t rgb)
+{
+    bool isValid{validPixel(p)};
+
+    if (isValid)
+    {
+        auto buffer = getBuffer();
+        buffer[offset(p)] = rgb;
+    }
+
+    return isValid;
+}
+
+//-------------------------------------------------------------------------
+
 Interface8880Point
 center(
     const Interface8880& frame,
@@ -145,3 +239,4 @@ center(
 //-------------------------------------------------------------------------
 
 } // namespace fb32
+

@@ -82,31 +82,7 @@ public:
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
 
-    [[nodiscard]] std::optional<RGB8880> getPixelRGB(
-        const Interface8880Point& p) const override;
-
-    [[nodiscard]] std::optional<uint32_t> getPixel(const Interface8880Point& p) const override;
-    [[nodiscard]] std::span<const uint32_t> getRow(int y) const override;
-
-    bool
-    setPixelRGB(
-        const Interface8880Point& p,
-        const RGB8880& rgb) override
-    {
-        return setPixel(p, rgb.get8880());
-    }
-
-    bool setPixel(
-        const Interface8880Point& p,
-        uint32_t rgb) override;
-
     size_t offset(const Interface8880Point& p) const noexcept override;
-
-    //---------------------------------------------------------------------
-    // image manipulaiton
-
-    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
-    void clear(uint32_t rgb) override;
 
 private:
 

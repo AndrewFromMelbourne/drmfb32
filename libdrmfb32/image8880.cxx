@@ -38,8 +38,6 @@
 using size_type = std::vector<uint32_t>::size_type;
 using Point = fb32::Interface8880Point;
 
-//=========================================================================
-// constructors, destructors and assignment
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
@@ -92,71 +90,6 @@ fb32::Image8880::Image8880(
     }
 }
 
-//=========================================================================
-// getters and setters
-//-------------------------------------------------------------------------
-
-std::optional<fb32::RGB8880>
-fb32::Image8880::getPixelRGB(
-    const Interface8880Point& p) const
-{
-    if (not validPixel(p))
-    {
-        return {};
-    }
-
-    return RGB8880(m_buffer[offset(p)]);
-}
-
-//-------------------------------------------------------------------------
-
-std::optional<uint32_t>
-fb32::Image8880::getPixel(
-    const Interface8880Point& p) const
-{
-    if (not validPixel(p))
-    {
-        return {};
-    }
-
-    return m_buffer[offset(p)];
-}
-
-//-------------------------------------------------------------------------
-
-std::span<const uint32_t>
-fb32::Image8880::getRow(
-    int y) const
-{
-    const Interface8880Point p{0, y};
-
-    if (validPixel(p))
-    {
-        return  getBuffer().subspan(offset(p), m_width);
-    }
-    else
-    {
-        return {};
-    }
-}
-
-//-------------------------------------------------------------------------
-
-bool
-fb32::Image8880::setPixel(
-    const Interface8880Point& p,
-    uint32_t rgb)
-{
-    bool isValid{validPixel(p)};
-
-    if (isValid)
-    {
-        m_buffer[offset(p)] = rgb;
-    }
-
-    return isValid;
-}
-
 //-------------------------------------------------------------------------
 
 size_t
@@ -164,16 +97,5 @@ fb32::Image8880::offset(
     const Interface8880Point& p) const noexcept
 {
     return p.x() + (p.y() * m_width);
-}
-
-//=========================================================================
-// image manipulation
-//-------------------------------------------------------------------------
-
-void
-fb32::Image8880::clear(
-    uint32_t rgb)
-{
-    std::fill(m_buffer.begin(), m_buffer.end(), rgb);
 }
 

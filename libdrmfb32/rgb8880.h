@@ -54,6 +54,11 @@ public:
 
     [[nodiscard]] uint32_t get8880() const noexcept { return m_rgb; }
 
+    [[nodiscard]] bool isGrey() const noexcept
+    {
+        return (getRed() == getGreen()) and (getGreen() == getBlue());
+    }
+
     void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
     void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
