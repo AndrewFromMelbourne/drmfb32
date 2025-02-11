@@ -87,7 +87,10 @@ public:
     [[nodiscard]] bool
     validPixel(const Interface8880Point& p) const noexcept
     {
-        return ((p.x() >= 0) and (p.y() >= 0) and (p.x() < getWidth()) and (p.y() < getHeight()));
+        return ((p.x() >= 0) and
+                (p.x() < getWidth()) and
+                (p.y() >= 0) and
+                (p.y() < getHeight()));
     }
 
 private:

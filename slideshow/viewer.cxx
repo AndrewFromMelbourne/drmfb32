@@ -312,7 +312,14 @@ Viewer::imagePrevious()
 void
 Viewer::openImage()
 {
-    m_image = fb32::readJpeg(m_files[m_current]);
+    try
+    {
+        m_image = fb32::readJpeg(m_files[m_current]);
+    }
+    catch (std::invalid_argument& e)
+    {
+        std::cerr << m_files[m_current] << " " << e.what() << '\n';
+    }
 
     m_enlighten = 0;
 
