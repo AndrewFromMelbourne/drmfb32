@@ -37,11 +37,6 @@ def main():
     print("{", end='')
 
     codeWidth = 10
-    #codeWidth = image.width
-
-    #while codeWidth > 16:
-    #    codeWidth = codeWidth // 2
-
     index = 0
 
     for j in range(image.height):
