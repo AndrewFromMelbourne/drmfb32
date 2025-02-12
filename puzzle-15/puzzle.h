@@ -68,6 +68,7 @@ private:
 
     std::array<uint8_t, c_boardSize> m_board;
     std::array<fb32::Image8880, c_tileCount> m_tileBuffers;
+    fb32::Image8880 m_tileSolved;
     Location m_blankLocation;
 };
 
