@@ -138,6 +138,13 @@ main(
         Image8880Font8x16 font;
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
+
+        if (fb.getHeight() < 480)
+        {
+            std::cerr << "Display too small, must be at least 480 pixels high\n";
+            exit(EXIT_FAILURE);
+        }
+
         fb.clear(RGB8880{0, 0, 0});
 
         Boxworld boxworld;
