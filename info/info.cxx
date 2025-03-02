@@ -25,18 +25,6 @@
 //
 //-------------------------------------------------------------------------
 
-#include <array>
-#include <chrono>
-#include <csignal>
-#include <cstdint>
-#include <cstring>
-#include <exception>
-#include <iostream>
-#include <memory>
-#include <string_view>
-#include <thread>
-#include <vector>
-
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -45,9 +33,22 @@
 
 #include <bsd/libutil.h>
 
+#include <fmt/format.h>
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+
+#include <array>
+#include <chrono>
+#include <csignal>
+#include <cstdint>
+#include <cstring>
+#include <exception>
+#include <memory>
+#include <string_view>
+#include <thread>
+#include <vector>
 
 #include "image8880FreeType.h"
 
@@ -85,42 +86,42 @@ messageLog(
     }
     else
     {
-        std::cerr << name << "[" << getpid() << "]:";
+        fmt::print(stderr, "{}[{}]:", name, getpid());
 
         switch (priority)
         {
         case LOG_DEBUG:
 
-            std::cerr << "debug";
+            fmt::print(stderr, "debug");
             break;
 
         case LOG_INFO:
 
-            std::cerr << "info";
+            fmt::print(stderr, "info");
             break;
 
         case LOG_NOTICE:
 
-            std::cerr << "notice";
+            fmt::print(stderr, "notice");
             break;
 
         case LOG_WARNING:
 
-            std::cerr << "warning";
+            fmt::print(stderr, "warning");
             break;
 
         case LOG_ERR:
 
-            std::cerr << "error";
+            fmt::print(stderr, "error");
             break;
 
         default:
 
-            std::cerr << "unknown(" << priority << ")";
+            fmt::print(stderr, "unknown({})", priority);
             break;
         }
 
-        std::cerr << ":" << message << '\n';
+        fmt::print(stderr, ":{}\n", message);
     }
 }
 
@@ -140,20 +141,20 @@ perrorLog(
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --daemon,-D - start in the background as a daemon\n";
-    os << "    --connector,-c - dri connector to use\n";
-    os << "    --device,-d - dri device to use\n";
-    os << "    --font,-f - font file to use\n";
-    os << "    --help,-h - print usage and exit\n";
-    os << "    --pidfile,-p <pidfile> - create and lock PID file";
-    os << " (if being run as a daemon)\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {}\n", name);
+    fmt::print(file, "\n");
+    fmt::print(file, "    --daemon,-D - start in the background as a daemon\n");
+    fmt::print(file, "    --connector,-c - dri connector to use\n");
+    fmt::print(file, "    --device,-d - dri device to use\n");
+    fmt::print(file, "    --font,-f - font file to use\n");
+    fmt::print(file, "    --help,-h - print usage and exit\n");
+    fmt::print(file, "    --pidfile,-p <pidfile> - create and lock PID file");
+    fmt::print(file, " (if being run as a daemon)\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -236,7 +237,7 @@ main(
 
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -255,7 +256,7 @@ main(
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -275,19 +276,17 @@ main(
 
             if (not pfh)
             {
-                std::cerr
-                    << program
-                    << " is already running "
-                    << otherpid
-                    << '\n';
-
+                fmt::print(
+                    "{} is already running with pid {}",
+                    program,
+                    otherpid);
                 ::exit(EXIT_FAILURE);
             }
         }
 
         if (::daemon(0, 0) == -1)
         {
-            std::cerr << "Cannot daemonize\n";
+            fmt::print("Cannot daemonize\n");
 
             if (pfh)
             {
@@ -316,11 +315,12 @@ main(
                 ::pidfile_remove(pfh);
             }
 
-            std::string message {"installing "};
-            message += strsignal(signal);
-            message += " signal handler";
+            fmt::print(
+                stderr,
+                "Error: installing {} signal handler : {}\n",
+                strsignal(signal),
+                strerror(errno));
 
-            perrorLog(isDaemon, program, message);
             ::exit(EXIT_FAILURE);
         }
     }
@@ -337,7 +337,7 @@ main(
         }
         catch (std::exception& error)
         {
-            std::cerr << "Warning: " << error.what() << '\n';
+            fmt::print(stderr, "Warning: {}\n", error.what());
         }
     }
 
@@ -437,7 +437,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Warning: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 

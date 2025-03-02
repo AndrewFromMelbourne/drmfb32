@@ -25,14 +25,13 @@
 //
 //-------------------------------------------------------------------------
 
-#include <algorithm>
-#include <iostream>
-#include <system_error>
-
 #include <fcntl.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+
+#include <algorithm>
+#include <system_error>
 
 #include "image8880Jpeg.h"
 #include "image8880Process.h"

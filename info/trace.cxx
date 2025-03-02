@@ -30,7 +30,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"

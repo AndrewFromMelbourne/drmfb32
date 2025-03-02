@@ -5,6 +5,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(FMT REQUIRED fmt)
 pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
 
@@ -79,7 +80,8 @@ add_executable(info info/info.cxx
 
 target_link_libraries(info drmfb32 ${BSD_LIBRARIES}
                                    ${DRM_LIBRARIES}
-                                   ${FREETYPE_LIBRARIES})
+                                   ${FREETYPE_LIBRARIES}
+                                   ${FMT_LIBRARIES})
 target_include_directories(info PUBLIC ${BSD_INCLUDE_DIRS})
 target_compile_options(info PUBLIC ${BSD_CFLAGS_OTHER})
 
@@ -94,13 +96,15 @@ add_executable(boxworld boxworld/main.cxx
                         boxworld/levels.cxx
                         boxworld/boxworld.cxx)
 
-target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES}
+                                       ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(joystickConfigure joystick/joystickConfigure.cxx)
 
-target_link_libraries(joystickConfigure drmfb32)
+target_link_libraries(joystickConfigure drmfb32
+                                        ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
@@ -108,20 +112,23 @@ add_executable(life life/main.cxx
                     life/life.cxx)
 
 target_link_libraries(life drmfb32 ${DRM_LIBRARIES}
-                                   ${BS_THREAD_LIBRARIES})
+                                   ${BS_THREAD_LIBRARIES}
+                                   ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(modes modes/modes.cxx)
 
-target_link_libraries(modes drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(modes drmfb32 ${DRM_LIBRARIES}
+                                    ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(puzzle-15 puzzle-15/main.cxx
                          puzzle-15/puzzle.cxx)
 
-target_link_libraries(puzzle-15 drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(puzzle-15 drmfb32 ${DRM_LIBRARIES}
+                                        ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
@@ -129,7 +136,8 @@ if (TURBOJPEG_FOUND)
 add_executable(showcam showcam/showcam.cxx
                        showcam/webcam.cxx)
 target_link_libraries(showcam drmfb32 ${DRM_LIBRARIES}
-                                      ${TURBOJPEG_LIBRARIES})
+                                      ${TURBOJPEG_LIBRARIES}
+                                      ${FMT_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
@@ -137,20 +145,23 @@ endif()
 if (TURBOJPEG_FOUND)
 add_executable(showjpeg showjpeg/showjpeg.cxx)
 target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
-                                       ${TURBOJPEG_LIBRARIES})
+                                       ${TURBOJPEG_LIBRARIES}
+                                       ${FMT_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
 
 add_executable(showqoi showqoi/showqoi.cxx)
-target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES}
+                                      ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(sphere sphere/main.cxx
                       sphere/sphere.cxx)
 
-target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES}
+                                     ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
@@ -159,23 +170,27 @@ add_executable(slideshow slideshow/slideshow.cxx
                          slideshow/viewer.cxx)
 
 target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
-                                        ${TURBOJPEG_LIBRARIES})
+                                        ${TURBOJPEG_LIBRARIES}
+                                        ${FMT_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
 
 add_executable(test test/test.cxx)
-target_link_libraries(test drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(test drmfb32 ${DRM_LIBRARIES}
+                                   ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(testCircle test/testCircle.cxx)
-target_link_libraries(testCircle drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(testCircle drmfb32 ${DRM_LIBRARIES}
+                                         ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(testColourBlend test/testColourBlend.cxx)
-target_link_libraries(testColourBlend drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(testColourBlend drmfb32 ${DRM_LIBRARIES}
+                                              ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
@@ -183,26 +198,30 @@ if (FREETYPE_FOUND)
 add_executable(testft test/testft.cxx)
 target_link_libraries(testft drmfb32
                              ${DRM_LIBRARIE}
-                             ${FREETYPE_LIBRARIES})
+                             ${FREETYPE_LIBRARIES}
+                             ${FMT_LIBRARIES})
 
 add_executable(testft2 test/testft2.cxx)
 target_link_libraries(testft2 drmfb32
                              ${DRM_LIBRARIE}
-                             ${FREETYPE_LIBRARIES})
+                             ${FREETYPE_LIBRARIES}
+                             ${FMT_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
 
 add_executable(testPutImage test/testPutImage.cxx)
-target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES}
+                                           ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(testResize test/testResize.cxx)
-target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES}
+                                         ${FMT_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
 add_executable(joysticktest test/testJoystick.cxx)
-target_link_libraries(joysticktest drmfb32)
+target_link_libraries(joysticktest drmfb32 ${FMT_LIBRARIES})
 

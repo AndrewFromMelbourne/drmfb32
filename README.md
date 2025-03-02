@@ -15,6 +15,7 @@ This project uses the following libraries. You will need to install the develope
 
 * libbsd
 * libdrm
+* libfmt
 * libfreetype2
 * libturbojpeg
 

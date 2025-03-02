@@ -29,9 +29,10 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <fmt/format.h>
+
 #include <cmath>
 #include <iomanip>
-#include <iostream>
 #include <system_error>
 
 #include "joystick.h"
@@ -51,15 +52,15 @@ using namespace fb32;
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --help,-h - print usage and exit\n";
-    os << "    --joystick,-j - joystick device\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {} <options>\n", name);
+    fmt::print(file, "\n");
+    fmt::print(file, "    --help,-h - print usage and exit\n");
+    fmt::print(file, "    --joystick,-j - joystick device\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -90,7 +91,7 @@ main(
         {
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -103,7 +104,7 @@ main(
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -122,27 +123,11 @@ main(
 
             for (auto button = 0 ; button < js.numberOfButtons() ; ++button)
             {
-                std::cout << button << '-';
-
-                if (js.buttonPressed(button))
-                {
-                    std::cout << 'X';
-                }
-                else
-                {
-                    std::cout << 'O';
-                }
-
-                if (js.buttonDown(button))
-                {
-                    std::cout << 'D';
-                }
-                else
-                {
-                    std::cout << 'U';
-                }
-
-                std::cout << ' ';
+                fmt::print(
+                    "{:02x}:{}{} ",
+                    button,
+                    (js.buttonPressed(button)) ? 'X' : 'O',
+                    (js.buttonDown(button)) ? 'D' : 'U');
             }
 
             for (auto axes = 0 ; axes < js.numberOfAxes() ; ++axes)
@@ -161,31 +146,24 @@ main(
                     return ' ';
                 };
 
-                auto [x, y] = js.getAxes(axes);
-                char xSign = signCharacter(x);
-                char ySign = signCharacter(y);
+                const auto [x, y] = js.getAxes(axes);
+                const char xSign = signCharacter(x);
+                const char ySign = signCharacter(y);
 
-                std::cout
-                    << xSign
-                    << std::setw(4)
-                    << std::setfill('0')
-                    << std::hex
-                    << static_cast<uint16_t>(std::abs(x))
-                    << ':'
-                    << ySign
-                    << std::setw(4)
-                    << std::setfill('0')
-                    << std::hex
-                    << static_cast<uint16_t>(std::abs(y))
-                    << ' ';
+                fmt::print(
+                    "{}{:04x}:{}{:04x} ",
+                    xSign,
+                    static_cast<uint16_t>(std::abs(x)),
+                    ySign,
+                    static_cast<uint16_t>(std::abs(y)));
             }
 
-            std::cout << '\n';
+            fmt::print("\n");
         }
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Error: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 

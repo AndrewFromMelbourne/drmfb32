@@ -28,8 +28,9 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <fmt/format.h>
+
 #include <chrono>
-#include <iostream>
 #include <system_error>
 #include <thread>
 
@@ -47,17 +48,17 @@ using namespace std::chrono_literals;
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --connector,-c - dri connector to use\n";
-    os << "    --device,-d - dri device to use\n";
-    os << "    --font,-f - font file to use\n";
-    os << "    --help,-h - print usage and exit\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {} <options>\n", name);
+    fmt::print(file, "\n");
+    fmt::print(file, "    --connector,-c - dri connector to use\n");
+    fmt::print(file, "    --device,-d - dri device to use\n");
+    fmt::print(file, "    --font,-f - font file to use\n");
+    fmt::print(file, "    --help,-h - print usage and exit\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -110,14 +111,14 @@ main(
 
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -128,7 +129,7 @@ main(
 
     if (font.empty())
     {
-        std::cerr << "Error: Font file must be specfied\n";
+        fmt::print(stderr, "Error: Font file must be specfied\n");
         exit(EXIT_FAILURE);
     }
 
@@ -192,7 +193,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Error: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 

@@ -30,8 +30,6 @@
 #include "boxworld.h"
 #include "images.h"
 
-#include <iostream>
-
 //-------------------------------------------------------------------------
 
 using namespace fb32;

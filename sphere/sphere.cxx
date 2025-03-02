@@ -30,7 +30,6 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
-#include <iostream>
 
 #include "sphere.h"
 

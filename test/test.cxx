@@ -25,15 +25,17 @@
 //
 //-------------------------------------------------------------------------
 
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <system_error>
-#include <thread>
-
 #include <getopt.h>
 #include <libgen.h>
 #include <unistd.h>
+
+#include <fmt/format.h>
+
+#include <chrono>
+#include <iomanip>
+#include <string_view>
+#include <system_error>
+#include <thread>
 
 #include "framebuffer8880.h"
 #include "image8880.h"
@@ -48,30 +50,34 @@ using namespace std::chrono_literals;
 
 //-------------------------------------------------------------------------
 
-#define TEST(expression, message) \
-    if (!expression) \
-    { \
-        std::cerr \
-            << __FILE__ "(" \
-            << __LINE__ \
-            << ") : " message " : " #expression " : test failed\n"; \
-        exit(EXIT_FAILURE); \
-    } \
+void test(bool expression, std::string_view message)
+{
+    if (!expression)
+    {
+        fmt::print(
+            stderr,
+            "{}({}) : {} : test failed\n",
+            __FILE__,
+            __LINE__,
+            message);
+        exit(EXIT_FAILURE);
+    }
+}
 
 //-------------------------------------------------------------------------
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --connector,-c - dri connector to use\n";
-    os << "    --device,-d - dri device to use\n";
-    os << "    --help,-h - print usage and exit\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {} <options>\n", name);
+    fmt::print(file, "\n");
+    fmt::print(file, "    --connector,-c - dri connector to use\n");
+    fmt::print(file, "    --device,-d - dri device to use\n");
+    fmt::print(file, "    --help,-h - print usage and exit\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -116,14 +122,14 @@ main(
 
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -142,20 +148,8 @@ main(
         const RGB8880 red{255, 0, 0};
         const RGB8880 green{0, 255, 0};
 
-        std::cout
-            << "  red: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << red.get8880()
-            << '\n';
-        std::cout
-            << "green: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << green.get8880()
-            << '\n';
+        fmt::print("red: 0x{:08X}\n", red.get8880());
+        fmt::print("green: 0x{:08X}\n", red.get8880());
 
         //-----------------------------------------------------------------
 
@@ -164,8 +158,8 @@ main(
 
         auto rgb = image.getPixelRGB(Interface8880Point(0,0));
 
-        TEST((rgb), "Image8880::getPixelRGB()");
-        TEST((*rgb == red), "Image8880::getPixelRGB()");
+        test(rgb.has_value(), "Image8880::getPixelRGB()");
+        test((*rgb == red), "Image8880::getPixelRGB()");
 
         line(image,
              Interface8880Point(0,0),
@@ -178,28 +172,16 @@ main(
 
         rgb = fb.getPixelRGB(imageLocation);
 
-        TEST((rgb), "FrameBuffer8880::getPixelRGB()");
-        TEST((*rgb == green), "FrameBuffer8880::getPixelRGB()");
+        test(rgb.has_value(), "FrameBuffer8880::getPixelRGB()");
+        test((*rgb == green), "FrameBuffer8880::getPixelRGB()");
 
         //-----------------------------------------------------------------
 
         const RGB8880 darkBlue{0, 0, 63};
         const RGB8880 white{255, 255, 255};
 
-        std::cout
-            << "Dblue: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << darkBlue.get8880()
-            << '\n';
-        std::cout
-            << "white: 0x"
-            << std::setfill('0')
-            << std::setw(8)
-            << std::hex
-            << white.get8880()
-            << '\n';
+        fmt::print("Dblue: 0x{:08X}\n", darkBlue.get8880());
+        fmt::print("white: 0x{:08X}\n", white.get8880());
 
         Image8880 textImage(248, 16);
         textImage.clear(darkBlue);
@@ -228,7 +210,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Error: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 

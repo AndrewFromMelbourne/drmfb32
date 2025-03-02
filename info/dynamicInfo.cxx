@@ -25,6 +25,13 @@
 //
 //-------------------------------------------------------------------------
 
+#include <ifaddrs.h>
+#include <unistd.h>
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -32,13 +39,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
-#include <ifaddrs.h>
-#include <unistd.h>
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/types.h>
 
 #include "dynamicInfo.h"
 #include "system.h"

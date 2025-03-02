@@ -28,10 +28,11 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <fmt/format.h>
+
 #include <chrono>
 #include <csignal>
 #include <cstring>
-#include <iostream>
 #include <thread>
 
 #include "framebuffer8880.h"
@@ -69,20 +70,20 @@ signalHandler(
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --FPS,-F - set the desired frames per second\n";
-    os << "    --connector,-c - dri connector to use\n";
-    os << "    --device,-d - dri device to use\n";
-    os << "    --fit,-f - fit image to screen\n";
-    os << "    --FPS,-F - request frames per second\n";
-    os << "    --help,-h - print usage and exit\n";
-    os << "    --videodevice,-v - video device to use\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {} <options>\n", name);
+    fmt::print(file, "\n");
+    fmt::print("    --FPS,-F - set the desired frames per second\n");
+    fmt::print("    --connector,-c - dri connector to use\n");
+    fmt::print("    --device,-d - dri device to use\n");
+    fmt::print("    --fit,-f - fit image to screen\n");
+    fmt::print("    --FPS,-F - request frames per second\n");
+    fmt::print("    --help,-h - print usage and exit\n");
+    fmt::print("    --videodevice,-v - video device to use\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -145,7 +146,7 @@ main(
 
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -158,7 +159,7 @@ main(
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -171,11 +172,11 @@ main(
     {
         if (std::signal(signal, signalHandler) == SIG_ERR)
         {
-            std::string message {"installing "};
-            message += strsignal(signal);
-            message += " signal handler";
-
-            perror(message.c_str());
+            fmt::print(
+                stderr,
+                "Error: installing {} signal handler : {}\n",
+                strsignal(signal),
+                strerror(errno));
             ::exit(EXIT_FAILURE);
         }
     }
@@ -191,14 +192,7 @@ main(
         //-----------------------------------------------------------------
 
         const auto [ width, height ] = wc.dimensions();
-
-        std::cout
-            << wc.formatName()
-            << " ["
-            << width
-            << "x"
-            << height
-            << "]\n";
+        fmt::print("{} [ {} x {}]\n", wc.formatName(), width, height);
 
         //-----------------------------------------------------------------
 
@@ -216,7 +210,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Error: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 

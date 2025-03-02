@@ -28,10 +28,11 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <fmt/format.h>
+
 #include <chrono>
 #include <csignal>
 #include <cstring>
-#include <iostream>
 #include <thread>
 
 #include "framebuffer8880.h"
@@ -69,16 +70,16 @@ signalHandler(
 
 void
 printUsage(
-    std::ostream& os,
+    FILE* file,
     const std::string& name)
 {
-    os << '\n';
-    os << "Usage: " << name << " <options>\n";
-    os << '\n';
-    os << "    --connector,-c - dri connector to use\n";
-    os << "    --device,-d - dri device to use\n";
-    os << "    --help,-h - print usage and exit\n";
-    os << '\n';
+    fmt::print(file, "\n");
+    fmt::print(file, "Usage: {} <options>\n", name);
+    fmt::print(file, "\n");
+    fmt::print(file, "    --connector,-c - dri connector to use\n");
+    fmt::print(file, "    --device,-d - dri device to use\n");
+    fmt::print(file, "    --help,-h - print usage and exit\n");
+    fmt::print(file, "\n");
 }
 
 //-------------------------------------------------------------------------
@@ -123,14 +124,14 @@ main(
 
         case 'h':
 
-            printUsage(std::cout, program);
+            printUsage(stdout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
 
         default:
 
-            printUsage(std::cerr, program);
+            printUsage(stderr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -143,11 +144,12 @@ main(
     {
         if (std::signal(signal, signalHandler) == SIG_ERR)
         {
-            std::string message {"installing "};
-            message += strsignal(signal);
-            message += " signal handler";
+            fmt::print(
+                stderr,
+                "Error: installing {} signal handler : {}\n",
+                strsignal(signal),
+                strerror(errno));
 
-            perror(message.c_str());
             ::exit(EXIT_FAILURE);
         }
     }
@@ -158,12 +160,7 @@ main(
         FrameBuffer8880 fb(device, connector);
         fb.clear(RGB8880{0, 0, 0});
 
-        std::cout
-            << "width = "
-            << fb.getWidth()
-            << " height = "
-            << fb.getHeight()
-            << '\n';
+        fmt::print("width = {} height = {}\n", fb.getWidth() ,fb.getHeight());
 
         Sphere sphere(fb.getHeight() - 10);
         sphere.setAmbient(0.1);
@@ -187,7 +184,7 @@ main(
     }
     catch (std::exception& error)
     {
-        std::cerr << "Error: " << error.what() << '\n';
+        fmt::print(stderr, "Error: {}\n", error.what());
         exit(EXIT_FAILURE);
     }
 
