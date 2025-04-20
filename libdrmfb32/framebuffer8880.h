@@ -89,6 +89,9 @@ public:
     FrameBuffer8880(FrameBuffer8880&& fb) = delete;
     FrameBuffer8880& operator=(FrameBuffer8880&& fb) = delete;
 
+    void clearBuffers(const RGB8880& rgb) { clearBuffers(rgb.get8880()); }
+    void clearBuffers(uint32_t rgb = 0);
+
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override;
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override;
 

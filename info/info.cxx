@@ -347,7 +347,7 @@ main(
     {
         fb32::FrameBuffer8880 fb(device, connector);
 
-        fb.clear(fb32::RGB8880{0, 0, 0});
+        fb.clearBuffers(fb32::RGB8880{0, 0, 0});
 
         //-----------------------------------------------------------------
 
@@ -433,7 +433,7 @@ main(
             std::this_thread::sleep_until(nextSecond);
         }
 
-        fb.clear();
+        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

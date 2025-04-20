@@ -146,7 +146,7 @@ main(
             exit(EXIT_FAILURE);
         }
 
-        fb.clear(RGB8880{0, 0, 0});
+        fb.clearBuffers(RGB8880{0, 0, 0});
 
         Boxworld boxworld;
         boxworld.init();
@@ -172,7 +172,7 @@ main(
             std::this_thread::sleep_for(250ms);
         }
 
-        fb.clear();
+        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

@@ -184,7 +184,7 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-        fb.clear(RGB8880{0, 0, 0});
+        fb.clearBuffers(RGB8880{0, 0, 0});
         Joystick js{joystick};
         Viewer viewer{fb, folder};
 

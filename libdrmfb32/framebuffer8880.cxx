@@ -350,6 +350,16 @@ fb32::FrameBuffer8880::~FrameBuffer8880()
 
 //-------------------------------------------------------------------------
 
+void
+fb32::FrameBuffer8880::clearBuffers(uint32_t rgb)
+{
+    clear(rgb);
+    update();
+    clear(rgb);
+}
+
+//-------------------------------------------------------------------------
+
 std::span<uint32_t>
 fb32::FrameBuffer8880::getBuffer() noexcept
 {

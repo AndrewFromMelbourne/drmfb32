@@ -141,7 +141,7 @@ main(
         const RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device, connector};
 
-        fb.clear(black);
+        fb.clearBuffers(black);
 
         Image8880 image{fb.getWidth(), fb.getHeight()};
         image.clear(black);
@@ -189,7 +189,7 @@ main(
 
         std::this_thread::sleep_for(10s);
 
-        fb.clear();
+        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

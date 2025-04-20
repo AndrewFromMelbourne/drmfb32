@@ -187,7 +187,7 @@ main(
         FrameBuffer8880 fb(device, connector);
         Webcam wc(videoDevice, fitToScreen, requestedFPS, fb);
 
-        fb.clear(RGB8880{0, 0, 0});
+        fb.clearBuffers(RGB8880{0, 0, 0});
 
         //-----------------------------------------------------------------
 
@@ -206,7 +206,7 @@ main(
 
         wc.stopStream();
 
-        fb.clear();
+        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

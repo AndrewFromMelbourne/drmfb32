@@ -96,6 +96,10 @@ An animated shaded sphere.
 
 Programs to test various parts of the library.
 
+## The down side of double buffering
+
+I created a bug by enabling double buffering. When you draw persisently and directly to the frame buffer you need to make sure that you draw to both front and back buffers. I have added a convenience function clearBuffer() that will clear the front and back buffers.
+
 ## Possible Future Features
 * Atomic commit
 * Overlay planes
