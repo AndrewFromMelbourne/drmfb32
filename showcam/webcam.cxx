@@ -156,7 +156,6 @@ fb32::Webcam::showFrame(
 
     if (result)
     {
-
         if (m_fitToScreen)
         {
             resizeToNearestNeighbour(m_image, m_resizedImage);
