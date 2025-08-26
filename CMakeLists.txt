@@ -9,12 +9,25 @@ pkg_check_modules(FMT REQUIRED fmt)
 pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
 
+if (CMAKE_BUILD_TYPE STREQUAL "")
 set(CMAKE_BUILD_TYPE Release)
+endif()
+
+message("Build type ${CMAKE_BUILD_TYPE}")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
+#--------------------------------------------------------------------------
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address,undefined")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+endif()
 
 #--------------------------------------------------------------------------
 
