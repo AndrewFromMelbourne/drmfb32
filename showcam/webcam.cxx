@@ -240,7 +240,7 @@ fb32::Webcam::chooseBestFit(
                     ((a.height == b.height) and (a.width > b.width));
         };
 
-        std::sort(dimensions.begin(), dimensions.end(), reverseSort);
+        std::ranges::sort(dimensions, reverseSort);
 
         for (const auto d : dimensions)
         {

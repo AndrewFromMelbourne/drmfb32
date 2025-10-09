@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <functional>
@@ -180,8 +181,8 @@ Life::init()
     std::mt19937 generator(randomDevice());
     std::uniform_int_distribution<> distribution(0, 1);
 
-    std::fill(m_cells.begin(), m_cells.end(), 0);
-    std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
+    std::ranges::fill(m_cells, 0);
+    std::ranges::fill(m_cellsNext, 0);
     m_image.clear(0);
 
     for (int row = 0 ; row < m_size ; ++row)
@@ -206,8 +207,8 @@ Life::createGosperGliderGun()
     const int x = (m_size - 36) / 2;
     const int y = (m_size - 8) / 2;
 
-    std::fill(m_cells.begin(), m_cells.end(), 0);
-    std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
+    std::ranges::fill(m_cells, 0);
+    std::ranges::fill(m_cellsNext, 0);
     m_image.clear(0);
 
     setCell(x + 24, y + 0);
@@ -267,8 +268,8 @@ Life::createSimkinGliderGun()
     const int y = (m_size - 20 ) / 2;
     m_image.clear(0);
 
-    std::fill(m_cells.begin(), m_cells.end(), 0);
-    std::fill(m_cellsNext.begin(), m_cellsNext.end(), 0);
+    std::ranges::fill(m_cells, 0);
+    std::ranges::fill(m_cellsNext, 0);
 
     setCell(x + 0, y + 0);
     setCell(x + 1, y + 0);

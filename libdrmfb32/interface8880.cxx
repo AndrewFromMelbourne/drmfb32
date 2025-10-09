@@ -28,6 +28,8 @@
 #include "image8880.h"
 #include "interface8880.h"
 
+#include <algorithm>
+
 //-------------------------------------------------------------------------
 
 namespace fb32
@@ -46,7 +48,7 @@ fb32::Interface8880::clear(
     uint32_t rgb)
 {
     auto buffer = getBuffer();
-    std::fill(buffer.begin(), buffer.end(), rgb);
+    std::ranges::fill(buffer, rgb);
 }
 
 //-------------------------------------------------------------------------
@@ -141,7 +143,7 @@ fb32::Interface8880::putImage(
         auto row = image.getRow(j);
         const auto ost = offset(Interface8880Point{p.x(), j + p.y()});
 
-        std::copy(row.begin(), row.end(), getBuffer().subspan(ost).begin());
+        std::ranges::copy(row, getBuffer().subspan(ost).begin());
     }
 
     return true;
@@ -201,7 +203,7 @@ fb32::Interface8880::putImagePartial(
         auto row = image.getRow(j).subspan(xStart, xLength);
         const auto ost = offset(Interface8880Point{x, j - yStart + y});
 
-        std::copy(row.begin(), row.end(), getBuffer().subspan(ost).begin());
+        std::ranges::copy(row, getBuffer().subspan(ost).begin());
     }
 
     return true;

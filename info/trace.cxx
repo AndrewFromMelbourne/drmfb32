@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ranges>
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
@@ -203,7 +204,7 @@ Trace::addDataPoint(
     }
     else
     {
-        std::rotate(m_time.begin(), m_time.begin() + 1, m_time.end());
+        std::ranges::rotate(m_time, m_time.begin() + 1);
         m_time.back() = now;
     }
 
@@ -226,7 +227,7 @@ TraceData::addData(
     }
     else
     {
-        std::rotate(m_values.begin(), m_values.begin() + 1, m_values.end());
+        std::ranges::rotate(m_values, m_values.begin() + 1);
         m_values.back() = value;
     }
 }
@@ -236,6 +237,6 @@ TraceData::addData(
 int
 TraceData::max() const
 {
-    return *std::max_element(m_values.begin(), m_values.end());
+    return *std::ranges::max_element(m_values);
 }
 
