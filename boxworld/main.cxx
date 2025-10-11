@@ -28,9 +28,9 @@
 #include <getopt.h>
 #include <libgen.h>
 
-#include <fmt/format.h>
-
 #include <csignal>
+#include <iostream>
+#include <print>
 #include <thread>
 
 #include "framebuffer8880.h"
@@ -55,17 +55,17 @@ const char* defaultJoystick = "/dev/input/js0";
 
 void
 printUsage(
-    FILE* file,
+    std::ostream& stream,
     const std::string& name)
 {
-    fmt::print(file, "\n");
-    fmt::print(file, "\nUsage: {} <options>\n\n", name);
-    fmt::print(file, "\n");
-    fmt::print(file, "    --connector,-c - dri connector to use\n");
-    fmt::print(file, "    --device,-d - dri device to use\n");
-    fmt::print(file, "    --help,-h - print usage and exit\n");
-    fmt::print(file, "    --joystick,-j - joystick device\n");
-    fmt::print(file, "\n");
+    std::println(stream, "");
+    std::println(stream, "Usage: {} <options>", name);
+    std::println(stream, "");
+    std::println(stream, "    --connector,-c - dri connector to use");
+    std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --help,-h - println usage and exit");
+    std::println(stream, "    --joystick,-j - joystick device");
+    std::println(stream, "");
 }
 
 //-------------------------------------------------------------------------
@@ -112,7 +112,7 @@ main(
 
         case 'h':
 
-            printUsage(stdout, program);
+            printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -125,7 +125,7 @@ main(
 
         default:
 
-            printUsage(stderr, program);
+            printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -142,7 +142,7 @@ main(
 
         if (fb.getHeight() < 480)
         {
-            fmt::print(stderr, "Display too small, must be at least 480 pixels high\n");
+            std::println(std::cerr, "Display too small, must be at least 480 pixels high");
             exit(EXIT_FAILURE);
         }
 
@@ -176,7 +176,7 @@ main(
     }
     catch (std::exception& error)
     {
-        fmt::print(stderr, "Error: {} \n",error.what());
+        std::println(std::cerr, "Error: {} \n",error.what());
         exit(EXIT_FAILURE);
     }
 

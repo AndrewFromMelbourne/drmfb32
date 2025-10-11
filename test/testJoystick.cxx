@@ -32,7 +32,8 @@
 #include <fmt/format.h>
 
 #include <cmath>
-#include <iomanip>
+#include <iostream>
+#include <print>
 #include <system_error>
 
 #include "joystick.h"
@@ -52,15 +53,15 @@ using namespace fb32;
 
 void
 printUsage(
-    FILE* file,
+    std::ostream& stream,
     const std::string& name)
 {
-    fmt::print(file, "\n");
-    fmt::print(file, "Usage: {} <options>\n", name);
-    fmt::print(file, "\n");
-    fmt::print(file, "    --help,-h - print usage and exit\n");
-    fmt::print(file, "    --joystick,-j - joystick device\n");
-    fmt::print(file, "\n");
+    std::println(stream, "");
+    std::println(stream, "Usage: {} <options>", name);
+    std::println(stream, "");
+    std::println(stream, "    --help,-h - print usage and exit");
+    std::println(stream, "    --joystick,-j - joystick device");
+    std::println(stream, "");
 }
 
 //-------------------------------------------------------------------------
@@ -91,7 +92,7 @@ main(
         {
         case 'h':
 
-            printUsage(stdout, program);
+            printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -104,7 +105,7 @@ main(
 
         default:
 
-            printUsage(stderr, program);
+            printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -123,7 +124,7 @@ main(
 
             for (auto button = 0 ; button < js.numberOfButtons() ; ++button)
             {
-                fmt::print(
+                std::print(
                     "{:02x}:{}{} ",
                     button,
                     (js.buttonPressed(button)) ? 'X' : 'O',
@@ -150,7 +151,7 @@ main(
                 const char xSign = signCharacter(x);
                 const char ySign = signCharacter(y);
 
-                fmt::print(
+                std::print(
                     "{}{:04x}:{}{:04x} ",
                     xSign,
                     static_cast<uint16_t>(std::abs(x)),
@@ -158,12 +159,12 @@ main(
                     static_cast<uint16_t>(std::abs(y)));
             }
 
-            fmt::print("\n");
+            std::println("");
         }
     }
     catch (std::exception& error)
     {
-        fmt::print(stderr, "Error: {}\n", error.what());
+        std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
 

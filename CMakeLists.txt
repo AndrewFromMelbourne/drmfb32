@@ -5,7 +5,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(FMT REQUIRED fmt)
 pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
 
@@ -15,7 +14,7 @@ endif()
 
 message("Build type ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)

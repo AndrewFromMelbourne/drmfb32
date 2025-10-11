@@ -29,10 +29,9 @@
 #include <libgen.h>
 #include <unistd.h>
 
-#include <fmt/format.h>
-
 #include <chrono>
-#include <iomanip>
+#include <iostream>
+#include <print>
 #include <string_view>
 #include <system_error>
 #include <thread>
@@ -54,9 +53,9 @@ void test(bool expression, std::string_view message)
 {
     if (!expression)
     {
-        fmt::print(
-            stderr,
-            "{}({}) : {} : test failed\n",
+        std::println(
+            std::cerr,
+            "{}({}) : {} : test failed",
             __FILE__,
             __LINE__,
             message);
@@ -68,16 +67,16 @@ void test(bool expression, std::string_view message)
 
 void
 printUsage(
-    FILE* file,
+    std::ostream& stream,
     const std::string& name)
 {
-    fmt::print(file, "\n");
-    fmt::print(file, "Usage: {} <options>\n", name);
-    fmt::print(file, "\n");
-    fmt::print(file, "    --connector,-c - dri connector to use\n");
-    fmt::print(file, "    --device,-d - dri device to use\n");
-    fmt::print(file, "    --help,-h - print usage and exit\n");
-    fmt::print(file, "\n");
+    std::println(stream, "");
+    std::println(stream, "Usage: {} <options>", name);
+    std::println(stream, "");
+    std::println(stream, "    --connector,-c - dri connector to use");
+    std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --help,-h - print usage and exit");
+    std::println(stream, "");
 }
 
 //-------------------------------------------------------------------------
@@ -122,14 +121,14 @@ main(
 
         case 'h':
 
-            printUsage(stdout, program);
+            printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
 
         default:
 
-            printUsage(stderr, program);
+            printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -148,8 +147,8 @@ main(
         const RGB8880 red{255, 0, 0};
         const RGB8880 green{0, 255, 0};
 
-        fmt::print("red: 0x{:08X}\n", red.get8880());
-        fmt::print("green: 0x{:08X}\n", red.get8880());
+        std::println("red: 0x{:08X}", red.get8880());
+        std::println("green: 0x{:08X}", red.get8880());
 
         //-----------------------------------------------------------------
 
@@ -180,8 +179,8 @@ main(
         const RGB8880 darkBlue{0, 0, 63};
         const RGB8880 white{255, 255, 255};
 
-        fmt::print("Dblue: 0x{:08X}\n", darkBlue.get8880());
-        fmt::print("white: 0x{:08X}\n", white.get8880());
+        std::println("Dblue: 0x{:08X}", darkBlue.get8880());
+        std::println("white: 0x{:08X}", white.get8880());
 
         Image8880 textImage(248, 16);
         textImage.clear(darkBlue);
@@ -210,7 +209,7 @@ main(
     }
     catch (std::exception& error)
     {
-        fmt::print(stderr, "Error: {}\n", error.what());
+        std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
 

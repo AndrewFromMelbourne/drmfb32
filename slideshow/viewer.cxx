@@ -25,11 +25,11 @@
 //
 //-------------------------------------------------------------------------
 
-#include <fmt/format.h>
-
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <iostream>
+#include <print>
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
@@ -319,7 +319,7 @@ Viewer::openImage()
     }
     catch (std::invalid_argument& e)
     {
-        fmt::print(stderr, "{} {}\n", m_files[m_current], e.what());
+        std::println(std::cerr, "{} {}", m_files[m_current], e.what());
     }
 
     m_enlighten = 0;

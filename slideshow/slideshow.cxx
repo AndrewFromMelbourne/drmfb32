@@ -28,10 +28,10 @@
 #include <getopt.h>
 #include <libgen.h>
 
-#include <fmt/format.h>
-
 #include <csignal>
 #include <cstring>
+#include <iostream>
+#include <print>
 
 #include "framebuffer8880.h"
 #include "image8880Jpeg.h"
@@ -70,18 +70,18 @@ signalHandler(
 
 void
 printUsage(
-    FILE* file,
+    std::ostream& stream,
     const std::string& name)
 {
-    fmt::print(file, "\n");
-    fmt::print(file, "Usage: {} <options>\n", name);
-    fmt::print(file, "\n");
-    fmt::print(file, "    --connector,-c - dri connector to use\n");
-    fmt::print(file, "    --device,-d - dri device to use\n");
-    fmt::print(file, "    --folder,-f - folder containing images\n");
-    fmt::print(file, "    --help,-h - print usage and exit\n");
-    fmt::print(file, "    --joystick,-j - joystick device\n");
-    fmt::print(file, "\n");;
+    std::println(stream, "");
+    std::println(stream, "Usage: {} <options>", name);
+    std::println(stream, "");
+    std::println(stream, "    --connector,-c - dri connector to use");
+    std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --folder,-f - folder containing images");
+    std::println(stream, "    --help,-h - print usage and exit");
+    std::println(stream, "    --joystick,-j - joystick device");
+    std::println(stream, "");;
 }
 
 //-------------------------------------------------------------------------
@@ -136,7 +136,7 @@ main(
 
         case 'h':
 
-            printUsage(stdout, program);
+            printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
@@ -149,7 +149,7 @@ main(
 
         default:
 
-            printUsage(stderr, program);
+            printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -160,7 +160,7 @@ main(
 
     if (folder.empty())
     {
-        printUsage(stderr, program);
+        printUsage(std::cerr, program);
         ::exit(EXIT_FAILURE);
     }
 
@@ -170,9 +170,9 @@ main(
     {
         if (std::signal(signal, signalHandler) == SIG_ERR)
         {
-            fmt::print(
-                stderr,
-                "Error: installing {} signal handler : {}\n",
+            std::println(
+                std::cerr,
+                "Error: installing {} signal handler : {}",
                 strsignal(signal),
                 strerror(errno));
 
@@ -209,7 +209,7 @@ main(
     }
     catch (std::exception& error)
     {
-        fmt::print(stderr, "Error: {}\n", error.what());
+        std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
 

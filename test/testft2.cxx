@@ -28,10 +28,10 @@
 #include <getopt.h>
 #include <libgen.h>
 
-#include <fmt/format.h>
-
 #include <chrono>
 #include <cstdlib>
+#include <iostream>
+#include <print>
 #include <system_error>
 #include <thread>
 
@@ -49,17 +49,17 @@ using namespace std::chrono_literals;
 
 void
 printUsage(
-    FILE* file,
+    std::ostream& stream,
     const std::string& name)
 {
-    fmt::print(file, "\n");
-    fmt::print(file, "Usage: {} <options>\n", name);
-    fmt::print(file, "\n");
-    fmt::print(file, "    --connector,-c - dri connector to use\n");
-    fmt::print(file, "    --device,-d - dri device to use\n");
-    fmt::print(file, "    --font,-f - font file to use\n");
-    fmt::print(file, "    --help,-h - print usage and exit\n");
-    fmt::print(file, "\n");
+    std::println(stream, "");
+    std::println(stream, "Usage: {} <options>", name);
+    std::println(stream, "");
+    std::println(stream, "    --connector,-c - dri connector to use");
+    std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --font,-f - font file to use");
+    std::println(stream, "    --help,-h - print usage and exit");
+    std::println(stream, "");
 }
 
 //-------------------------------------------------------------------------
@@ -120,14 +120,14 @@ main(
 
         case 'h':
 
-            printUsage(stdout, program);
+            printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
 
             break;
 
         default:
 
-            printUsage(stderr, program);
+            printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
 
             break;
@@ -165,7 +165,7 @@ main(
     }
     catch (std::exception& error)
     {
-        fmt::print(stderr, "Error: {}\n", error.what());
+        std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
 
