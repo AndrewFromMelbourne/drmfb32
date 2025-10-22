@@ -109,19 +109,6 @@ findDrmResourcesForConnector(
 //-------------------------------------------------------------------------
 
 FoundDrmResource
-findDrmResourcesForConnector(
-    fb32::FileDescriptor& fd,
-    uint32_t connectorId) noexcept
-{
-    return findDrmResourcesForConnector(fd,
-                                        connectorId,
-                                        drm::drmModeGetResources(fd));
-}
-
-
-//-------------------------------------------------------------------------
-
-FoundDrmResource
 findDrmResources(
     fb32::FileDescriptor& fd,
     uint32_t connectorId) noexcept
@@ -378,7 +365,7 @@ fb32::FrameBuffer8880::getBuffer() const noexcept
 
 //-------------------------------------------------------------------------
 
-size_t
+std::size_t
 fb32::FrameBuffer8880::getBufferSize() const noexcept
 {
     auto& dbb = m_dbs[m_dbBack];
@@ -387,7 +374,7 @@ fb32::FrameBuffer8880::getBufferSize() const noexcept
 
 //-------------------------------------------------------------------------
 
-size_t
+std::size_t
 fb32::FrameBuffer8880::offset(
     const Interface8880Point& p) const noexcept
 {
@@ -478,10 +465,8 @@ fb32::FrameBuffer8880::createDumbBuffer(
 
     //---------------------------------------------------------------------
 
-    drm_mode_map_dumb dmmd =
-    {
-        .handle = db.m_fbHandle
-    };
+    drm_mode_map_dumb dmmd;
+    dmmd.handle = db.m_fbHandle;
 
     if (drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_MAP_DUMB, &dmmd) < 0)
     {

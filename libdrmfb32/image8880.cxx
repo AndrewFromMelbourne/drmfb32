@@ -61,7 +61,7 @@ fb32::Image8880::Image8880(
     m_height{height},
     m_buffer{buffer}
 {
-    size_t minBufferSize = width * height;
+    std::size_t minBufferSize = width * height;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -82,7 +82,7 @@ fb32::Image8880::Image8880(
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    size_t minBufferSize = width * height;
+    std::size_t minBufferSize = width * height;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -92,7 +92,7 @@ fb32::Image8880::Image8880(
 
 //-------------------------------------------------------------------------
 
-size_t
+std::size_t
 fb32::Image8880::offset(
     const Interface8880Point& p) const noexcept
 {

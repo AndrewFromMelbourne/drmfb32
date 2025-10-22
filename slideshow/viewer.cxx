@@ -67,11 +67,12 @@ std::string tolower(std::string s)
 
 Viewer::Viewer(
     fb32::Interface8880& interface,
-    const std::string& folder)
+    const std::string& folder,
+    bool quality)
 :
     m_annotate{true},
     m_buffer{interface.getWidth(), interface.getHeight()},
-    m_current{-1},
+    m_current{INVALID_INDEX},
     m_directory{folder},
     m_enlighten{0},
     m_files{},
@@ -79,6 +80,7 @@ Viewer::Viewer(
     m_image{},
     m_imageProcessed{},
     m_percent{100},
+    m_quality{quality},
     m_xOffset{0},
     m_yOffset{0},
     m_zoom{0}
@@ -141,6 +143,15 @@ Viewer::annotate()
                   " ]";
 
     annotation += " " + std::to_string(m_percent) + "%";
+
+    if (m_quality)
+    {
+        annotation += " [smooth]";
+    }
+    else
+    {
+        annotation += " [fast]";
+    }
 
     if (m_zoom)
     {
@@ -297,11 +308,13 @@ Viewer::imagePrevious()
 {
     if (haveImages())
     {
-        --m_current;
-
-        if (m_current == -1)
+        if (m_current == 0)
         {
             m_current = m_files.size() - 1;
+        }
+        else
+        {
+            --m_current;
         }
 
         openImage();
@@ -423,7 +436,14 @@ Viewer::processImage()
                           m_image.getWidth();
             }
 
-            m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
+            if (m_quality)
+            {
+                m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, width, height);
+            }
+            else
+            {
+                m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
+            }
             auto percent = (100.0 * m_imageProcessed.getWidth()) /
                            m_image.getWidth();
             m_percent = static_cast<int>(0.5 + percent);

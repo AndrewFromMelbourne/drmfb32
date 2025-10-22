@@ -146,7 +146,7 @@ CpuTrace::CpuTrace(
 void
 CpuTrace::update(
     time_t now,
-    fb32::Interface8880Font& font)
+    fb32::Interface8880Font&)
 {
     const CpuStats currentStats;
     const CpuStats diff{currentStats - m_previousStats};

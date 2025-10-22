@@ -226,7 +226,7 @@ DynamicInfo::DynamicInfo(
 
 void
 DynamicInfo::init(
-    fb32::Interface8880Font& font)
+    fb32::Interface8880Font&)
 {
 }
 

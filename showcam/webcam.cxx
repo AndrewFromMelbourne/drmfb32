@@ -124,10 +124,9 @@ bool
 fb32::Webcam::showFrame(
     Interface8880& image)
 {
-    v4l2_buffer buffer{
-        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-        .memory = V4L2_MEMORY_MMAP
-    };
+    v4l2_buffer buffer;
+    buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    buffer.memory = V4L2_MEMORY_MMAP;
 
     if (::ioctl(m_fd.fd(), VIDIOC_DQBUF, &buffer) == -1)
     {
@@ -210,7 +209,9 @@ fb32::Webcam::chooseBestFit(
 {
     std::vector<Dimensions> dimensions;
 
-    v4l2_frmsizeenum frmsize{ .index = 0, .pixel_format = m_format };
+    v4l2_frmsizeenum frmsize;
+    frmsize.index = 0;
+    frmsize.pixel_format = m_format;
 
     while (::ioctl(m_fd.fd(), VIDIOC_ENUM_FRAMESIZES, &frmsize) == 0)
     {
@@ -266,14 +267,14 @@ fb32::Webcam::chooseBestFit(
     {
         const auto& sw = frmsize.stepwise;
 
-        if ((image.getWidth() < sw.min_width) or
-            (image.getHeight() < sw.min_height))
+        if ((image.getWidth() < static_cast<int>(sw.min_width)) or
+            (image.getHeight() < static_cast<int>(sw.min_height)))
         {
             m_dimensions.width = sw.min_width;
             m_dimensions.height = sw.min_height;
         }
-        else if ((image.getWidth() > sw.max_width) or
-                 (image.getHeight() > sw.max_height))
+        else if ((image.getWidth() > static_cast<int>(sw.max_width)) or
+                 (image.getHeight() > static_cast<int>(sw.max_height)))
         {
             m_dimensions.width = sw.max_width;
             m_dimensions.height = sw.max_height;
@@ -298,7 +299,8 @@ bool
 fb32::Webcam::chooseFormat() noexcept
 {
     bool result = false;
-    v4l2_fmtdesc fmtdesc{ .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+    v4l2_fmtdesc fmtdesc;
+    fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     for (fmtdesc.index = 0 ;
          ::ioctl(m_fd.fd(), VIDIOC_ENUM_FMT, &fmtdesc) == 0 ;
@@ -327,7 +329,7 @@ fb32::Webcam::chooseFormat() noexcept
 bool
 fb32::Webcam::convertMjpeg(
     const uint8_t* data,
-    size_t length)
+    std::size_t length)
 {
     bool result = false;
 
@@ -358,12 +360,12 @@ fb32::Webcam::convertMjpeg(
 bool
 fb32::Webcam::convertYuyv(
     const uint8_t* data,
-    size_t length)
+    std::size_t length)
 {
     auto buffer = m_image.getBuffer().begin();
-    constexpr size_t BytesPerYuyv{4};
+    constexpr std::size_t BytesPerYuyv{4};
 
-    for (size_t i = 0 ; i < length ; i += BytesPerYuyv)
+    for (auto i = 0U ; i < length ; i += BytesPerYuyv)
     {
         const int y1 = data[0] - 16;
         const int u = data[1] - 128;
@@ -420,12 +422,10 @@ bool fb32::Webcam::initBuffers() noexcept
     constexpr int NUMBER_OF_BUFFERS_TO_REQUEST{4};
     constexpr int MINIMUM_BUFFERS{2};
 
-    struct v4l2_requestbuffers reqbuffers
-    {
-        .count = NUMBER_OF_BUFFERS_TO_REQUEST,
-        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-        .memory = V4L2_MEMORY_MMAP
-    };
+    struct v4l2_requestbuffers reqbuffers;
+    reqbuffers.count = NUMBER_OF_BUFFERS_TO_REQUEST;
+    reqbuffers.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    reqbuffers.memory = V4L2_MEMORY_MMAP;
 
     if (::ioctl(m_fd.fd(), VIDIOC_REQBUFS, &reqbuffers) == -1)
     {
@@ -441,12 +441,10 @@ bool fb32::Webcam::initBuffers() noexcept
 
     for (unsigned int i = 0 ; i < numberOfVideoBuffers ; ++i)
     {
-        v4l2_buffer buffer
-        {
-            .index = i,
-            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-            .memory = V4L2_MEMORY_MMAP
-        };
+        v4l2_buffer buffer;
+        buffer.index = i;
+        buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buffer.memory = V4L2_MEMORY_MMAP;
 
         if (::ioctl(m_fd.fd(), VIDIOC_QUERYBUF, &buffer) == -1)
         {
@@ -475,12 +473,10 @@ bool fb32::Webcam::initBuffers() noexcept
 
     for (unsigned int i = 0 ; i < numberOfVideoBuffers ; ++i)
     {
-        v4l2_buffer buffer
-        {
-            .index = i,
-            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-            .memory = V4L2_MEMORY_MMAP
-        };
+        v4l2_buffer buffer;
+        buffer.index = i;
+        buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buffer.memory = V4L2_MEMORY_MMAP;
 
         if (::ioctl(m_fd.fd(), VIDIOC_QBUF, &buffer) == -1)
         {
@@ -551,7 +547,8 @@ fb32::Webcam::setFPS(
         return false;
     }
 
-    struct v4l2_streamparm streamparm{ .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
+    struct v4l2_streamparm streamparm;
+    streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     if (::ioctl(m_fd.fd(), VIDIOC_G_PARM, &streamparm) == -1)
     {

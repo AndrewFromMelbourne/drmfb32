@@ -29,6 +29,7 @@
 
 // ------------------------------------------------------------------------
 
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,7 @@ class Viewer
 {
 public:
 
-    Viewer(fb32::Interface8880& interface, const std::string& folder);
+    Viewer(fb32::Interface8880& interface, const std::string& folder, bool quality);
     ~Viewer();
 
     Viewer(const Viewer&) = delete;
@@ -74,13 +75,13 @@ private:
     [[nodiscard]] int zoomedHeight() const noexcept;
     [[nodiscard]] int zoomedWidth() const noexcept;
 
-    static const int INVALID_INDEX{-1};
+    static const std::size_t INVALID_INDEX{std::numeric_limits<std::size_t>::max()};
     static const int MAX_ZOOM{5};
     static const int SCALE_OVERSIZED{0};
 
     bool m_annotate;
     fb32::Image8880 m_buffer;
-    int m_current;
+    std::size_t m_current;
     std::string m_directory;
     int m_enlighten;
     std::vector<std::string> m_files;
@@ -88,6 +89,7 @@ private:
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
     int m_percent;
+    bool m_quality;
     int m_xOffset;
     int m_yOffset;
     int m_zoom;

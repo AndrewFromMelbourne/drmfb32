@@ -92,8 +92,8 @@ private:
 
     bool chooseBestFit(Interface8880& image);
     bool chooseFormat() noexcept;
-    bool convertMjpeg(const uint8_t* data, size_t length);
-    bool convertYuyv(const uint8_t* data, size_t length);
+    bool convertMjpeg(const uint8_t* data, std::size_t length);
+    bool convertYuyv(const uint8_t* data, std::size_t length);
     bool hasVideoCapabilities() const noexcept;
     bool initBuffers() noexcept;
     void initResizedImage(Interface8880& image);

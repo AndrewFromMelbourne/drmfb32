@@ -47,7 +47,7 @@ class Life
 {
 public:
 
-    static constexpr size_t c_aliveCellShift{4};
+    static constexpr std::size_t c_aliveCellShift{4};
     static constexpr uint8_t c_aliveCellMask{1 << c_aliveCellShift};
 
     enum CellState

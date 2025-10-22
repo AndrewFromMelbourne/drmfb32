@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(drmfb32)
 
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -143,7 +145,8 @@ if (TURBOJPEG_FOUND)
 add_executable(showcam showcam/showcam.cxx
                        showcam/webcam.cxx)
 target_link_libraries(showcam drmfb32 ${DRM_LIBRARIES}
-                                      ${TURBOJPEG_LIBRARIES})
+                                      ${TURBOJPEG_LIBRARIES}
+                                      ${BS_THREAD_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
@@ -173,7 +176,8 @@ add_executable(slideshow slideshow/slideshow.cxx
                          slideshow/viewer.cxx)
 
 target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
-                                        ${TURBOJPEG_LIBRARIES})
+                                        ${TURBOJPEG_LIBRARIES}
+                                        ${BS_THREAD_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
@@ -213,7 +217,8 @@ target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
 #--------------------------------------------------------------------------
 
 add_executable(testResize test/testResize.cxx)
-target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES}
+                                         ${BS_THREAD_LIBRARIES})
 
 #--------------------------------------------------------------------------
 

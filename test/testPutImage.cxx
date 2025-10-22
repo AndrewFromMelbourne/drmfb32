@@ -119,7 +119,7 @@ main(
 
     try
     {
-        FrameBuffer8880 fb{device};
+        FrameBuffer8880 fb{device, connector};
         fb.clearBuffers();
 
         //-----------------------------------------------------------------

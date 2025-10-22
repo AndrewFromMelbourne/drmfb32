@@ -129,7 +129,7 @@ NetworkTrace::NetworkTrace(
 void
 NetworkTrace::update(
     time_t now,
-    fb32::Interface8880Font& font)
+    fb32::Interface8880Font&)
 {
     const NetworkStats currentStats;
     const NetworkStats diff{currentStats - m_previousStats};

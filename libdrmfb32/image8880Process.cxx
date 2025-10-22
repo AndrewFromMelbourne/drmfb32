@@ -34,6 +34,10 @@
 #include "image8880.h"
 #include "image8880Process.h"
 
+#ifdef WITH_BS_THREAD_POOL
+#include "BS_thread_pool.hpp"
+#endif
+
 //-------------------------------------------------------------------------
 
 using size_type = std::vector<uint32_t>::size_type;
@@ -79,14 +83,30 @@ private:
 
 //-------------------------------------------------------------------------
 
+#ifdef WITH_BS_THREAD_POOL
+
+BS::thread_pool& threadPool()
+{
+    static BS::thread_pool s_threadPool;
+
+    return s_threadPool;
+}
+
+#endif
+
+//-------------------------------------------------------------------------
+
 }
 
 //=========================================================================
 
-fb32::Image8880
-fb32::boxBlur(
+void
+boxBlurRows(
     const fb32::Interface8880& input,
-    int radius)
+    fb32::Image8880& rb,
+    int radius,
+    int jStart,
+    int jEnd)
 {
     auto clamp = [](int value, int end) -> int
     {
@@ -94,61 +114,115 @@ fb32::boxBlur(
     };
 
     const auto diameter = 2 * radius + 1;
+    const auto width = input.getWidth();
+    auto inputi = input.getBuffer().data();
+    auto rbi = rb.getBuffer().data();
 
-    // row blurred image
-    fb32::Image8880 rb{input.getWidth(), input.getHeight()};
-
-    auto inputi = input.getBuffer().begin();
-    auto rbi = rb.getBuffer().begin();
-
-    for (auto j = 0 ; j < input.getHeight() ; ++j)
+    for (auto j = jStart ; j < jEnd ; ++j)
     {
         AccumulateRGB8880 argb;
 
         for (auto k = -radius - 1 ; k < radius ; ++k)
         {
-            const Point p{clamp(k, input.getWidth()), j};
+            const Point p{clamp(k, width), j};
             argb.add(fb32::RGB8880(*(inputi + input.offset(p))));
         }
 
-        for (auto i = 0 ; i < input.getWidth() ; ++i)
+        for (auto i = 0 ; i < width ; ++i)
         {
-            Point p{clamp(i + radius, input.getWidth()), j};
+            Point p{clamp(i + radius, width), j};
             argb.add(fb32::RGB8880(*(inputi + input.offset(p))));
 
-            p = Point(clamp(i - radius - 1, input.getWidth()), j);
+            p = Point(clamp(i - radius - 1, width), j);
             argb.subtract(fb32::RGB8880(*(inputi + input.offset(p))));
 
             p = Point(i, j);
             *(rbi + rb.offset(p)) = argb.average(diameter).get8880();
         }
     }
+}
 
-    fb32::Image8880 output{rb.getWidth(), rb.getHeight()};
-    auto outputi = output.getBuffer().begin();
+void
+boxBlurColumns(
+    const fb32::Image8880& rb,
+    fb32::Image8880& output,
+    int radius,
+    int iStart,
+    int iEnd)
+{
+    auto clamp = [](int value, int end) -> int
+    {
+        return std::clamp(value, 0, end - 1);
+    };
 
-    for (auto i = 0 ; i < input.getWidth() ; ++i)
+    const auto diameter = 2 * radius + 1;
+    const auto height = rb.getHeight();
+    const auto rbi = rb.getBuffer().data();
+    auto outputi = output.getBuffer().data();
+
+    for (auto i = iStart ; i < iEnd ; ++i)
     {
         AccumulateRGB8880 argb;
 
         for (auto k = -radius - 1 ; k < radius ; ++k)
         {
-            const Point p{i, clamp(k, rb.getHeight())};
+            const Point p{i, clamp(k, height)};
             argb.add(fb32::RGB8880(*(rbi + rb.offset(p))));
         }
 
-        for (auto j = 0 ; j < rb.getHeight() ; ++j)
+        for (auto j = 0 ; j < height ; ++j)
         {
-            Point p{i, clamp(j + radius, rb.getHeight())};
+            Point p{i, clamp(j + radius, height)};
             argb.add(fb32::RGB8880(*(rbi + rb.offset(p))));
 
-            p = Point(i, clamp(j - radius - 1, rb.getHeight()));
+            p = Point(i, clamp(j - radius - 1, height));
             argb.subtract(fb32::RGB8880(*(rbi + rb.offset(p))));
 
             p = Point(i, j);
             *(outputi + output.offset(p)) = argb.average(diameter).get8880();
         }
     }
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::boxBlur(
+    const fb32::Interface8880& input,
+    int radius)
+{
+    const auto width = input.getWidth();
+    const auto height = input.getHeight();
+
+    fb32::Image8880 rb{width, height};
+    fb32::Image8880 output{width, height};
+
+#ifdef WITH_BS_THREAD_POOL
+
+    auto& tPool = threadPool();
+
+    auto iterateRows = [&input, &rb, radius](int start, int end)
+    {
+        boxBlurRows(input, rb, radius, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, height, iterateRows);
+    tPool.wait();
+
+    auto iterateColumns = [&rb, &output, radius](int start, int end)
+    {
+        boxBlurColumns(rb, output, radius, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, width, iterateColumns);
+    tPool.wait();
+
+#else
+
+    boxBlurRows(input, rb, radius, 0, height);
+    boxBlurColumns(rb, output, radius, 0, width);
+
+#endif
 
     return output;
 }
@@ -178,13 +252,13 @@ fb32::enlighten(
     const auto minI = 1.0 / flerp(1.0, 10.0, strength2);
     const auto maxI = 1.0 / flerp(1.0, 1.111, strength2);
 
-    auto mbi = mb.getBuffer().begin();
-    auto outputi = output.getBuffer().begin();
+    auto mbi = mb.getBuffer().data();
+    auto outputi = output.getBuffer().data();
 
     for (auto pixel : input.getBuffer())
     {
         auto c = fb32::RGB8880(pixel);
-        auto max = fb32::RGB8880(*(mbi++)).getRed();
+        const auto max = fb32::RGB8880(*(mbi++)).getRed();
         const auto illumination = std::clamp(max / 255.0, minI, maxI);
 
         if (illumination < maxI)
@@ -281,10 +355,12 @@ fb32::resizeNearestNeighbour(
 
 //-------------------------------------------------------------------------
 
-fb32::Image8880&
-fb32::resizeToBilinearInterpolation(
+void
+rowsBilinearInterpolation(
     const fb32::Interface8880& input,
-    fb32::Image8880& output)
+    fb32::Image8880& output,
+    int jStart,
+    int jEnd)
 {
     const auto xScale = (output.getWidth() > 1)
                       ? (input.getWidth() - 1.0f) / (output.getWidth() - 1.0f)
@@ -293,7 +369,7 @@ fb32::resizeToBilinearInterpolation(
                       ? (input.getHeight() - 1.0f) / (output.getHeight() - 1.0f)
                       : 0.0f;
 
-    for (int j = 0; j < output.getHeight(); ++j)
+    for (int j = jStart; j < jEnd; ++j)
     {
         for (int i = 0; i < output.getWidth(); ++i)
         {
@@ -328,43 +404,67 @@ fb32::resizeToBilinearInterpolation(
             };
 
             fb32::RGB8880 rgb{evaluate(&fb32::RGB8880::getRed),
-                              evaluate(&fb32::RGB8880::getGreen),
-                              evaluate(&fb32::RGB8880::getBlue)};
+                                evaluate(&fb32::RGB8880::getGreen),
+                                evaluate(&fb32::RGB8880::getBlue)};
 
             output.setPixelRGB(Point{i, j}, rgb);
         }
     }
-
-    return output;
 }
 
 //-------------------------------------------------------------------------
 
 fb32::Image8880&
-fb32::resizeToLanczos3Interpolation(
+fb32::resizeToBilinearInterpolation(
     const fb32::Interface8880& input,
     fb32::Image8880& output)
 {
-    constexpr int a{3};
-
-    auto kernel = [](float x, int a) -> float
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output](int start, int end)
     {
-        const auto pi = std::numbers::pi_v<float>;
-
-        if (x == 0.0f)
-        {
-            return 1.0f;
-        }
-
-        if (x < -a or x > a)
-        {
-            return 0.0f;
-        }
-
-        return (a * std::sin(pi * x) * std::sin(pi * x / a)) /
-               (pi * pi * x * x);
+        rowsBilinearInterpolation(input, output, start, end);
     };
 
+    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.wait();
+#else
+    rowsBilinearInterpolation(input, output, 0, output.getHeight());
+#endif
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+float
+lanczosKernel(float x, int a)
+{
+    const auto pi = std::numbers::pi_v<float>;
+
+    if (x == 0.0f)
+    {
+        return 1.0f;
+    }
+
+    if (x < -a or x > a)
+    {
+        return 0.0f;
+    }
+
+    return (a * std::sin(pi * x) * std::sin(pi * x / a)) /
+            (pi * pi * x * x);
+}
+
+//-------------------------------------------------------------------------
+
+void
+rowsLanczos3Interpolation(
+    const fb32::Interface8880& input,
+    fb32::Image8880& output,
+    int jStart,
+    int jEnd)
+{
+    constexpr int a{3};
     const auto xScale = (output.getWidth() > 1)
                       ? (input.getWidth() - 1.0f) / (output.getWidth() - 1.0f)
                       : 0.0f;
@@ -372,7 +472,7 @@ fb32::resizeToLanczos3Interpolation(
                       ? (input.getHeight() - 1.0f) / (output.getHeight() - 1.0f)
                       : 0.0f;
 
-    for (int j = 0; j < output.getHeight(); ++j)
+    for (int j = jStart; j < jEnd; ++j)
     {
         for (int i = 0; i < output.getWidth(); ++i)
         {
@@ -392,12 +492,12 @@ fb32::resizeToLanczos3Interpolation(
             for (int y = yLow; y <= yHigh; ++y)
             {
                 const auto dy = yMid - y;
-                const auto yKernelValue = kernel(dy, a);
+                const auto yKernelValue = lanczosKernel(dy, a);
 
                 for (int x = xLow; x <= xHigh; ++x)
                 {
                     const auto dx = xMid - x;
-                    const auto weight = kernel(dx, a) * yKernelValue;
+                    const auto weight = lanczosKernel(dx, a) * yKernelValue;
                     weightsSum += weight;
 
                     auto rgb = *input.getPixelRGB(Point{x, y});
@@ -412,14 +512,67 @@ fb32::resizeToLanczos3Interpolation(
             const auto blue = std::clamp(blueSum / weightsSum, 0.0f, 255.0f);
 
             fb32::RGB8880 rgb{static_cast<uint8_t>(red),
-                              static_cast<uint8_t>(green),
-                              static_cast<uint8_t>(blue)};
+                                static_cast<uint8_t>(green),
+                                static_cast<uint8_t>(blue)};
 
             output.setPixelRGB(Point{i, j}, rgb);
         }
     }
+}
 
+//-------------------------------------------------------------------------
+
+fb32::Image8880&
+fb32::resizeToLanczos3Interpolation(
+    const fb32::Interface8880& input,
+    fb32::Image8880& output)
+{
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output](int start, int end)
+    {
+        rowsLanczos3Interpolation(input, output, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.wait();
+#else
+    rowsLanczos3Interpolation(input, output, 0, output.getHeight());
+#endif
     return output;
+}
+
+//-------------------------------------------------------------------------
+
+void
+rowsNearestNeighbour(
+    const fb32::Interface8880& input,
+    fb32::Image8880& output,
+    int jStart,
+    int jEnd)
+{
+    const auto inputWidth = input.getWidth();
+    const auto inputHeight = input.getHeight();
+    const auto outputWidth = output.getWidth();
+    const auto outputHeight = output.getHeight();
+
+    const int a = (outputWidth > inputWidth) ? 0 : 1;
+    const int b = (output.getHeight() > inputHeight) ? 0 : 1;
+
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        const int y = (j * (inputHeight - b)) / (outputHeight - b);
+        for (int i = 0 ; i < outputWidth ; ++i)
+        {
+            const int x = (i * (inputWidth - a)) / (outputWidth - a);
+            auto pixel{input.getPixel(Point{x, y})};
+
+            if (pixel.has_value())
+            {
+                output.setPixel(Point{i, j}, pixel.value());
+            }
+        }
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -429,23 +582,18 @@ fb32::resizeToNearestNeighbour(
     const fb32::Interface8880& input,
     fb32::Image8880& output)
 {
-    const int a = (output.getWidth() > input.getWidth()) ? 0 : 1;
-    const int b = (output.getHeight() > input.getHeight()) ? 0 : 1;
-
-    for (int j = 0 ; j < output.getHeight() ; ++j)
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output](int start, int end)
     {
-        const int y = (j * (input.getHeight() - b)) / (output.getHeight() - b);
-        for (int i = 0 ; i < output.getWidth() ; ++i)
-        {
-            const int x = (i * (input.getWidth() - a)) / (output.getWidth() - a);
-            auto pixel{input.getPixel(Point{x, y})};
+        rowsNearestNeighbour(input, output, start, end);
+    };
 
-            if (pixel.has_value())
-            {
-                output.setPixel(Point{i, j}, pixel.value());
-            }
-        }
-    }
+    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.wait();
+#else
+    rowsNearestNeighbour(input, output, 0, output.getHeight());
+#endif
 
     return output;
 }
@@ -457,19 +605,22 @@ fb32::scaleUp(
     const fb32::Interface8880& input,
     uint8_t scale)
 {
-    fb32::Image8880 output{input.getWidth() * scale, input.getHeight() * scale};
+    const auto width = input.getWidth();
+    const auto height = input.getHeight();
+    auto inputi = input.getBuffer().data();
+    fb32::Image8880 output{width * scale, height * scale};
 
-    for (int j = 0 ; j < input.getHeight() ; ++j)
+    for (int j = 0 ; j < height ; ++j)
     {
-        for (int i = 0 ; i < input.getWidth() ; ++i)
+        for (int i = 0 ; i < width ; ++i)
         {
-            auto pixel = input.getPixel(Point{i, j});
+            auto pixel = *(inputi++);
             for (int b = 0 ; b < scale ; ++b)
             {
                 for (int a = 0 ; a < scale ; ++a)
                 {
-                    Point p{ (i * scale) + a, (j * scale) + b};
-                    output.setPixel(p, *pixel);
+                    Point p{(i * scale) + a, (j * scale) + b};
+                    output.setPixel(p, pixel);
                 }
             }
         }

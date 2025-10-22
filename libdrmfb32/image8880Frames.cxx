@@ -67,7 +67,7 @@ fb32::Image8880Frames::Image8880Frames(
     m_numberOfFrames{numberOfFrames},
     m_buffer{buffer}
 {
-    size_t minBufferSize = width * height * numberOfFrames;
+    std::size_t minBufferSize = width * height * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -91,7 +91,7 @@ fb32::Image8880Frames::Image8880Frames(
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    size_t minBufferSize = width * height * numberOfFrames;
+    std::size_t minBufferSize = width * height * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -114,7 +114,7 @@ fb32::Image8880Frames::setFrame(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Image8880Frames::setPixel(
+fb32::Image8880Frames::setFramePixel(
     const Interface8880Point& p,
     uint32_t rgb,
     uint8_t frame)
@@ -131,7 +131,7 @@ fb32::Image8880Frames::setPixel(
 
 //-------------------------------------------------------------------------
 
-size_t
+std::size_t
 fb32::Image8880Frames::offset(
     const Interface8880Point& p,
     uint8_t frame) const noexcept

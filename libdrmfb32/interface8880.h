@@ -70,7 +70,7 @@ public:
     [[nodiscard]] std::span<uint32_t> getRow(int y);
     [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
 
-    [[nodiscard]] virtual size_t offset(const Interface8880Point& p) const noexcept = 0;
+    [[nodiscard]] virtual std::size_t offset(const Interface8880Point& p) const noexcept = 0;
 
     bool
     setPixelRGB(
