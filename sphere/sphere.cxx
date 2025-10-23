@@ -51,7 +51,13 @@ Sphere::Sphere(int size)
     m_size{size},
     m_image(size, size),
     m_ambient{ 0.3 },
+#ifdef WITH_BS_THREAD_POOL
+    m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) },
+    m_threadPool()
+#else
     m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) }
+    m_image(size, size)
+#endif
 {
 }
 
@@ -68,9 +74,29 @@ Sphere::init()
 void
 Sphere::update()
 {
-    auto radius = m_size / 2;
+#ifdef WITH_BS_THREAD_POOL
+    auto iterateRows = [this](int start, int end)
+    {
+        updateRows(start, end);
+    };
 
-    for (auto j = 0 ; j < m_size ; ++j)
+    m_threadPool.detach_blocks<int>(0, m_size, iterateRows);
+    m_threadPool.wait();
+#else
+    updateRows(0, m_size);
+#endif
+}
+
+//-------------------------------------------------------------------------
+
+void
+Sphere::updateRows(
+    int jStart,
+    int jEnd)
+{
+    const auto radius = m_size / 2;
+
+    for (auto j = jStart; j < jEnd; ++j)
     {
         const double y = double(radius - j) / radius;
         for (auto i = 0 ; i < m_size ; ++i)
@@ -98,7 +124,6 @@ Sphere::update()
             m_image.setPixelRGB(p, RGB8880(grey, grey, grey));
         }
     }
-
 }
 
 //-------------------------------------------------------------------------

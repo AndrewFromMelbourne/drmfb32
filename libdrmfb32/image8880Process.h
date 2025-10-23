@@ -29,13 +29,6 @@
 
 //-------------------------------------------------------------------------
 
-#include <cstddef>
-#include <cstdint>
-#include <initializer_list>
-#include <utility>
-#include <span>
-#include <vector>
-
 #include "image8880.h"
 #include "interface8880.h"
 #include "rgb8880.h"
@@ -58,8 +51,8 @@ enlighten(
     const Interface8880& input,
     double strength);
 
-[[nodiscard]]
-Image8880 maxRGB(
+[[nodiscard]] Image8880
+maxRGB(
     const Interface8880& input);
 
 [[nodiscard]] Image8880

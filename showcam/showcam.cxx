@@ -95,7 +95,7 @@ main(
 {
     uint32_t connector{0};
     std::string device{""};
-    std::string program{basename(argv[0])};
+    const std::string program{basename(argv[0])};
     bool fitToScreen{false};
     int requestedFPS{0};
     std::string videoDevice{"/dev/video0"};

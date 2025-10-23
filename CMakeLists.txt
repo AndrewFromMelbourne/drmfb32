@@ -154,13 +154,16 @@ endif()
 if (TURBOJPEG_FOUND)
 add_executable(showjpeg showjpeg/showjpeg.cxx)
 target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
-                                       ${TURBOJPEG_LIBRARIES})
+                                       ${TURBOJPEG_LIBRARIES}
+                                       ${BS_THREAD_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------
 
 add_executable(showqoi showqoi/showqoi.cxx)
-target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES})
+target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES}
+                                      ${BS_THREAD_LIBRARIES})
+
 
 #--------------------------------------------------------------------------
 

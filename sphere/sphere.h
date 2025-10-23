@@ -36,6 +36,10 @@
 #include "framebuffer8880.h"
 #include "image8880.h"
 
+#ifdef WITH_BS_THREAD_POOL
+#include "BS_thread_pool.hpp"
+#endif
+
 //-------------------------------------------------------------------------
 
 using vector3 = std::array<double, 3>;
@@ -56,8 +60,13 @@ public:
 
 private:
 
+    void updateRows(int jStart, int jEnd);
+
     int m_size;
     fb32::Image8880 m_image;
     double m_ambient;
     vector3 m_light;
+#ifdef WITH_BS_THREAD_POOL
+    BS::thread_pool m_threadPool;
+#endif
 };

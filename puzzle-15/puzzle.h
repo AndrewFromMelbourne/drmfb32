@@ -50,7 +50,7 @@ public:
         int y;
     };
 
-    Puzzle();
+    explicit Puzzle(bool fitToScreen);
 
     void init();
     bool update(fb32::Joystick& js);
@@ -66,9 +66,11 @@ private:
     static constexpr int c_puzzleHeight{4};
     static constexpr int c_boardSize{c_puzzleWidth * c_puzzleHeight};
 
+    Location m_blankLocation;
     std::array<uint8_t, c_boardSize> m_board;
+    bool m_fitToScreen;
+    fb32::Image8880 m_image;
     std::array<fb32::Image8880, c_tileCount> m_tileBuffers;
     fb32::Image8880 m_tileSolved;
-    Location m_blankLocation;
 };
 

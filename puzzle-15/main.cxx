@@ -64,6 +64,7 @@ printUsage(
     std::println(stream, "");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --fitToScreen,-f - fit puzzle to screen");
     std::println(stream, "    --help,-h - print usage and exit");
     std::println(stream, "    --joystick,-j - joystick device");
     std::println(stream, "");
@@ -78,15 +79,17 @@ main(
 {
     uint32_t connector{0};
     std::string device{};
-    std::string program{basename(argv[0])};
+    bool fitToScreen{false};
     std::string joystick{defaultJoystick};
+    const std::string program{basename(argv[0])};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:hj:";
+    static const char* sopts = "c:d:fhj:";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
+        { "fitToScreen", no_argument, nullptr, 'f' },
         { "device", required_argument, nullptr, 'd' },
         { "help", no_argument, nullptr, 'h' },
         { "joystick", required_argument, nullptr, 'j' },
@@ -108,6 +111,12 @@ main(
         case 'd':
 
             device = optarg;
+
+            break;
+
+        case 'f':
+
+            fitToScreen = true;
 
             break;
 
@@ -143,7 +152,7 @@ main(
         FrameBuffer8880 fb{device, connector};
         fb.clearBuffers(RGB8880{0, 0, 0});
 
-        Puzzle puzzle;
+        Puzzle puzzle{fitToScreen};
         puzzle.init();
         puzzle.draw(fb);
         fb.update();

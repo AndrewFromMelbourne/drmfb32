@@ -71,7 +71,7 @@ main(
     int argc,
     char *argv[])
 {
-    std::string program = basename(argv[0]);
+    const std::string program = basename(argv[0]);
     std::string joystick = defaultJoystick;
 
     //---------------------------------------------------------------------

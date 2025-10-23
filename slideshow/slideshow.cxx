@@ -94,7 +94,7 @@ main(
 {
     uint32_t connector{0};
     std::string device{};
-    std::string program{basename(argv[0])};
+    const std::string program{basename(argv[0])};
     std::string folder{};
     std::string joystick{defaultJoystick};
     bool quality{false};
@@ -109,7 +109,7 @@ main(
         { "folder", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { "joystick", required_argument, nullptr, 'j' },
-        { "quality", required_argument, nullptr, 'q' },
+        { "quality", no_argument, nullptr, 'q' },
         { nullptr, no_argument, nullptr, 0 }
     };
 

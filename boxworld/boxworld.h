@@ -74,19 +74,19 @@ public:
 
     //---------------------------------------------------------------------
 
-    Boxworld();
+    explicit Boxworld(bool fitToScreen);
 
     void init();
     void update(fb32::Joystick& js);
-    void draw(fb32::FrameBuffer8880& fb, fb32::Interface8880Font& font);
+    void draw(fb32::Interface8880& fb, fb32::Interface8880Font& font);
 
 private:
 
     void findPlayer();
     void swapPieces(const Location& location1, const Location& location2);
     void isLevelSolved();
-    void drawBoard(fb32::FrameBuffer8880& fb);
-    void drawText(fb32::FrameBuffer8880& fb, fb32::Interface8880Font& font);
+    void drawBoard(fb32::Interface8880& fb);
+    void drawText(fb32::Interface8880& fb, fb32::Interface8880Font& font);
 
     //---------------------------------------------------------------------
 
@@ -102,11 +102,14 @@ private:
     std::array<fb32::Image8880Frames, c_tileCount> m_tileBuffers;
     fb32::Image8880 m_topTextImage;
     fb32::Image8880 m_bottomTextImage;
+    fb32::Image8880 m_image;
 
     fb32::RGB8880 m_textRGB;
     fb32::RGB8880 m_boldRGB;
     fb32::RGB8880 m_disabledRGB;
     fb32::RGB8880 m_solvedRGB;
     fb32::RGB8880 m_backgroundRGB;
+
+    bool m_fitToScreen;
 };
 

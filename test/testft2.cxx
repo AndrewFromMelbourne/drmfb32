@@ -55,6 +55,7 @@ printUsage(
     std::println(stream, "");
     std::println(stream, "Usage: {} <options>", name);
     std::println(stream, "");
+    std::println(stream, "    --character,-C - index character to draw");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
     std::println(stream, "    --font,-f - font file to use");
@@ -71,7 +72,7 @@ main(
 {
     uint32_t connector{0};
     std::string device{};
-    std::string program = basename(argv[0]);
+    const std::string program = basename(argv[0]);
     std::string font{};
     uint32_t c{'A'};
 

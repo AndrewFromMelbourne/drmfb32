@@ -26,6 +26,7 @@
 //-------------------------------------------------------------------------
 
 #include "image8880Font8x16.h"
+#include "image8880Process.h"
 
 #include "boxworld.h"
 #include "images.h"
@@ -36,7 +37,7 @@ using namespace fb32;
 
 //-------------------------------------------------------------------------
 
-Boxworld::Boxworld()
+Boxworld::Boxworld(bool fitToScreen)
 :
     m_level{0},
     m_levelSolved{false},
@@ -58,11 +59,13 @@ Boxworld::Boxworld()
         }),
     m_topTextImage{ 480, 20 },
     m_bottomTextImage{ 480, 40 },
+    m_image{ 480, 480 },
     m_textRGB(255, 255, 255),
     m_boldRGB(255, 255, 0),
     m_disabledRGB(170, 170, 170),
     m_solvedRGB(255, 0, 255),
-    m_backgroundRGB(0, 0, 0)
+    m_backgroundRGB(0, 0, 0),
+    m_fitToScreen{fitToScreen}
 {
 }
 
@@ -159,20 +162,45 @@ Boxworld::update(Joystick& js)
 
 void
 Boxworld::draw(
-    FrameBuffer8880& fb,
+    Interface8880& fb,
     Interface8880Font& font)
 {
-    drawBoard(fb);
-    drawText(fb, font);
+    drawBoard(m_image);
+    drawText(m_image, font);
+
+    const auto imageWidth = m_image.getWidth();
+    const auto imageHeight = m_image.getHeight();
+
+    const auto fbWidth = fb.getWidth();
+    const auto fbHeight = fb.getHeight();
+
+    const auto zoom = std::min(fbWidth / imageWidth, fbHeight / imageHeight);
+
+    if ((zoom > 1) and m_fitToScreen)
+    {
+        auto zoomed = scaleUp(m_image, zoom);
+
+        const int xOffset = (fbWidth - zoomed.getWidth()) / 2;
+        const int yOffset = (fbHeight - zoomed.getHeight()) / 2;
+
+        const Interface8880Point p{ xOffset, yOffset };
+        fb.putImage(p, zoomed);
+    }
+    else
+    {
+        const int xOffset = (fbWidth - imageWidth) / 2;
+        const int yOffset = (fbHeight - imageHeight) / 2;
+
+        const Interface8880Point p{ xOffset, yOffset };
+        fb.putImage(p, m_image);
+    }
 }
 
 //-------------------------------------------------------------------------
 
 void
-Boxworld::drawBoard(FrameBuffer8880& fb)
+Boxworld::drawBoard(Interface8880& fb)
 {
-    constexpr int width = Level::c_levelWidth * c_tileWidth;
-    const int xOffset = (fb.getWidth() - width) / 2;
     constexpr int yOffset = 20;
     static uint8_t frame = 0;
 
@@ -190,7 +218,7 @@ Boxworld::drawBoard(FrameBuffer8880& fb)
 
             fb.putImage(
                 Interface8880Point{
-                    (i * c_tileWidth) + xOffset,
+                    (i * c_tileWidth),
                     (j * c_tileHeight) + yOffset
                 },
                 tile);
@@ -211,13 +239,9 @@ Boxworld::drawBoard(FrameBuffer8880& fb)
 
 void
 Boxworld::drawText(
-    FrameBuffer8880& fb,
+    Interface8880& fb,
     Interface8880Font& font)
 {
-    const int xOffset = (fb.getWidth() - m_topTextImage.getWidth()) / 2;
-
-    //---------------------------------------------------------------------
-
     m_topTextImage.clear(m_backgroundRGB);
 
     Interface8880Point position{ 2, 2 };
@@ -229,7 +253,7 @@ Boxworld::drawText(
         position = font.drawString(position, " [solved]", m_solvedRGB, m_topTextImage);
     }
 
-    fb.putImage(Interface8880Point{ xOffset, 0 }, m_topTextImage);
+    fb.putImage(Interface8880Point{ 0, 0 }, m_topTextImage);
 
     //---------------------------------------------------------------------
 
@@ -262,7 +286,7 @@ Boxworld::drawText(
     position = font.drawString(position, "(B): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "previous level", previousRGB, m_bottomTextImage);
 
-    fb.putImage(Interface8880Point{ xOffset, 440 }, m_bottomTextImage);
+    fb.putImage(Interface8880Point{ 0, 440 }, m_bottomTextImage);
 }
 
 //-------------------------------------------------------------------------

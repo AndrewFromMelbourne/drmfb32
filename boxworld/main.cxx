@@ -63,6 +63,7 @@ printUsage(
     std::println(stream, "");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --fitToScreen,-f - fit boxworld to screen");
     std::println(stream, "    --help,-h - println usage and exit");
     std::println(stream, "    --joystick,-j - joystick device");
     std::println(stream, "");
@@ -77,16 +78,18 @@ main(
 {
     uint32_t connector{0};
     std::string device{};
-    std::string program{basename(argv[0])};
+    bool fitToScreen{false};
+    const std::string program{basename(argv[0])};
     std::string joystick{defaultJoystick};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:hj:";
+    static const char* sopts = "c:d:fhj:";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
+        { "fitToScreen", no_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { "joystick", required_argument, nullptr, 'j' },
         { nullptr, no_argument, nullptr, 0 }
@@ -107,6 +110,12 @@ main(
         case 'd':
 
             device = optarg;
+
+            break;
+
+        case 'f':
+
+            fitToScreen = true;
 
             break;
 
@@ -148,7 +157,7 @@ main(
 
         fb.clearBuffers(RGB8880{0, 0, 0});
 
-        Boxworld boxworld;
+        Boxworld boxworld{fitToScreen};
         boxworld.init();
         boxworld.draw(fb, font);
 
