@@ -44,7 +44,70 @@ class Viewer
 {
 public:
 
-    Viewer(fb32::Interface8880& interface, const std::string& folder, bool quality);
+    // --------------------------------------------------------------------
+
+    enum Quality
+    {
+        LOW,
+        MEDIUM,
+        HIGH
+    };
+
+    [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
+    [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
+
+    // --------------------------------------------------------------------
+
+    class Offset
+    {
+    public:
+
+        Offset(int x, int y) noexcept
+        :
+            m_x{x},
+            m_y{y},
+            m_zoom{1},
+            m_zoomedX{x},
+            m_zoomedY{y}
+        {}
+
+        void center() noexcept
+        {
+            m_x = 0;
+            m_y = 0;
+            m_zoomedX = 0;
+            m_zoomedY = 0;
+        }
+
+        void pan(int dx, int dy, int zoom) noexcept
+        {
+            m_x += dx;
+            m_y += dy;
+            zoomed(zoom);
+        }
+
+        [[nodiscard]] int x() const noexcept { return m_zoomedX; }
+        [[nodiscard]] int y() const noexcept { return m_zoomedY; }
+
+        void zoomed(int zoom) noexcept
+        {
+            m_zoom = (zoom == 0) ? 1 : zoom;
+            m_zoomedX = m_x * m_zoom;
+            m_zoomedY = m_y * m_zoom;
+        }
+
+    private:
+
+        int m_x{};
+        int m_y{};
+        int m_zoom{1};
+        int m_zoomedX{};
+        int m_zoomedY{};
+    };
+
+    // --------------------------------------------------------------------
+
+    Viewer(fb32::Interface8880& interface, const std::string& folder, Quality quality);
     ~Viewer();
 
     Viewer(const Viewer&) = delete;
@@ -71,6 +134,7 @@ private:
     void pan(int dx, int dy) noexcept;
     [[nodiscard]] fb32::Interface8880Point placeImage(const fb32::Image8880& image) const noexcept;
     void processImage();
+    void processResize(int width, int height);
     void readDirectory();
     [[nodiscard]] int zoomedHeight() const noexcept;
     [[nodiscard]] int zoomedWidth() const noexcept;
@@ -88,9 +152,8 @@ private:
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
+    Offset m_offset;
     int m_percent;
-    bool m_quality;
-    int m_xOffset;
-    int m_yOffset;
+    Quality m_quality;
     int m_zoom;
 };

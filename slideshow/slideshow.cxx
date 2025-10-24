@@ -81,7 +81,7 @@ printUsage(
     std::println(stream, "    --folder,-f - folder containing images");
     std::println(stream, "    --help,-h - print usage and exit");
     std::println(stream, "    --joystick,-j - joystick device");
-    std::println(stream, "    --quality,-q - use high quality resize");
+    std::println(stream, "    --quality,-q - resize qualitylow, medium or high");
     std::println(stream, "");;
 }
 
@@ -97,11 +97,11 @@ main(
     const std::string program{basename(argv[0])};
     std::string folder{};
     std::string joystick{defaultJoystick};
-    bool quality{false};
+    Viewer::Quality quality{Viewer::MEDIUM};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:f:hj:q";
+    static const char* sopts = "c:d:f:hj:q:";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
@@ -109,7 +109,7 @@ main(
         { "folder", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
         { "joystick", required_argument, nullptr, 'j' },
-        { "quality", no_argument, nullptr, 'q' },
+        { "quality", required_argument, nullptr, 'q' },
         { nullptr, no_argument, nullptr, 0 }
     };
 
@@ -152,7 +152,7 @@ main(
 
         case 'q':
 
-            quality = true;
+            quality = Viewer::qualityFromString(optarg);
 
             break;
 
@@ -194,7 +194,7 @@ main(
     {
         FrameBuffer8880 fb(device, connector);
         fb.clearBuffers(RGB8880{0, 0, 0});
-        Joystick js{joystick};
+        Joystick js{joystick, true};
         Viewer viewer{fb, folder, quality};
 
         viewer.draw(fb);

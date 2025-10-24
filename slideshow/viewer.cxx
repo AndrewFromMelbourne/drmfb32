@@ -64,11 +64,60 @@ std::string tolower(std::string s)
 
 // ========================================================================
 
+Viewer::Quality
+Viewer::qualityFromString(
+    std::string_view string) noexcept
+{
+    auto s = tolower(std::string(string));
+
+    if (s == "low")
+    {
+        return LOW;
+    }
+
+    if (s == "medium")
+    {
+        return MEDIUM;
+    }
+
+    if (s == "high")
+    {
+        return HIGH;
+    }
+
+    return MEDIUM;
+}
+
+// ------------------------------------------------------------------------
+
+std::string
+Viewer::qualityToString(
+    Viewer::Quality quality) noexcept
+{
+    switch (quality)
+    {
+    case LOW:
+
+        return "low";
+
+    case MEDIUM:
+
+        return "medium";
+
+    case HIGH:
+
+        return "high";
+    }
+
+    return "";
+}
+
+// ------------------------------------------------------------------------
 
 Viewer::Viewer(
     fb32::Interface8880& interface,
     const std::string& folder,
-    bool quality)
+    Viewer::Quality quality)
 :
     m_annotate{true},
     m_buffer{interface.getWidth(), interface.getHeight()},
@@ -79,10 +128,9 @@ Viewer::Viewer(
     m_fitToScreen{false},
     m_image{},
     m_imageProcessed{},
+    m_offset{0, 0},
     m_percent{100},
     m_quality{quality},
-    m_xOffset{0},
-    m_yOffset{0},
     m_zoom{0}
 {
     readDirectory();
@@ -144,14 +192,7 @@ Viewer::annotate()
 
     annotation += " " + std::to_string(m_percent) + "%";
 
-    if (m_quality)
-    {
-        annotation += " [smooth]";
-    }
-    else
-    {
-        annotation += " [fast]";
-    }
+    annotation += " [ " + qualityToString(m_quality) + " ]";
 
     if (m_zoom)
     {
@@ -208,6 +249,7 @@ Viewer::handleImageViewing(
         if (m_zoom < MAX_ZOOM)
         {
             ++m_zoom;
+            m_offset.zoomed(m_zoom);
             processImage();
             paint();
             return true;
@@ -222,10 +264,10 @@ Viewer::handleImageViewing(
 
             if (m_zoom == 0)
             {
-                m_xOffset = 0;
-                m_yOffset = 0;
+                m_offset.center();
             }
 
+            m_offset.zoomed(m_zoom);
             processImage();
             paint();
             return true;
@@ -337,8 +379,7 @@ Viewer::openImage()
 
     m_enlighten = 0;
 
-    m_xOffset = 0;
-    m_yOffset = 0;
+    m_offset.center();
 
     processImage();
     paint();
@@ -369,8 +410,7 @@ Viewer::paint()
 
     if (not oversize())
     {
-        m_xOffset = 0;
-        m_yOffset = 0;
+        m_offset.center();
     }
 
     m_buffer.putImage(placeImage(m_imageProcessed), m_imageProcessed);
@@ -384,8 +424,7 @@ Viewer::pan(int x, int y) noexcept
 {
     if (oversize() and (m_zoom != SCALE_OVERSIZED))
     {
-        m_xOffset += (x * m_zoom);
-        m_yOffset += (y * m_zoom);
+        m_offset.pan(x, y, m_zoom);
     }
 }
 
@@ -396,7 +435,7 @@ Viewer::placeImage(
     const fb32::Image8880& image) const noexcept
 {
     auto p = center(m_buffer, image);
-    p.incr(m_xOffset, m_yOffset);
+    p.incr(m_offset.x(), m_offset.y());
 
     return p;
 }
@@ -436,14 +475,8 @@ Viewer::processImage()
                           m_image.getWidth();
             }
 
-            if (m_quality)
-            {
-                m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, width, height);
-            }
-            else
-            {
-                m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
-            }
+            processResize(width, height);
+
             auto percent = (100.0 * m_imageProcessed.getWidth()) /
                            m_image.getWidth();
             m_percent = static_cast<int>(0.5 + percent);
@@ -453,6 +486,32 @@ Viewer::processImage()
             m_imageProcessed = scaleUp(m_imageProcessed, m_zoom);
             m_percent = m_zoom * 100;
         }
+    }
+}
+
+// ------------------------------------------------------------------------
+
+void
+Viewer::processResize(
+    int width,
+    int height)
+{
+    switch (m_quality)
+    {
+    case LOW:
+
+        m_imageProcessed = resizeNearestNeighbour(m_imageProcessed, width, height);
+        break;
+
+    case MEDIUM:
+
+        m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
+        break;
+
+    case HIGH:
+
+        m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, width, height);
+        break;
     }
 }
 
@@ -487,9 +546,7 @@ Viewer::readDirectory()
     else
     {
         m_current = INVALID_INDEX;
-
-        m_xOffset = 0;
-        m_yOffset = 0;
+        m_offset.center();
     }
 }
 
