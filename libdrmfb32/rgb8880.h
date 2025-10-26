@@ -38,12 +38,36 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
+struct RGB8
+{
+    RGB8(uint8_t r, uint8_t g, uint8_t b)
+    :
+        red{r},
+        green{g},
+        blue{b}
+    {}
+
+    explicit RGB8(uint32_t rgb)
+    :
+        red{static_cast<uint8_t>((rgb >> 16) & 0xFF)},
+        green{static_cast<uint8_t>((rgb >> 8) & 0xFF)},
+        blue{static_cast<uint8_t>(rgb & 0xFF)}
+    {}
+
+    uint8_t red{};
+    uint8_t green{};
+    uint8_t blue{};
+};
+
+//-------------------------------------------------------------------------
+
 class RGB8880
 {
 public:
 
     RGB8880(uint8_t red, uint8_t green, uint8_t blue) noexcept;
 
+    explicit RGB8880(RGB8 rbg) noexcept;
     explicit RGB8880(uint32_t rgb) noexcept;
 
     [[nodiscard]] RGB8880 blend(uint8_t alpha, const RGB8880& background) const noexcept;
@@ -51,6 +75,7 @@ public:
     [[nodiscard]] uint8_t getRed() const noexcept;
     [[nodiscard]] uint8_t getGreen() const noexcept;
     [[nodiscard]] uint8_t getBlue() const noexcept;
+    [[nodiscard]] RGB8 getRGB8() const noexcept;
 
     [[nodiscard]] uint32_t get8880() const noexcept { return m_rgb; }
 
@@ -60,6 +85,7 @@ public:
     }
 
     void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
+    void setRGB8(RGB8 rgb) noexcept;
 
     void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
     void setGrey(uint8_t grey) noexcept { setRGB(grey, grey, grey); }

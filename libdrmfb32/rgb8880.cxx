@@ -42,6 +42,16 @@ fb32::RGB8880::RGB8880(
 //-------------------------------------------------------------------------
 
 fb32::RGB8880::RGB8880(
+    RGB8 rgb) noexcept
+:
+    m_rgb{0}
+{
+    setRGB8(rgb);
+}
+
+//-------------------------------------------------------------------------
+
+fb32::RGB8880::RGB8880(
     uint32_t rgb) noexcept
 :
     m_rgb{rgb}
@@ -84,6 +94,16 @@ fb32::RGB8880::getBlue() const noexcept
 
 //-------------------------------------------------------------------------
 
+fb32::RGB8
+fb32::RGB8880::getRGB8() const noexcept
+{
+    return RGB8{ static_cast<uint8_t>((m_rgb >> 16) & 0xFF),
+                 static_cast<uint8_t>((m_rgb >> 8) & 0xFF),
+                 static_cast<uint8_t>(m_rgb & 0xFF) };
+}
+
+//-------------------------------------------------------------------------
+
 void
 fb32::RGB8880::setRGB(
     uint8_t red,
@@ -91,6 +111,15 @@ fb32::RGB8880::setRGB(
     uint8_t blue) noexcept
 {
     m_rgb = rgbTo8880(red, green, blue);
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::RGB8880::setRGB8(
+    RGB8 rgb8) noexcept
+{
+    m_rgb = rgbTo8880(rgb8.red, rgb8.green, rgb8.blue);
 }
 
 //-------------------------------------------------------------------------

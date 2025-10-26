@@ -55,16 +55,18 @@ public:
 
     void add(const fb32::RGB8880& rgb) noexcept
     {
-        m_red += rgb.getRed();
-        m_green += rgb.getGreen();
-        m_blue += rgb.getBlue();
+        const auto rgb8 = rgb.getRGB8();
+        m_red += rgb8.red;
+        m_green += rgb8.green;
+        m_blue += rgb8.blue;
     }
 
     void subtract(const fb32::RGB8880& rgb) noexcept
     {
-        m_red -= rgb.getRed();
-        m_green -= rgb.getGreen();
-        m_blue -= rgb.getBlue();
+        const auto rgb8 = rgb.getRGB8();
+        m_red -= rgb8.red;
+        m_green -= rgb8.green;
+        m_blue -= rgb8.blue;
     }
 
     [[nodiscard]] fb32::RGB8880 average(int count) noexcept
@@ -210,31 +212,29 @@ rowsBilinearInterpolation(
             const auto xWeight = (xScale * i) - xLow;
             const auto yWeight = (yScale * j) - yLow;
 
-            auto a = *input.getPixelRGB(Point{xLow, yLow});
-            auto b = *input.getPixelRGB(Point{xHigh, yLow});
-            auto c = *input.getPixelRGB(Point{xLow, yHigh});
-            auto d = *input.getPixelRGB(Point{xHigh, yHigh});
+            auto a = *input.getPixelRGB8(Point{xLow, yLow});
+            auto b = *input.getPixelRGB8(Point{xHigh, yLow});
+            auto c = *input.getPixelRGB8(Point{xLow, yHigh});
+            auto d = *input.getPixelRGB8(Point{xHigh, yHigh});
 
             const auto aWeight = (1.0f - xWeight) * (1.0f - yWeight);
             const auto bWeight = xWeight * (1.0f - yWeight);
             const auto cWeight = (1.0f - xWeight) * yWeight;
             const auto dWeight = xWeight * yWeight;
 
-            typedef  uint8_t (fb32::RGB8880::*RGB8880MemFn)() const;
-
-            auto evaluate = [&](RGB8880MemFn get) -> uint8_t
+            auto evaluate = [&](const uint8_t fb32::RGB8::* channel) -> uint8_t
             {
-                float value = std::invoke(get, a) * aWeight +
-                                std::invoke(get, b) * bWeight +
-                                std::invoke(get, c) * cWeight +
-                                std::invoke(get, d) * dWeight;
+                float value = a.*channel * aWeight
+                            + b.*channel * bWeight
+                            + c.*channel * cWeight
+                            + d.*channel * dWeight;
 
                 return static_cast<uint8_t>(std::clamp(value, 0.0f, 255.0f));
             };
 
-            fb32::RGB8880 rgb{evaluate(&fb32::RGB8880::getRed),
-                                evaluate(&fb32::RGB8880::getGreen),
-                                evaluate(&fb32::RGB8880::getBlue)};
+            fb32::RGB8880 rgb{evaluate(&fb32::RGB8::red),
+                              evaluate(&fb32::RGB8::green),
+                              evaluate(&fb32::RGB8::blue)};
 
             output.setPixelRGB(Point{i, j}, rgb);
         }
@@ -308,9 +308,10 @@ rowsLanczos3Interpolation(
                     weightsSum += weight;
 
                     auto rgb = *input.getPixelRGB(Point{x, y});
-                    redSum += rgb.getRed() * weight;
-                    greenSum += rgb.getGreen() * weight;
-                    blueSum += rgb.getBlue() * weight;
+                    const auto rgb8 = rgb.getRGB8();
+                    redSum += rgb8.red * weight;
+                    greenSum += rgb8.green * weight;
+                    blueSum += rgb8.blue * weight;
                 }
             }
 
@@ -468,8 +469,9 @@ fb32::enlighten(
 
     for (auto pixel : input.getBuffer())
     {
-        auto c = fb32::RGB8880(pixel);
-        const auto max = fb32::RGB8880(*(mbi++)).getRed();
+        fb32::RGB8880 c{pixel};
+        const auto rgb8 = c.getRGB8();
+        const auto max = fb32::RGB8(*(mbi++)).red;
         const auto illumination = std::clamp(max / 255.0, minI, maxI);
 
         if (illumination < maxI)
@@ -477,9 +479,9 @@ fb32::enlighten(
             const auto r = illumination / maxI;
             const auto scale = (0.4 + (r * 0.6)) / r;
 
-            c.setRGB(scaled(c.getRed(), scale),
-                     scaled(c.getGreen(), scale),
-                     scaled(c.getBlue(), scale));
+            c.setRGB(scaled(rgb8.red, scale),
+                     scaled(rgb8.green, scale),
+                     scaled(rgb8.blue, scale));
         }
 
         *(outputi++) = c.get8880();
@@ -499,9 +501,9 @@ fb32::maxRGB(
 
     for (const auto pixel : input.getBuffer())
     {
-        fb32::RGB8880 rgb(pixel);
-        rgb.setGrey(std::max({rgb.getRed(), rgb.getGreen(), rgb.getBlue()}));
-        *(buffer++) = rgb.get8880();
+        fb32::RGB8 rgb8(pixel);
+        const auto grey(std::max({rgb8.red, rgb8.green, rgb8.blue}));
+        *(buffer++) = fb32::RGB8880::rgbTo8880(grey, grey, grey);
     }
 
     return output;

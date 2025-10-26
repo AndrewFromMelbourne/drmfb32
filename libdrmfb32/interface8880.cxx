@@ -68,6 +68,21 @@ fb32::Interface8880::getPixelRGB(
 
 //-------------------------------------------------------------------------
 
+std::optional<fb32::RGB8>
+fb32::Interface8880::getPixelRGB8(
+    const Interface8880Point& p) const
+{
+    if (not validPixel(p))
+    {
+        return {};
+    }
+
+    auto buffer = getBuffer();
+    return RGB8(buffer[offset(p)]);
+}
+
+//-------------------------------------------------------------------------
+
 std::optional<uint32_t>
 fb32::Interface8880::getPixel(
     const Interface8880Point& p) const
