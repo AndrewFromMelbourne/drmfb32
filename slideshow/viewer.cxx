@@ -30,6 +30,7 @@
 #include <filesystem>
 #include <iostream>
 #include <print>
+#include <ranges>
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
@@ -49,13 +50,11 @@ namespace
 
 // ------------------------------------------------------------------------
 
-std::string tolower(std::string s)
+std::string tolower(std::string_view s)
 {
-    std::transform(s.begin(),
-                   s.end(),
-                   s.begin(),
-                   [](unsigned char c){ return std::tolower(c); });
-    return s;
+    std::string result;
+    std::ranges::copy(std::views::transform(s, ::tolower), std::back_inserter(result));
+    return result;
 }
 
 // ------------------------------------------------------------------------
@@ -68,7 +67,7 @@ Viewer::Quality
 Viewer::qualityFromString(
     std::string_view string) noexcept
 {
-    auto s = tolower(std::string(string));
+    auto s = tolower(string);
 
     if (s == "low")
     {
