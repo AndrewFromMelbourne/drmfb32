@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <format>
 #include <iostream>
 #include <print>
 #include <ranges>
@@ -177,25 +178,18 @@ Viewer::annotate()
     auto name = m_files[m_current];
     auto annotation = name.substr(name.find_last_of('/') + 1);
 
-    annotation += " ( " +
-                  std::to_string(m_image.getWidth()) +
-                  " x " +
-                  std::to_string(m_image.getHeight()) +
-                  " )";
+    annotation += std::format(" ( {} x {} )",
+                              m_image.getWidth(),
+                              m_image.getHeight());
 
-    annotation += " [ " +
-                  std::to_string(m_current + 1) +
-                  " / " +
-                  std::to_string(m_files.size()) +
-                  " ]";
+    annotation += std::format(" [ {} / {} ]", m_current + 1, m_files.size());
+    annotation += std::format(" {}%", m_percent);
 
-    annotation += " " + std::to_string(m_percent) + "%";
-
-    annotation += " [ " + qualityToString(m_quality) + " ]";
+    annotation += std::format(" [ {} ]", qualityToString(m_quality));
 
     if (m_zoom)
     {
-        annotation += " [ x" + std::to_string(m_zoom) + " ]";
+        annotation += std::format(" [ x{} ]", m_zoom);
     }
     else if (m_fitToScreen)
     {
@@ -206,7 +200,7 @@ Viewer::annotate()
         annotation += " [ FOS ]";
     }
 
-    annotation += " [ enlighten "  + std::to_string(m_enlighten * 10) + "% ]";
+    annotation += std::format(" [ enlighten {}% ]", m_enlighten * 10);
 
     fb32::Image8880Font8x16 font;
     constexpr int padding{4};
