@@ -51,7 +51,7 @@ public:
         int yPosition,
         int gridHeight,
         const std::string& title,
-        const std::vector<TraceConfiguration>& traces);
+        std::initializer_list<TraceConfiguration> traces);
 
     void update(time_t now, fb32::Interface8880Font& font) override = 0;
 

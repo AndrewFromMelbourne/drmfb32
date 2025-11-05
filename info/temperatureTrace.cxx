@@ -52,7 +52,7 @@ TemperatureTrace::TemperatureTrace(
         yPosition,
         gridHeight,
         "Temperature",
-        std::vector<TraceConfiguration>{{"temperature", {102, 167, 225}}})
+        { TraceConfiguration{"temperature", {102, 167, 225}} })
 {
 }
 
@@ -64,6 +64,6 @@ TemperatureTrace::update(
     fb32::Interface8880Font&)
 {
     const auto temperature{inf::getTemperature()};
-    Trace::addData(std::vector<int>{temperature}, now);
+    Trace::addData({temperature}, now);
 }
 
