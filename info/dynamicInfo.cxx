@@ -109,7 +109,7 @@ getTime(
     tm *lt = ::localtime_r(&now, &result);
 
     char buffer[128];
-    std::strftime(buffer, sizeof(buffer), "%T", lt);
+    ::strftime(buffer, sizeof(buffer), "%T", lt);
 
     return buffer;
 }
