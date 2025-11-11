@@ -117,7 +117,7 @@ Sphere::updateRows(
                 intensity *= intensity;
                 intensity *= (1.0 - m_ambient);
 
-                grey = (uint8_t)std::ceil(255.0 * (intensity + m_ambient));
+                grey = (uint8_t)std::ceil(200.0 * (intensity + m_ambient));
             }
 
             const Interface8880Point p{i, j};
