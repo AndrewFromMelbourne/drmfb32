@@ -8,6 +8,9 @@ Test circle drawing functions
 ## testColourBlend
 Test blending a blue background with a red foreground at alpha value from 0 to 255.
 
+## testDoubleBuffer
+Test double buffering by displaying one red and one greem buffer. WARNING: causes a strobing effect.
+
 ## testft and testft2
 Tests programs for truetype fonts (Requires Freetype2).
 

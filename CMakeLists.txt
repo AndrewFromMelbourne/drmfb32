@@ -200,6 +200,11 @@ target_link_libraries(testColourBlend drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
+add_executable(testDoubleBuffer test/testDoubleBuffer.cxx)
+target_link_libraries(testDoubleBuffer drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 if (FREETYPE_FOUND)
 add_executable(testft test/testft.cxx)
 target_link_libraries(testft drmfb32

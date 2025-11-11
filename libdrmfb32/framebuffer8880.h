@@ -32,6 +32,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "drmMode.h"
 #include "point.h"
@@ -77,6 +78,17 @@ public:
 
     //---------------------------------------------------------------------
 
+    struct AtomicProperty
+    {
+        uint32_t m_objectId;
+        uint32_t m_objectType;
+        uint32_t m_propertyId;
+        std::string m_propertyName;
+        uint64_t m_value;
+    };
+
+    //---------------------------------------------------------------------
+
     explicit FrameBuffer8880(
         const std::string& device = "",
         uint32_t connectorId = 0);
@@ -97,8 +109,13 @@ public:
 
     [[nodiscard]] std::size_t getBufferSize() const noexcept;
 
+    [[nodiscard]] drm::drmVersion_ptr getDrmVersion() noexcept { return drm::drmGetVersion(m_fd); }
+
     [[nodiscard]] int getWidth() const noexcept override { return m_width; }
     [[nodiscard]] int getHeight() const noexcept override { return m_height; }
+
+    [[nodiscard]] bool hasAtomic() const noexcept { return m_hasAtomic; }
+    [[nodiscard]] bool hasUniversalPlanes() const noexcept { return m_hasUniversalPlanes; }
 
     [[nodiscard]] std::size_t offset(const Interface8880Point& p) const noexcept override;
 
@@ -108,8 +125,23 @@ private:
 
     void createDumbBuffer(int index);
     void destroyDumbBuffer(int index);
+    void setDumbBuffer(int index);
+
+    void
+    addAtomicProperties(
+        drm::drmModeAtomicReq_ptr& atomicRequest,
+        uint32_t fbId);
+    void
+    addAtomicRequest(
+        uint32_t objectId,
+        uint32_t objectType,
+        const std::string& propertyName,
+        uint64_t value);
+    void createAtomicRequests();
 
     void findResources(uint32_t connectorId);
+
+    [[nodiscard]] bool useAtomic() const noexcept { return m_hasAtomic and m_hasUniversalPlanes; }
 
     int m_width;
     int m_height;
@@ -120,8 +152,13 @@ private:
     int m_dbFront;
     int m_dbBack;
 
+    bool m_hasAtomic;
+    bool m_hasUniversalPlanes;
+    std::vector<AtomicProperty> m_atomicProperties;
+    uint32_t m_blobId;
     uint32_t m_connectorId;
     uint32_t m_crtcId;
+    uint32_t m_planeId;
     drmModeModeInfo m_mode;
     drm::drmModeCrtc_ptr m_originalCrtc;
 };
