@@ -122,6 +122,8 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
 fb32::FrameBuffer8880::~FrameBuffer8880()
 {
+    clearBuffers(0x00000000);
+
     if (useAtomic())
     {
         drmModeDestroyPropertyBlob(m_fd.fd(), m_blobId);
