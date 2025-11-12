@@ -160,7 +160,7 @@ fb32::FrameBuffer8880::clearBuffers(uint32_t rgb)
 std::span<uint32_t>
 fb32::FrameBuffer8880::getBuffer() noexcept
 {
-    auto& dbb = m_dbs[m_dbBack];
+    const auto& dbb = m_dbs[m_dbBack];
     return {dbb.m_fbp, getBufferSize()};
 }
 
@@ -169,7 +169,7 @@ fb32::FrameBuffer8880::getBuffer() noexcept
 std::span<const uint32_t>
 fb32::FrameBuffer8880::getBuffer() const noexcept
 {
-    auto& dbb = m_dbs[m_dbBack];
+    const auto& dbb = m_dbs[m_dbBack];
     return {dbb.m_fbp, getBufferSize()};
 }
 
@@ -178,7 +178,7 @@ fb32::FrameBuffer8880::getBuffer() const noexcept
 std::size_t
 fb32::FrameBuffer8880::getBufferSize() const noexcept
 {
-    auto& dbb = m_dbs[m_dbBack];
+    const auto& dbb = m_dbs[m_dbBack];
     return dbb.m_lineLengthPixels * m_height;
 }
 
@@ -188,7 +188,7 @@ std::size_t
 fb32::FrameBuffer8880::offset(
     const Interface8880Point& p) const noexcept
 {
-    auto& dbb = m_dbs[m_dbBack];
+    const auto& dbb = m_dbs[m_dbBack];
     return p.x() + p.y() * dbb.m_lineLengthPixels;
 }
 
