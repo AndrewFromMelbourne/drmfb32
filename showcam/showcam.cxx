@@ -192,7 +192,7 @@ main(
         //-----------------------------------------------------------------
 
         const auto [ width, height ] = wc.dimensions();
-        std::println("{} [ {} x {}]", wc.formatName(), width, height);
+        std::println("{} [{} x {}]", wc.formatName(), width, height);
 
         //-----------------------------------------------------------------
 

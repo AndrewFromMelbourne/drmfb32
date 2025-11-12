@@ -43,7 +43,7 @@ fb32::Webcam::Webcam(
     const std::string& device,
     bool fitToScreen,
     int requestedFPS,
-    Interface8880& image)
+    Interface8880& interface)
 :
     m_dimensions{ .width = 0, .height = 0 },
     m_fd{::open(device.c_str(), O_RDWR)},
@@ -75,7 +75,7 @@ fb32::Webcam::Webcam(
                                     " does not support YUYV or MJPEG");
     }
 
-    if (not chooseBestFit(image))
+    if (not chooseBestFit(interface))
     {
         throw std::invalid_argument("Device " +
                                     device +
@@ -84,7 +84,7 @@ fb32::Webcam::Webcam(
 
     if (m_fitToScreen)
     {
-        initResizedImage(image);
+        initResizedImage(interface);
     }
 
     if (not initVideo())
@@ -122,7 +122,7 @@ fb32::Webcam::~Webcam()
 
 bool
 fb32::Webcam::showFrame(
-    Interface8880& image)
+    Interface8880& interface)
 {
     v4l2_buffer buffer;
     buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -158,11 +158,11 @@ fb32::Webcam::showFrame(
         if (m_fitToScreen)
         {
             resizeToNearestNeighbour(m_image, m_resizedImage);
-            image.putImage(center(image, m_resizedImage), m_resizedImage);
+            interface.putImage(center(interface, m_resizedImage), m_resizedImage);
         }
         else
         {
-            image.putImage(center(image, m_image), m_image);
+            interface.putImage(center(interface, m_image), m_image);
         }
     }
 
@@ -205,7 +205,7 @@ fb32::Webcam::stopStream() const noexcept
 
 bool
 fb32::Webcam::chooseBestFit(
-    Interface8880& image)
+    Interface8880& interface)
 {
     std::vector<Dimensions> dimensions;
 
@@ -245,8 +245,8 @@ fb32::Webcam::chooseBestFit(
 
         for (const auto d : dimensions)
         {
-            if ((d.width <= image.getWidth()) and
-                (d.height <= image.getHeight()) and
+            if ((d.width <= interface.getWidth()) and
+                (d.height <= interface.getHeight()) and
                 (d.width > m_dimensions.width) and
                 (d.height > m_dimensions.height))
             {
@@ -267,24 +267,24 @@ fb32::Webcam::chooseBestFit(
     {
         const auto& sw = frmsize.stepwise;
 
-        if ((image.getWidth() < static_cast<int>(sw.min_width)) or
-            (image.getHeight() < static_cast<int>(sw.min_height)))
+        if ((interface.getWidth() < static_cast<int>(sw.min_width)) or
+            (interface.getHeight() < static_cast<int>(sw.min_height)))
         {
             m_dimensions.width = sw.min_width;
             m_dimensions.height = sw.min_height;
         }
-        else if ((image.getWidth() > static_cast<int>(sw.max_width)) or
-                 (image.getHeight() > static_cast<int>(sw.max_height)))
+        else if ((interface.getWidth() > static_cast<int>(sw.max_width)) or
+                 (interface.getHeight() > static_cast<int>(sw.max_height)))
         {
             m_dimensions.width = sw.max_width;
             m_dimensions.height = sw.max_height;
         }
         else
         {
-            m_dimensions.width = image.getWidth() -
-                                 (image.getWidth() % sw.step_width);
-            m_dimensions.height = image.getHeight() -
-                                  (image.getHeight() % sw.step_height);
+            m_dimensions.width = interface.getWidth() -
+                                 (interface.getWidth() % sw.step_width);
+            m_dimensions.height = interface.getHeight() -
+                                  (interface.getHeight() % sw.step_height);
         }
 
         result = true;
@@ -491,16 +491,16 @@ bool fb32::Webcam::initBuffers() noexcept
 
 void
 fb32::Webcam::initResizedImage(
-    Interface8880& image)
+    Interface8880& interface)
 {
-    int width = (m_dimensions.width * image.getHeight()) /
-                 m_dimensions.height;
-    int height = image.getHeight();
+    auto width = (m_dimensions.width * interface.getHeight()) /
+                  m_dimensions.height;
+    auto height = interface.getHeight();
 
-    if (width > m_dimensions.width)
+    if (width > interface.getWidth())
     {
-        width = image.getWidth();
-        height = (m_dimensions.height * image.getWidth()) /
+        width = interface.getWidth();
+        height = (m_dimensions.height * interface.getWidth()) /
                   m_dimensions.width;
     }
 
