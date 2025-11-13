@@ -155,8 +155,6 @@ main(
             exit(EXIT_FAILURE);
         }
 
-        fb.clearBuffers(RGB8880{0, 0, 0});
-
         Boxworld boxworld{fitToScreen};
         boxworld.init();
         boxworld.draw(fb, font);
@@ -180,8 +178,6 @@ main(
 
             std::this_thread::sleep_for(250ms);
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

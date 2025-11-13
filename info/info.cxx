@@ -339,7 +339,7 @@ main(
     {
         fb32::FrameBuffer8880 fb(device, connector);
 
-        fb.clearBuffers(fb32::RGB8880{0, 0, 0});
+        fb.clearBuffers();
 
         //-----------------------------------------------------------------
 
@@ -424,8 +424,6 @@ main(
             const auto nextSecond = std::chrono::round<std::chrono::seconds>(now) + 1s;
             std::this_thread::sleep_until(nextSecond);
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

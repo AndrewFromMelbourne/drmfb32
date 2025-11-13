@@ -185,7 +185,6 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-        fb.clearBuffers(RGB8880{0, 0, 0});
 
         auto image = readJpeg(filename);
 
@@ -212,8 +211,6 @@ main(
         {
             std::this_thread::sleep_for(1s);
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

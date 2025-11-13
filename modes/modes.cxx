@@ -38,7 +38,7 @@ void
 findConnectedConnectors(
     const std::string& device)
 {
-    fb32::FileDescriptor fd{::open(device.c_str(), O_RDWR)};
+    fd::FileDescriptor fd{::open(device.c_str(), O_RDWR)};
 
     if (fd.fd() == -1)
     {

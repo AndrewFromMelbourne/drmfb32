@@ -146,7 +146,7 @@ private:
     int m_width;
     int m_height;
 
-    FileDescriptor m_fd;
+    fd::FileDescriptor m_fd;
 
     std::array<DumbBuffer, 2> m_dbs;
     int m_dbFront;

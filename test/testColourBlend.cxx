@@ -121,7 +121,6 @@ main(
     try
     {
         FrameBuffer8880 fb{device, connector};
-        fb.clearBuffers();
 
         //-----------------------------------------------------------------
 
@@ -162,7 +161,6 @@ main(
         //-----------------------------------------------------------------
 
         std::this_thread::sleep_for(10s);
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

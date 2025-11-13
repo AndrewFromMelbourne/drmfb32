@@ -101,7 +101,7 @@ private:
     bool setFPS(int fps) const noexcept;
 
     Dimensions m_dimensions;
-    FileDescriptor m_fd;
+    fd::FileDescriptor m_fd;
     bool m_fitToScreen;
     uint32_t m_format;
     std::string m_formatName;

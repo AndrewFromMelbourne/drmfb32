@@ -135,7 +135,7 @@ main(
     {
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
-        fb.clearBuffers(RGB8880{11, 11, 11});
+        fb.clearBuffers(RGB8880{15, 15, 15});
 
         std::println("width = {} height = {}", fb.getWidth(), fb.getHeight());
 
@@ -160,8 +160,6 @@ main(
                 fb.update();
             }
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

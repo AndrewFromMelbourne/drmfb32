@@ -187,8 +187,6 @@ main(
         FrameBuffer8880 fb(device, connector);
         Webcam wc(videoDevice, fitToScreen, requestedFPS, fb);
 
-        fb.clearBuffers(RGB8880{0, 0, 0});
-
         //-----------------------------------------------------------------
 
         const auto [ width, height ] = wc.dimensions();
@@ -205,8 +203,6 @@ main(
         }
 
         wc.stopStream();
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

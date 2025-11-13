@@ -77,7 +77,7 @@ fb32::FrameBuffer8880::FrameBuffer8880(
         card = drm::findDrmDevice(connectorId);
     }
 
-    m_fd = FileDescriptor{::open(card.c_str(), O_RDWR)};
+    m_fd = fd::FileDescriptor{::open(card.c_str(), O_RDWR)};
 
     //---------------------------------------------------------------------
 
@@ -93,12 +93,12 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     m_hasUniversalPlanes = drm::setUniversalPlanes(m_fd);
     m_hasAtomic = drm::setAtomicModeSetting(m_fd);
     findResources(connectorId);
-    drmSetMaster(m_fd.fd());
+    drm::drmSetMaster(m_fd);
 
     if (useAtomic())
     {
-        if (drmModeCreatePropertyBlob(
-                m_fd.fd(),
+        if (drm::drmModeCreatePropertyBlob(
+                m_fd,
                 &m_mode,
                 sizeof(m_mode),
                 &m_blobId) != 0)
@@ -115,35 +115,35 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     createDumbBuffer(m_dbBack);
 
     setDumbBuffer(m_dbFront);
-    update();
+    clearBuffers();
 }
 
 //-------------------------------------------------------------------------
 
 fb32::FrameBuffer8880::~FrameBuffer8880()
 {
-    clearBuffers(0x00000000);
+    clearBuffers();
 
     if (useAtomic())
     {
-        drmModeDestroyPropertyBlob(m_fd.fd(), m_blobId);
+        drm::drmModeDestroyPropertyBlob(m_fd, m_blobId);
     }
 
     destroyDumbBuffer(m_dbBack);
     destroyDumbBuffer(m_dbFront);
 
-    drmModeSetCrtc(m_fd.fd(),
-                   m_originalCrtc->crtc_id,
-                   m_originalCrtc->buffer_id,
-                   m_originalCrtc->x,
-                   m_originalCrtc->y,
-                   &m_connectorId,
-                   1,
-                   &(m_originalCrtc->mode));
+    drm::drmModeSetCrtc(m_fd,
+                        m_originalCrtc->crtc_id,
+                        m_originalCrtc->buffer_id,
+                        m_originalCrtc->x,
+                        m_originalCrtc->y,
+                        &m_connectorId,
+                        1,
+                        &(m_originalCrtc->mode));
 
-    if (drmIsMaster(m_fd.fd()))
+    if (drm::drmIsMaster(m_fd))
     {
-        drmDropMaster(m_fd.fd());
+        drm::drmDropMaster(m_fd);
     }
 }
 
@@ -219,11 +219,11 @@ fb32::FrameBuffer8880::update()
     else
     {
 
-        drmModePageFlip(m_fd.fd(),
-                        m_crtcId,
-                        dbf.m_fbId,
-                        DRM_MODE_PAGE_FLIP_EVENT,
-                        nullptr);
+        drm::drmModePageFlip(m_fd,
+                             m_crtcId,
+                             dbf.m_fbId,
+                             DRM_MODE_PAGE_FLIP_EVENT,
+                             nullptr);
     }
 
     drmEventContext ev{
@@ -234,7 +234,7 @@ fb32::FrameBuffer8880::update()
         .sequence_handler = nullptr
     };
 
-    drmHandleEvent(m_fd.fd(), &ev);
+    drm::drmHandleEvent(m_fd, &ev);
 }
 
 //-------------------------------------------------------------------------
@@ -256,7 +256,7 @@ fb32::FrameBuffer8880::createDumbBuffer(
         .size = 0
     };
 
-    if (drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_CREATE_DUMB, &dmcb) < 0)
+    if (drm::drmIoctl(m_fd, DRM_IOCTL_MODE_CREATE_DUMB, &dmcb) < 0)
     {
         throw std::system_error{errno,
                                 std::system_category(),
@@ -273,16 +273,16 @@ fb32::FrameBuffer8880::createDumbBuffer(
     uint32_t strides[4] = { dmcb.pitch };
     uint32_t offsets[4] = { 0 };
 
-    if (drmModeAddFB2(
-            m_fd.fd(),
-            m_mode.hdisplay,
-            m_mode.vdisplay,
-            DRM_FORMAT_XRGB8888,
-            handles,
-            strides,
-            offsets,
-            &db.m_fbId,
-            0) < 0)
+    const auto added = drm::drmModeAddFB2(m_fd,
+                                          m_mode.hdisplay,
+                                          m_mode.vdisplay,
+                                          DRM_FORMAT_XRGB8888,
+                                          handles,
+                                          strides,
+                                          offsets,
+                                          &db.m_fbId,
+                                          0);
+    if (added < 0)
     {
         throw std::system_error{errno,
                                 std::system_category(),
@@ -294,7 +294,7 @@ fb32::FrameBuffer8880::createDumbBuffer(
     drm_mode_map_dumb dmmd;
     dmmd.handle = db.m_fbHandle;
 
-    if (drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_MAP_DUMB, &dmmd) < 0)
+    if (drm::drmIoctl(m_fd, DRM_IOCTL_MODE_MAP_DUMB, &dmmd) < 0)
     {
         throw std::system_error{errno,
                                 std::system_category(),
@@ -327,14 +327,14 @@ fb32::FrameBuffer8880::destroyDumbBuffer(
     const auto& db = m_dbs[index];
 
     ::munmap(db.m_fbp, db.m_length);
-    drmModeRmFB(m_fd.fd(), db.m_fbId);
+    drm::drmModeRmFB(m_fd, db.m_fbId);
 
     drm_mode_destroy_dumb dmdd =
     {
         .handle = db.m_fbHandle
     };
 
-    drmIoctl(m_fd.fd(), DRM_IOCTL_MODE_DESTROY_DUMB, &dmdd);
+    drm::drmIoctl(m_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &dmdd);
 }
 
 //-------------------------------------------------------------------------
@@ -367,18 +367,18 @@ fb32::FrameBuffer8880::setDumbBuffer(
             .sequence_handler = nullptr
         };
 
-        drmHandleEvent(m_fd.fd(), &ev);
+        drm::drmHandleEvent(m_fd, &ev);
     }
     else
     {
-        auto setCrtcResult = drmModeSetCrtc(m_fd.fd(),
-                                            m_crtcId,
-                                            db.m_fbId,
-                                            0,
-                                            0,
-                                            &m_connectorId,
-                                            1,
-                                            &m_mode);
+        const auto setCrtcResult = drm::drmModeSetCrtc(m_fd,
+                                                       m_crtcId,
+                                                       db.m_fbId,
+                                                       0,
+                                                       0,
+                                                       &m_connectorId,
+                                                       1,
+                                                       &m_mode);
 
         if (setCrtcResult < 0)
         {
@@ -398,7 +398,7 @@ fb32::FrameBuffer8880::addAtomicRequest(
     const std::string& propertyName,
     uint64_t value)
 {
-    auto propertyId{
+    const auto propertyId{
         drm::findDrmPropertyId(
             m_fd,
             objectId,
@@ -468,7 +468,7 @@ fb32::FrameBuffer8880::findResources(
     uint32_t connectorId)
 {
     uint64_t hasDumb;
-    if ((drmGetCap(m_fd.fd(), DRM_CAP_DUMB_BUFFER, &hasDumb) < 0) or not hasDumb)
+    if ((drm::drmGetCap(m_fd, DRM_CAP_DUMB_BUFFER, &hasDumb) < 0) or not hasDumb)
     {
         throw std::system_error{errno,
                                 std::system_category(),

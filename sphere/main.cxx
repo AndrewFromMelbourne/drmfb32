@@ -158,7 +158,6 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-        fb.clearBuffers(RGB8880{0, 0, 0});
 
         std::println("width = {} height = {}", fb.getWidth() ,fb.getHeight());
 
@@ -179,8 +178,6 @@ main(
 
             bearing = (bearing + 1) % 360;
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {

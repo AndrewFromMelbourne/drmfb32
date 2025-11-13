@@ -150,7 +150,6 @@ main(
         constexpr bool block{true};
         Joystick js(joystick, block);
         FrameBuffer8880 fb{device, connector};
-        fb.clearBuffers(RGB8880{0, 0, 0});
 
         Puzzle puzzle{fitToScreen};
         puzzle.init();
@@ -173,8 +172,6 @@ main(
                 fb.update();
             }
         }
-
-        fb.clearBuffers();
     }
     catch (std::exception& error)
     {
