@@ -127,8 +127,8 @@ main(
     {
         FrameBuffer8880 fb{device, connector};
 
-        const RGB8880 darkBlue{0, 0, 63};
-        const RGB8880 white{255, 255, 255};
+        constexpr RGB8880 darkBlue{0, 0, 63};
+        constexpr RGB8880 white{255, 255, 255};
 
         constexpr int width{248};
         constexpr int height{16};

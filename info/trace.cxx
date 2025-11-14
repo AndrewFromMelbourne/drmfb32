@@ -40,12 +40,6 @@
 
 //-------------------------------------------------------------------------
 
-const fb32::RGB8880 Trace::sc_foreground{255, 255, 255};
-const fb32::RGB8880 Trace::sc_background{0, 0, 0};
-const fb32::RGB8880 Trace::sc_gridColour{48, 48, 48};
-
-//-------------------------------------------------------------------------
-
 Trace::Trace(
     int width,
     int traceHeight,

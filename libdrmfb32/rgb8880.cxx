@@ -30,31 +30,9 @@
 //-------------------------------------------------------------------------
 
 fb32::RGB8880::RGB8880(
-    uint8_t red,
-    uint8_t green,
-    uint8_t blue) noexcept
-:
-    m_rgb{0}
-{
-    setRGB(red, green, blue);
-}
-
-//-------------------------------------------------------------------------
-
-fb32::RGB8880::RGB8880(
     RGB8 rgb) noexcept
 :
-    m_rgb{0}
-{
-    setRGB8(rgb);
-}
-
-//-------------------------------------------------------------------------
-
-fb32::RGB8880::RGB8880(
-    uint32_t rgb) noexcept
-:
-    m_rgb{rgb}
+    m_rgb{rgbTo8880(rgb.red, rgb.green, rgb.blue)}
 {
 }
 
@@ -70,47 +48,12 @@ fb32::RGB8880::blend(
 
 //-------------------------------------------------------------------------
 
-uint8_t
-fb32::RGB8880::getRed() const noexcept
-{
-    return (m_rgb >> 16) & 0xFF;
-}
-
-//-------------------------------------------------------------------------
-
-uint8_t
-fb32::RGB8880::getGreen() const noexcept
-{
-    return (m_rgb >> 8) & 0xFF;
-}
-
-//-------------------------------------------------------------------------
-
-uint8_t
-fb32::RGB8880::getBlue() const noexcept
-{
-    return m_rgb & 0xFF;
-}
-
-//-------------------------------------------------------------------------
-
 fb32::RGB8
 fb32::RGB8880::getRGB8() const noexcept
 {
     return RGB8{ static_cast<uint8_t>((m_rgb >> 16) & 0xFF),
                  static_cast<uint8_t>((m_rgb >> 8) & 0xFF),
                  static_cast<uint8_t>(m_rgb & 0xFF) };
-}
-
-//-------------------------------------------------------------------------
-
-void
-fb32::RGB8880::setRGB(
-    uint8_t red,
-    uint8_t green,
-    uint8_t blue) noexcept
-{
-    m_rgb = rgbTo8880(red, green, blue);
 }
 
 //-------------------------------------------------------------------------

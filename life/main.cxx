@@ -133,9 +133,10 @@ main(
 
     try
     {
+        constexpr RGB8880 grey{15, 15, 15};
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
-        fb.clearBuffers(RGB8880{15, 15, 15});
+        fb.clearBuffers(grey);
 
         std::println("width = {} height = {}", fb.getWidth(), fb.getHeight());
 

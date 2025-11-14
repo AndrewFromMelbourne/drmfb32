@@ -132,9 +132,9 @@ protected:
     std::vector<TraceData> m_traceData;
     std::vector<time_t> m_time;
 
-    static const fb32::RGB8880 sc_foreground;
-    static const fb32::RGB8880 sc_background;
-    static const fb32::RGB8880 sc_gridColour;
+    static constexpr fb32::RGB8880 sc_foreground{255, 255, 255};
+    static constexpr fb32::RGB8880 sc_background{0, 0, 0};
+    static constexpr fb32::RGB8880 sc_gridColour{48, 48, 48};
 
 private:
 

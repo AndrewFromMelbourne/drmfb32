@@ -210,13 +210,11 @@ Viewer::annotate()
     Point p2{length * font.getPixelWidth() + 2 * padding,
              font.getPixelHeight() + 2 * padding};
 
-    fb32::boxFilled(m_buffer, p1, p2, fb32::RGB8880{0}, 127);
+    constexpr fb32::RGB8880 black{0};
+    constexpr fb32::RGB8880 green{0, 255, 0};
 
-    font.drawString(
-        Point{padding, padding},
-        annotation,
-        fb32::RGB8880{0, 255, 0},
-        m_buffer);
+    fb32::boxFilled(m_buffer, p1, p2, black, 127);
+    font.drawString(Point{padding, padding}, annotation, green, m_buffer);
 }
 
 // ------------------------------------------------------------------------

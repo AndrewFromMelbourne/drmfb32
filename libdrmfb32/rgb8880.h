@@ -40,14 +40,14 @@ namespace fb32
 
 struct RGB8
 {
-    RGB8(uint8_t r, uint8_t g, uint8_t b)
+    constexpr RGB8(uint8_t r, uint8_t g, uint8_t b)
     :
         red{r},
         green{g},
         blue{b}
     {}
 
-    explicit RGB8(uint32_t rgb)
+    explicit constexpr RGB8(uint32_t rgb)
     :
         red{static_cast<uint8_t>((rgb >> 16) & 0xFF)},
         green{static_cast<uint8_t>((rgb >> 8) & 0xFF)},
@@ -65,33 +65,62 @@ class RGB8880
 {
 public:
 
-    RGB8880(uint8_t red, uint8_t green, uint8_t blue) noexcept;
+    constexpr RGB8880(uint8_t red, uint8_t green, uint8_t blue) noexcept
+    :
+        m_rgb{rgbTo8880(red, green, blue)}
+    {
+    }
+
+    //---------------------------------------------------------------------
 
     explicit RGB8880(RGB8 rbg) noexcept;
-    explicit RGB8880(uint32_t rgb) noexcept;
+
+    //---------------------------------------------------------------------
+
+    explicit constexpr RGB8880(uint32_t rgb) noexcept
+    :
+        m_rgb{rgb}
+    {
+    }
+
+    //---------------------------------------------------------------------
 
     [[nodiscard]] RGB8880 blend(uint8_t alpha, const RGB8880& background) const noexcept;
 
-    [[nodiscard]] uint8_t getRed() const noexcept;
-    [[nodiscard]] uint8_t getGreen() const noexcept;
-    [[nodiscard]] uint8_t getBlue() const noexcept;
+    [[nodiscard]] constexpr uint8_t getRed() const noexcept { return (m_rgb >> 16) & 0xFF; }
+    [[nodiscard]] constexpr uint8_t getGreen() const noexcept { return (m_rgb >> 8) & 0xFF; }
+    [[nodiscard]] constexpr uint8_t getBlue() const noexcept { return m_rgb & 0xFF; }
+
+
     [[nodiscard]] RGB8 getRGB8() const noexcept;
 
-    [[nodiscard]] uint32_t get8880() const noexcept { return m_rgb; }
+    [[nodiscard]] constexpr uint32_t get8880() const noexcept { return m_rgb; }
 
-    [[nodiscard]] bool isGrey() const noexcept
+    [[nodiscard]] constexpr bool isGrey() const noexcept
     {
         return (getRed() == getGreen()) and (getGreen() == getBlue());
     }
 
-    void setRGB(uint8_t red, uint8_t green, uint8_t blue) noexcept;
+    //---------------------------------------------------------------------
+
+    constexpr void
+    setRGB(
+        uint8_t red,
+        uint8_t green,
+        uint8_t blue) noexcept
+    {
+        m_rgb = rgbTo8880(red, green, blue);
+    }
+
+    //---------------------------------------------------------------------
+
     void setRGB8(RGB8 rgb) noexcept;
 
-    void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
+    constexpr void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
     void setGrey(uint8_t grey) noexcept { setRGB(grey, grey, grey); }
 
     [[nodiscard]] static RGB8880 blend(uint8_t alpha, const RGB8880& a, const RGB8880& b) noexcept;
-    [[nodiscard]] static uint32_t rgbTo8880(uint8_t red, uint8_t green, uint8_t blue) noexcept
+    [[nodiscard]] static constexpr uint32_t rgbTo8880(uint8_t red, uint8_t green, uint8_t blue) noexcept
     {
         return (red << 16) | (green << 8) | blue;
     }

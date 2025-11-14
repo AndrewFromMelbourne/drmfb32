@@ -143,8 +143,8 @@ main(
 
         //-----------------------------------------------------------------
 
-        const RGB8880 red{255, 0, 0};
-        const RGB8880 green{0, 255, 0};
+        constexpr RGB8880 red{255, 0, 0};
+        constexpr RGB8880 green{0, 255, 0};
 
         std::println("red: 0x{:08X}", red.get8880());
         std::println("green: 0x{:08X}", red.get8880());
@@ -175,8 +175,8 @@ main(
 
         //-----------------------------------------------------------------
 
-        const RGB8880 darkBlue{0, 0, 63};
-        const RGB8880 white{255, 255, 255};
+        constexpr RGB8880 darkBlue{0, 0, 63};
+        constexpr RGB8880 white{255, 255, 255};
 
         std::println("Dblue: 0x{:08X}", darkBlue.get8880());
         std::println("white: 0x{:08X}", white.get8880());

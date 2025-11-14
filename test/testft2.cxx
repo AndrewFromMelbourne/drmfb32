@@ -138,8 +138,8 @@ main(
 
     try
     {
-        const RGB8880 black{0, 0, 0};
-        const RGB8880 white{255, 255, 255};
+        constexpr RGB8880 black{0, 0, 0};
+        constexpr RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device, connector};
 
         Image8880 image{fb.getWidth(), fb.getHeight()};
