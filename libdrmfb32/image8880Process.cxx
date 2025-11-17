@@ -393,6 +393,43 @@ rowsScaleUp(
 
 //-------------------------------------------------------------------------
 
+void
+rowsRotate(
+    fb32::Image8880& image,
+    fb32::Image8880& output,
+    double sinAngle,
+    double cosAngle,
+    int jStart,
+    int jEnd)
+{
+    const auto inputHeight = image.getHeight();
+    const auto outputWidth = output.getWidth();
+
+    const auto y00 = inputHeight * cosAngle;
+
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        const auto b = y00 - j;
+
+        for (int i = 0 ; i < outputWidth ; ++i)
+        {
+
+            const auto x = static_cast<int>(floor(i * cosAngle) - (b * sinAngle));
+            const auto y = static_cast<int>(floor((i * sinAngle) + (b * cosAngle)));
+
+            const auto pixel = image.getPixel(Point{x, image.getHeight() - 1 - y});
+
+            if (pixel.has_value())
+            {
+                output.setPixel(Point{i, j}, pixel.value());
+            }
+        }
+    }
+}
+
+
+//-------------------------------------------------------------------------
+
 }
 
 //=========================================================================
@@ -406,8 +443,8 @@ fb32::boxBlur(
     const auto width = input.getWidth();
     const auto height = input.getHeight();
 
-    fb32::Image8880 rb{width, height};
-    fb32::Image8880 output{width, height};
+    Image8880 rb{width, height};
+    Image8880 output{width, height};
 
 #ifdef WITH_BS_THREAD_POOL
 
@@ -456,9 +493,9 @@ fb32::enlighten(
         return static_cast<uint8_t>(std::clamp(channel * scale, 0.0, 255.0));
     };
 
-    const auto mb = fb32::boxBlur(fb32::maxRGB(input), 12);
+    const auto mb = boxBlur(maxRGB(input), 12);
 
-    fb32::Image8880 output{input.getWidth(), input.getHeight()};
+    Image8880 output{input.getWidth(), input.getHeight()};
 
     const auto strength2 = strength * strength;
     const auto minI = 1.0 / flerp(1.0, 10.0, strength2);
@@ -469,9 +506,9 @@ fb32::enlighten(
 
     for (auto pixel : input.getBuffer())
     {
-        fb32::RGB8880 c{pixel};
+        RGB8880 c{pixel};
         const auto rgb8 = c.getRGB8();
-        const auto max = fb32::RGB8(*(mbi++)).red;
+        const auto max = RGB8(*(mbi++)).red;
         const auto illumination = std::clamp(max / 255.0, minI, maxI);
 
         if (illumination < maxI)
@@ -496,14 +533,14 @@ fb32::Image8880
 fb32::maxRGB(
     const fb32::Interface8880& input)
 {
-    fb32::Image8880 output{input.getWidth(), input.getHeight()};
+    Image8880 output{input.getWidth(), input.getHeight()};
     auto* buffer = output.getBuffer().data();
 
     for (const auto pixel : input.getBuffer())
     {
-        fb32::RGB8 rgb8(pixel);
+        RGB8 rgb8(pixel);
         const auto grey(std::max({rgb8.red, rgb8.green, rgb8.blue}));
-        *(buffer++) = fb32::RGB8880::rgbTo8880(grey, grey, grey);
+        *(buffer++) = RGB8880::rgbTo8880(grey, grey, grey);
     }
 
     return output;
@@ -522,7 +559,7 @@ fb32::resizeBilinearInterpolation(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    fb32::Image8880 output{width, height};
+    Image8880 output{width, height};
     resizeToBilinearInterpolation(input, output);
 
     return output;
@@ -541,7 +578,7 @@ fb32::resizeLanczos3Interpolation(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    fb32::Image8880 output{width, height};
+    Image8880 output{width, height};
     resizeToLanczos3Interpolation(input, output);
 
     return output;
@@ -560,7 +597,7 @@ fb32::resizeNearestNeighbour(
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    fb32::Image8880 output{width, height};
+    Image8880 output{width, height};
     resizeToNearestNeighbour(input, output);
 
     return output;
@@ -636,13 +673,187 @@ fb32::resizeToNearestNeighbour(
 //-------------------------------------------------------------------------
 
 fb32::Image8880
+fb32::rotate(
+    const fb32::Interface8880& input,
+    uint32_t background,
+    double angle)
+{
+    if (angle >= 360.0)
+    {
+        angle = fmod(angle, 360.0);
+    }
+    else if (angle < 0.0)
+    {
+        angle = 360.0 + fmod(angle, 360.0);
+    }
+
+    // rotate so angle is in the range 0 to 90
+
+    Image8880 image;
+
+    if (angle >= 270.0)
+    {
+        image = rotate270(input);
+        angle -= 270.0;
+    }
+    else if (angle >= 180.0)
+    {
+        image = rotate180(input);
+        angle -= 180.0;
+    }
+    else if (angle >= 90.0)
+    {
+        image = rotate90(input);
+        angle -= 90.0;
+    }
+    else
+    {
+        image = Image8880(input.getWidth(), input.getHeight(), input.getBuffer());
+    }
+
+    // now angle is in the range 0 to 90
+    if (std::min(angle, 90.0 - angle) < 0.01)
+    {
+        return image;
+    }
+
+    //---------------------------------------------------------------------
+    //
+    // (x0,y0) +-------+ (x1,y0)
+    //         |       |
+    //         |       |
+    //         |       |
+    // (x0,y1) +-------+ (x1,y1)
+    //
+    // x' =  x * cos(angle) + y * sin(angle)
+    // y' = -x * sin(angle) + y * cos(angle)
+    //
+    // x = x' * cos(angle) - y' * sin(angle)
+    // y = x' * sin(angle) + y' * cos(angle)
+    //
+    //---------------------------------------------------------------------
+
+    const auto radians = angle * (std::numbers::pi_v<double> / 180.0);
+    const auto cosAngle = std::cos(radians);
+    const auto sinAngle = std::sin(radians);
+
+    const auto inputWidth = image.getWidth();
+    const auto inputHeight = image.getHeight();
+
+    const auto x10 = (inputWidth * cosAngle) + (inputHeight * sinAngle);
+    const auto y00 = inputHeight * cosAngle;
+    const auto y11 = -(inputWidth * sinAngle);
+
+    const auto outputWidth = static_cast<int>(std::ceil(x10));
+    const auto outputHeight = static_cast<int>(std::ceil(y00 - y11 + 1.0));
+
+    Image8880 output{outputWidth, outputHeight};
+    output.clear(background);
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&image, &output, sinAngle, cosAngle](int start, int end)
+    {
+        rowsRotate(image, output, sinAngle, cosAngle, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.wait();
+#else
+    rowsRotate(image, output, sinAngle, cosAngle, 0, output.getHeight());
+#endif
+
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::rotate90(
+    const fb32::Interface8880& input)
+{
+    const auto width = input.getWidth();
+    const auto height = input.getHeight();
+    Image8880 output{height, width};
+
+    for (auto j = 0 ; j < height ; ++j)
+    {
+        for (auto i = 0 ; i < width ; ++i)
+        {
+            const auto pixel{input.getPixel(Point{i, j})};
+
+            if (pixel.has_value())
+            {
+                output.setPixel(Point{height - j - 1, i}, pixel.value());
+            }
+        }
+    }
+
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::rotate180(
+    const fb32::Interface8880& input)
+{
+    const auto width = input.getWidth();
+    const auto height = input.getHeight();
+    Image8880 output{width, height};
+
+    for (auto j = 0 ; j < height ; ++j)
+    {
+        for (auto i = 0 ; i < width ; ++i)
+        {
+            const auto pixel{input.getPixel(Point{i, j})};
+
+            if (pixel.has_value())
+            {
+                output.setPixel(Point{width - i - 1, height - j - 1}, pixel.value());
+            }
+        }
+    }
+
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::rotate270(
+    const fb32::Interface8880& input)
+{
+    const auto width = input.getWidth();
+    const auto height = input.getHeight();
+    Image8880 output{height, width};
+
+    for (auto j = 0 ; j < height ; ++j)
+    {
+        for (auto i = 0 ; i < width ; ++i)
+        {
+            const auto pixel{input.getPixel(Point{i, j})};
+
+            if (pixel.has_value())
+            {
+                output.setPixel(Point{j, width - i - 1}, pixel.value());
+            }
+        }
+    }
+
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
 fb32::scaleUp(
     const fb32::Interface8880& input,
     uint8_t scale)
 {
     const auto width = input.getWidth();
     const auto height = input.getHeight();
-    fb32::Image8880 output{width * scale, height * scale};
+    Image8880 output{width * scale, height * scale};
 
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();

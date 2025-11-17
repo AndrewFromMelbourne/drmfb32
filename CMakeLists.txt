@@ -230,6 +230,12 @@ target_link_libraries(testResize drmfb32 ${DRM_LIBRARIES}
 
 #--------------------------------------------------------------------------
 
+add_executable(testRotate test/testRotate.cxx)
+target_link_libraries(testRotate drmfb32 ${DRM_LIBRARIES}
+                                         ${BS_THREAD_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 add_executable(joysticktest test/testJoystick.cxx)
 target_link_libraries(joysticktest drmfb32)
 

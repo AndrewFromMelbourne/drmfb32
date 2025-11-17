@@ -89,6 +89,41 @@ resizeToNearestNeighbour(
     Image8880& output);
 
 [[nodiscard]] Image8880
+rotate(
+    const Interface8880& input,
+    uint32_t background,
+    double angle);
+
+[[nodiscard]] inline Image8880
+rotate(
+    const Interface8880& input,
+    const RGB8880& background,
+    double angle)
+{
+    return rotate(input, background.get8880(), angle);
+}
+
+[[nodiscard]] inline Image8880
+rotate(
+    const Interface8880& input,
+    double angle)
+{
+    return rotate(input, 0, angle);
+}
+
+[[nodiscard]] Image8880
+rotate90(
+    const Interface8880& input);
+
+[[nodiscard]] Image8880
+rotate180(
+    const Interface8880& input);
+
+[[nodiscard]] Image8880
+rotate270(
+    const Interface8880& input);
+
+[[nodiscard]] Image8880
 scaleUp(
     const Interface8880& input,
     uint8_t scale);
