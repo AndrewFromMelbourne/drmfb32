@@ -123,7 +123,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        RGB8880 red{255, 0, 0};
+        constexpr RGB8880 red{255, 0, 0};
 
         //-----------------------------------------------------------------
 
@@ -132,7 +132,7 @@ main(
         const auto fwidth{fb.getWidth()};
         const auto fheight{fb.getHeight()};
 
-        Image8880 image
+        const Image8880 image
         {
             iwidth,
             iwidth,
