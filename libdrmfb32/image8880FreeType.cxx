@@ -58,6 +58,15 @@ Image8880FreeType::Image8880FreeType(
 
 //-------------------------------------------------------------------------
 
+Image8880FreeType::Image8880FreeType(
+    const FontConfig& fontConfig)
+:
+    Image8880FreeType(fontConfig.m_fontFile, fontConfig.m_pixelHeight)
+{
+}
+
+//-------------------------------------------------------------------------
+
 Image8880FreeType::~Image8880FreeType()
 {
     FT_Done_FreeType(m_library);

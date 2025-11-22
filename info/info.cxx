@@ -151,7 +151,7 @@ printUsage(
     std::println(stream, "    --daemon,-D - start in the background as a daemon");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
-    std::println(stream, "    --font,-f - font file to use");
+    std::println(stream, "    --font,-f - font file to use[:pixel height]");
     std::println(stream, "    --help,-h - println usage and exit");
     std::println(stream, "    --pidfile,-p <pidfile> - create and lock PID file (if being run as a daemon)");
     std::println(stream, "");
@@ -193,7 +193,7 @@ main(
     uint32_t connector{0};
     std::string device{};
     const std::string program{basename(argv[0])};
-    std::string fontFile{};
+    fb32::FontConfig fontConfig;
     char* pidfile{};
     bool isDaemon{false};
 
@@ -231,7 +231,7 @@ main(
 
         case 'f':
 
-            fontFile = optarg;
+            fontConfig = fb32::parseFontConfig(optarg, 16);
 
             break;
 
@@ -321,11 +321,11 @@ main(
 
     std::unique_ptr<fb32::Interface8880Font> font{std::make_unique<fb32::Image8880Font8x16>()};
 
-    if (not fontFile.empty())
+    if (not fontConfig.m_fontFile.empty())
     {
         try
         {
-            font = std::make_unique<fb32::Image8880FreeType>(fontFile, 16);
+            font = std::make_unique<fb32::Image8880FreeType>(fontConfig);
         }
         catch (std::exception& error)
         {

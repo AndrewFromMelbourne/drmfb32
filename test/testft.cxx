@@ -71,7 +71,7 @@ main(
     uint32_t connector{0};
     std::string device{};
     const std::string program = basename(argv[0]);
-    std::string font{};
+    FontConfig fontConfig;
 
     //---------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ main(
 
         case 'f':
 
-            font = optarg;
+            fontConfig = fb32::parseFontConfig(optarg, 32);
 
             break;
 
@@ -127,7 +127,7 @@ main(
 
     //---------------------------------------------------------------------
 
-    if (font.empty())
+    if (fontConfig.m_fontFile.empty())
     {
         std::println(std::cerr, "Error: Font file must be specfied");
         exit(EXIT_FAILURE);
@@ -146,7 +146,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        Image8880FreeType ft{font, 32};
+        Image8880FreeType ft{fontConfig};
 
         Interface8880Point p{0, 0};
 

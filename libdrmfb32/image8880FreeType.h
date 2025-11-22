@@ -62,6 +62,7 @@ public:
 
     Image8880FreeType() = default;
     Image8880FreeType(const std::string& fontFile, int pixelSize);
+    explicit Image8880FreeType(const FontConfig& fontConfig);
     ~Image8880FreeType() override;
 
     Image8880FreeType(const Image8880FreeType&) = delete;
