@@ -57,7 +57,7 @@ printUsage(
     std::println(stream, "    --character,-C - index character to draw");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
-    std::println(stream, "    --font,-f - font file to use");
+    std::println(stream, "    --font,-f - font file to use[:pixel height]");
     std::println(stream, "    --help,-h - print usage and exit");
     std::println(stream, "");
 }
