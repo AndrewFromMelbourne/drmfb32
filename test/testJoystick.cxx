@@ -29,8 +29,6 @@
 #include <libgen.h>
 #include <unistd.h>
 
-#include <fmt/format.h>
-
 #include <cmath>
 #include <iostream>
 #include <print>
