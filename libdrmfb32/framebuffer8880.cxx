@@ -188,7 +188,7 @@ fb32::FrameBuffer8880::getBufferSize() const noexcept
 
 std::size_t
 fb32::FrameBuffer8880::offset(
-    const Interface8880Point& p) const noexcept
+    Interface8880Point p) const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
     return p.x() + p.y() * dbb.m_lineLengthPixels;

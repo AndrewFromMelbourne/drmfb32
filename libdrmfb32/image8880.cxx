@@ -94,7 +94,7 @@ fb32::Image8880::Image8880(
 
 std::size_t
 fb32::Image8880::offset(
-    const Interface8880Point& p) const noexcept
+    Interface8880Point p) const noexcept
 {
     return p.x() + (p.y() * m_width);
 }

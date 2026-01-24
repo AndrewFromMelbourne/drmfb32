@@ -87,30 +87,30 @@ public:
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
 
-    std::optional<RGB8880> getFramePixelRGB(const Interface8880Point& p, uint8_t frame) const;
-    std::optional<uint32_t> getFramePixel(const Interface8880Point& p, uint8_t frame) const;
+    std::optional<RGB8880> getFramePixelRGB(Interface8880Point p, uint8_t frame) const;
+    std::optional<uint32_t> getFramePixel(Interface8880Point p, uint8_t frame) const;
 
     void setFrame(uint8_t frame);
 
-    bool setFramePixel(const Interface8880Point& p, uint32_t rgb, uint8_t frame);
+    bool setFramePixel(Interface8880Point p, uint32_t rgb, uint8_t frame);
 
     bool
     setPixelRGB(
-        const Interface8880Point& p,
+        Interface8880Point p,
         const RGB8880& rgb,
         uint8_t frame)
     {
         return setFramePixel(p, rgb.get8880(), frame);
     }
 
-    std::size_t offset(const Interface8880Point& p) const noexcept override
+    std::size_t offset(Interface8880Point p) const noexcept override
     {
         return offset(p, m_frame);
     }
 
 private:
 
-    [[nodiscard]] std::size_t offset(const Interface8880Point& p, uint8_t frame) const noexcept;
+    [[nodiscard]] std::size_t offset(Interface8880Point p, uint8_t frame) const noexcept;
 
     int m_width{};
     int m_height{};

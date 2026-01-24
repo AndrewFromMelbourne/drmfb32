@@ -55,7 +55,7 @@ fb32::Interface8880::clear(
 
 std::optional<fb32::RGB8880>
 fb32::Interface8880::getPixelRGB(
-    const Interface8880Point& p) const
+    Interface8880Point p) const
 {
     if (not validPixel(p))
     {
@@ -70,7 +70,7 @@ fb32::Interface8880::getPixelRGB(
 
 std::optional<fb32::RGB8>
 fb32::Interface8880::getPixelRGB8(
-    const Interface8880Point& p) const
+    Interface8880Point p) const
 {
     if (not validPixel(p))
     {
@@ -85,7 +85,7 @@ fb32::Interface8880::getPixelRGB8(
 
 std::optional<uint32_t>
 fb32::Interface8880::getPixel(
-    const Interface8880Point& p) const
+    Interface8880Point p) const
 {
     if (not validPixel(p))
     {
@@ -136,7 +136,7 @@ fb32::Interface8880::getRow(
 
 bool
 fb32::Interface8880::putImage(
-    const Interface8880Point& p_left,
+    Interface8880Point p_left,
     const Interface8880& image)
 {
     Interface8880Point p{ p_left.x(), p_left.y() };
@@ -168,7 +168,7 @@ fb32::Interface8880::putImage(
 
 bool
 fb32::Interface8880::putImagePartial(
-    const Interface8880Point& p,
+    Interface8880Point p,
     const Interface8880& image)
 {
     auto x = p.x();
@@ -228,7 +228,7 @@ fb32::Interface8880::putImagePartial(
 
 bool
 fb32::Interface8880::setPixel(
-    const Interface8880Point& p,
+    Interface8880Point p,
     uint32_t rgb)
 {
     bool isValid{validPixel(p)};

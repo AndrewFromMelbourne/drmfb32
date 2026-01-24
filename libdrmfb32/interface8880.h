@@ -64,18 +64,18 @@ public:
     void clear(const RGB8880& rgb) { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0);
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(const Interface8880Point& p) const;
-    [[nodiscard]] virtual std::optional<RGB8> getPixelRGB8(const Interface8880Point& p) const;
-    [[nodiscard]] virtual std::optional<uint32_t> getPixel(const Interface8880Point& p) const;
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Interface8880Point p) const;
+    [[nodiscard]] virtual std::optional<RGB8> getPixelRGB8(Interface8880Point p) const;
+    [[nodiscard]] virtual std::optional<uint32_t> getPixel(Interface8880Point p) const;
 
     [[nodiscard]] std::span<uint32_t> getRow(int y);
     [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
 
-    [[nodiscard]] virtual std::size_t offset(const Interface8880Point& p) const noexcept = 0;
+    [[nodiscard]] virtual std::size_t offset(Interface8880Point p) const noexcept = 0;
 
     bool
     setPixelRGB(
-        const Interface8880Point& p,
+        Interface8880Point p,
         const RGB8880& rgb)
     {
         return setPixel(p, rgb.get8880());
@@ -83,18 +83,18 @@ public:
 
     bool
     setPixelRGB8(
-        const Interface8880Point& p,
+        Interface8880Point p,
         RGB8 rgb)
     {
         return setPixel(p, RGB8880(rgb).get8880());
     }
 
-    bool setPixel(const Interface8880Point& p, uint32_t rgb);
+    bool setPixel(Interface8880Point p, uint32_t rgb);
 
-    virtual bool putImage(const Interface8880Point& p, const Interface8880& image);
+    virtual bool putImage(Interface8880Point p, const Interface8880& image);
 
     [[nodiscard]] bool
-    validPixel(const Interface8880Point& p) const noexcept
+    validPixel(Interface8880Point p) const noexcept
     {
         return ((p.x() >= 0) and
                 (p.x() < getWidth()) and
@@ -104,7 +104,7 @@ public:
 
 private:
 
-    bool putImagePartial(const Interface8880Point& p, const Interface8880& image);
+    bool putImagePartial(Interface8880Point p, const Interface8880& image);
 };
 
 //-------------------------------------------------------------------------

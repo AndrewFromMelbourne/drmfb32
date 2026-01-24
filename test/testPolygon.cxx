@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2024 Andrew Duncan
+// Copyright (c) 2026 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -29,17 +29,17 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <array>
 #include <chrono>
+#include <cmath>
 #include <iostream>
+#include <numbers>
 #include <print>
 #include <system_error>
 #include <thread>
 
 #include "framebuffer8880.h"
-#include "image8880.h"
-#include "image8880Font8x16.h"
 #include "image8880Graphics.h"
-#include "image8880Process.h"
 #include "point.h"
 
 //-------------------------------------------------------------------------
@@ -125,53 +125,67 @@ main(
     {
         FrameBuffer8880 fb{device, connector};
 
-        constexpr RGB8880 darkBlue{0, 0, 63};
+        //-----------------------------------------------------------------
+
+        const auto fwidth = fb.getWidth();
+        const auto fheight = fb.getHeight();
+
         constexpr RGB8880 white{255, 255, 255};
+        constexpr RGB8880 grey(192, 192, 192);
+        constexpr RGB8880 black{0, 0, 0};
 
-        constexpr int width{248};
-        constexpr int height{16};
-
-        Image8880 image(width, height);
-        image.clear(darkBlue);
+        fb.clearBuffers(grey);
 
         //-----------------------------------------------------------------
 
-        Image8880Font8x16 font;
-
-        font.drawString(
-            Interface8880Point{4, 0},
-            "Lorem ipsum dolor sit amet ...",
-            white,
-            image);
+        const int diameter = std::min(fwidth, fheight) / 4;
+        const int radius = (diameter / 2) - 5;
 
         //-----------------------------------------------------------------
 
-        constexpr int scale{3};
-        constexpr int swidth{scale * width};
-        constexpr int sheight{scale * height};
-        constexpr int imageOffset{200};
-        constexpr int yStep{sheight + 8};
-
-        const auto imageSu = scaleUp(image, scale);
-        const auto imageNn = resizeNearestNeighbour(image, swidth, sheight);
-        const auto imageBi = resizeBilinearInterpolation(image, swidth, sheight);
-        const auto imageLi = resizeLanczos3Interpolation(image, swidth, sheight);
-
-        Interface8880Point t{0, 0};
-        Interface8880Point p{ imageOffset, 0 };
-
-        auto show = [&](std::string_view title, const Image8880& image)
+        auto starVertex = [](int i, int r, int x, int y) -> Interface8880Point
         {
-            font.drawString(t, title, white, fb);
-            fb.putImage(p, image);
-            t.translateY(yStep);
-            p.translateY(yStep);
+            constexpr auto pi = std::numbers::pi;
+            constexpr auto phi = std::numbers::phi;
+            const auto sinValue = std::sin((i * pi) / 5.0);
+            const auto cosValue = std::cos((i * pi) / 5.0);
+            const auto radius = (i % 2 == 0) ? r : (r * (2 - phi));
+            return Interface8880Point{
+                x + static_cast<int>(std::round(radius * sinValue)),
+                y - static_cast<int>(std::round(radius * cosValue))
+            };
         };
 
-        show("Scale up:", imageSu);
-        show("Nearest neighbour:", imageNn);
-        show("Bilinear interpolation:", imageBi);
-        show("Lanczos3 interpolation:", imageLi);
+        //-----------------------------------------------------------------
+
+        const int jIncrement = fheight / 4;
+        const int iIncrement = fwidth / 4;
+
+        for (int j = 0; j <= fheight; j += jIncrement)
+        {
+            const int index = j / jIncrement;
+            const int startI = (index % 2 == 0) ? 0 : (iIncrement / 2);
+            for (int i = startI; i <= fwidth; i += iIncrement)
+            {
+                const std::array<Interface8880Point, 10> starVertices{
+                    starVertex(0, radius, i, j),
+                    starVertex(1, radius, i, j),
+                    starVertex(2, radius, i, j),
+                    starVertex(3, radius, i, j),
+                    starVertex(4, radius, i, j),
+                    starVertex(5, radius, i, j),
+                    starVertex(6, radius, i, j),
+                    starVertex(7, radius, i, j),
+                    starVertex(8, radius, i, j),
+                    starVertex(9, radius, i, j)
+                };
+
+                polygonFilled(fb, starVertices, white);
+                polygon(fb, starVertices, black);
+            }
+        }
+
+        //-----------------------------------------------------------------
 
         fb.update();
 

@@ -117,7 +117,7 @@ public:
     [[nodiscard]] bool hasAtomic() const noexcept { return m_hasAtomic; }
     [[nodiscard]] bool hasUniversalPlanes() const noexcept { return m_hasUniversalPlanes; }
 
-    [[nodiscard]] std::size_t offset(const Interface8880Point& p) const noexcept override;
+    [[nodiscard]] std::size_t offset(Interface8880Point p) const noexcept override;
 
     void update();
 

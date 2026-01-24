@@ -65,15 +65,18 @@ private:
     fb32::RGB8880 m_warning;
     fb32::RGB8880 m_background;
 
-    void drawIpAddress(fb32::Interface8880Point& position,
-                       fb32::Interface8880Font& font);
+    fb32::Interface8880Point
+    drawIpAddress(fb32::Interface8880Point position,
+                  fb32::Interface8880Font& font);
 
-    void drawTemperature(fb32::Interface8880Point& position,
-                         fb32::Interface8880Font& font);
+    fb32::Interface8880Point
+    drawTemperature(fb32::Interface8880Point position,
+                    fb32::Interface8880Font& font);
 
-    void drawTime(fb32::Interface8880Point& position,
-                  fb32::Interface8880Font& font,
-                  time_t now);
+    fb32::Interface8880Point
+    drawTime(fb32::Interface8880Point position,
+             fb32::Interface8880Font& font,
+             time_t now);
 };
 
 //-------------------------------------------------------------------------

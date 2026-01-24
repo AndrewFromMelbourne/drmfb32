@@ -219,6 +219,16 @@ endif()
 
 #--------------------------------------------------------------------------
 
+add_executable(testLines test/testLines.cxx)
+target_link_libraries(testLines drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
+add_executable(testPolygon test/testPolygon.cxx)
+target_link_libraries(testPolygon drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
 add_executable(testPutImage test/testPutImage.cxx)
 target_link_libraries(testPutImage drmfb32 ${DRM_LIBRARIES})
 

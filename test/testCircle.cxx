@@ -36,8 +36,6 @@
 #include <thread>
 
 #include "framebuffer8880.h"
-#include "image8880.h"
-#include "image8880Font8x16.h"
 #include "image8880Graphics.h"
 #include "point.h"
 

@@ -30,6 +30,7 @@
 //-------------------------------------------------------------------------
 
 #include <cstdint>
+#include <span>
 
 #include "image8880.h"
 #include "point.h"
@@ -44,83 +45,83 @@ namespace fb32
 
 void
 box(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb);
 
 inline void
 box(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     const RGB8880& rgb)
 {
-    box(image, p1, p2, rgb.get8880());
+    box(iface, p1, p2, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------
 
 void
 boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb);
 
 inline void
 boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     const RGB8880& rgb)
 {
-    boxFilled(image, p1, p2, rgb.get8880());
+    boxFilled(iface, p1, p2, rgb.get8880());
 }
 
 void
 boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     const RGB8880& rgb,
     uint8_t alpha);
 
 inline void
 boxFilled(
-        Interface8880& image,
-        const Interface8880Point& p1,
-        const Interface8880Point& p2,
+        Interface8880& iface,
+        Interface8880Point p1,
+        Interface8880Point p2,
         uint32_t rgb,
         uint8_t alpha)
 {
-    boxFilled(image, p1, p2, RGB8880{rgb}, alpha);
+    boxFilled(iface, p1, p2, RGB8880{rgb}, alpha);
 }
 
 //-------------------------------------------------------------------------
 
 void
 line(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb);
 
 inline void
 line(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     const RGB8880& rgb)
 {
-    line(image, p1, p2, rgb.get8880());
+    line(iface, p1, p2, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------
 
 void
 horizontalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x1,
     int x2,
     int y,
@@ -128,20 +129,20 @@ horizontalLine(
 
 inline void
 horizontalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x1,
     int x2,
     int y,
     const RGB8880& rgb)
 {
-    horizontalLine(image, x1, x2, y, rgb.get8880());
+    horizontalLine(iface, x1, x2, y, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------
 
 void
 verticalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x,
     int y1,
     int y2,
@@ -149,51 +150,102 @@ verticalLine(
 
 inline void
 verticalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x,
     int y1,
     int y2,
     const RGB8880& rgb)
 {
-    verticalLine(image, x, y1, y2, rgb.get8880());
+    verticalLine(iface, x, y1, y2, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------
 
 void
 circle(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     uint32_t rgb);
 
 inline void
 circle(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     const RGB8880& rgb)
 {
-    circle(image, p, r, rgb.get8880());
+    circle(iface, p, r, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------
 
 void
 circleFilled(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     uint32_t rgb);
 
 inline void
 circleFilled(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     const RGB8880& rgb)
 {
-    circleFilled(image, p, r, rgb.get8880());
+    circleFilled(iface, p, r, rgb.get8880());
+}
+
+//-------------------------------------------------------------------------
+
+void
+polygon(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb);
+
+inline void
+polygon(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    const RGB8880& rgb)
+{
+    polygon(iface, vertices, rgb.get8880());
+}
+
+//-------------------------------------------------------------------------
+
+void
+polygonFilled(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb);
+
+inline void
+polygonFilled(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    const RGB8880& rgb)
+{
+    polygonFilled(iface, vertices, rgb.get8880());
+}
+
+//-------------------------------------------------------------------------
+
+void
+polyline(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb);
+
+inline void
+polyline(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    const RGB8880& rgb)
+{
+    polyline(iface, vertices, rgb.get8880());
 }
 
 //-------------------------------------------------------------------------

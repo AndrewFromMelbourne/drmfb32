@@ -82,7 +82,7 @@ public:
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
 
-    std::size_t offset(const Interface8880Point& p) const noexcept override;
+    std::size_t offset(Interface8880Point p) const noexcept override;
 
 private:
 

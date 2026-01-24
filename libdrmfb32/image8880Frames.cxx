@@ -115,7 +115,7 @@ fb32::Image8880Frames::setFrame(
 
 bool
 fb32::Image8880Frames::setFramePixel(
-    const Interface8880Point& p,
+    Interface8880Point p,
     uint32_t rgb,
     uint8_t frame)
 {
@@ -133,7 +133,7 @@ fb32::Image8880Frames::setFramePixel(
 
 std::size_t
 fb32::Image8880Frames::offset(
-    const Interface8880Point& p,
+    Interface8880Point p,
     uint8_t frame) const noexcept
 {
     return p.x() + (p.y() * m_width) + (m_width * m_height * frame);

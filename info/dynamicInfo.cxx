@@ -120,9 +120,9 @@ getTime(
 
 //=========================================================================
 
-void
+fb32::Interface8880Point
 DynamicInfo::drawIpAddress(
-    fb32::Interface8880Point& position,
+    fb32::Interface8880Point position,
     fb32::Interface8880Font& font)
 {
     position = font.drawString(position,
@@ -147,13 +147,14 @@ DynamicInfo::drawIpAddress(
                                m_foreground,
                                getImage());
 
+    return position;
 }
 
 //-------------------------------------------------------------------------
 
-void
+fb32::Interface8880Point
 DynamicInfo::drawTemperature(
-    fb32::Interface8880Point& position,
+    fb32::Interface8880Point position,
     fb32::Interface8880Font& font)
 {
     position = font.drawString(position,
@@ -184,13 +185,14 @@ DynamicInfo::drawTemperature(
                                m_foreground,
                                getImage());
 
+    return position;
 }
 
 //-------------------------------------------------------------------------
 
-void
+fb32::Interface8880Point
 DynamicInfo::drawTime(
-    fb32::Interface8880Point& position,
+    fb32::Interface8880Point position,
     fb32::Interface8880Font& font,
     time_t now)
 {
@@ -205,6 +207,8 @@ DynamicInfo::drawTime(
                                timeString + " ",
                                m_foreground,
                                getImage());
+
+    return position;
 }
 
 //-------------------------------------------------------------------------
@@ -242,7 +246,7 @@ DynamicInfo::update(
     //---------------------------------------------------------------------
 
     fb32::Interface8880Point position = { 0, 0 };
-    drawIpAddress(position, font);
-    drawTime(position, font, now);
-    drawTemperature(position, font);
+    position = drawIpAddress(position, font);
+    position = drawTime(position, font, now);
+    position = drawTemperature(position, font);
 }

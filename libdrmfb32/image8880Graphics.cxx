@@ -25,18 +25,96 @@
 //
 //-------------------------------------------------------------------------
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <span>
 
 #include "interface8880.h"
 #include "image8880Graphics.h"
 #include "point.h"
 
+//=========================================================================
+
+namespace
+{
+
 //-------------------------------------------------------------------------
 
-using Point = fb32::Interface8880Point;
+void
+trim(
+    const fb32::Interface8880& iface,
+    fb32::Interface8880Point& p1,
+    fb32::Interface8880Point& p2)
+{
+    if ((p1.x() == p2.x()) or (p1.y() == p2.y()))
+    {
+        return;
+    }
+
+    const auto minX = std::min(p1.x(), p2.x());
+    const auto maxX = std::max(p1.x(), p2.x());
+
+    const auto minY = std::min(p1.y(), p2.y());
+    const auto maxY = std::max(p1.y(), p2.y());
+
+    if ((minX > 0) and
+        (maxX < iface.getWidth()) and
+        (minY > 0) and
+        (maxY < iface.getHeight()))
+    {
+        return;
+    }
+
+    if (p1.y() > p2.y())
+    {
+        std::swap(p1, p2);
+    }
+
+    auto rise = p2.y() - p1.y();
+    auto run = p2.x() - p1.x();
+    auto c = p1.y() - (rise * p1.x()) / run;
+
+    if (p1.y() < 0)
+    {
+        p1.setY(0);
+        p1.setX((p1.y() - c) * run / rise);
+    }
+
+    if (p2.y() >= iface.getHeight())
+    {
+        p2.setY(iface.getHeight() - 1);
+        p2.setX((p2.y() - c) * run / rise);
+    }
+
+    if (p1.x() > p2.x())
+    {
+        std::swap(p1, p2);
+
+    }
+
+    rise = p2.y() - p1.y();
+    run = p2.x() - p1.x();
+    c = p1.y() - (rise * p1.x()) / run;
+
+    if (p1.x() < 0)
+    {
+        p1.setX(0);
+        p1.setY((rise * p1.x()) / run + c);
+    }
+
+    if (p2.x() >= iface.getWidth())
+    {
+        p2.setX(iface.getWidth() - 1);
+        p2.setY((rise * p2.x()) / run + c);
+    }
+}
 
 //-------------------------------------------------------------------------
+
+} // namespace
+
+//=========================================================================
 
 namespace fb32
 {
@@ -45,35 +123,37 @@ namespace fb32
 
 void
 box(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb)
 {
-    verticalLine(image, p1.x(), p1.y(), p2.y(), rgb);
-    horizontalLine(image, p1.x(), p2.x(), p1.y(), rgb);
-    verticalLine(image, p2.x(), p1.y(), p2.y(), rgb);
-    horizontalLine(image, p1.x(), p2.x(), p2.y(), rgb);
+    trim(iface, p1, p2);
+    verticalLine(iface, p1.x(), p1.y(), p2.y(), rgb);
+    horizontalLine(iface, p1.x(), p2.x(), p1.y(), rgb);
+    verticalLine(iface, p2.x(), p1.y(), p2.y(), rgb);
+    horizontalLine(iface, p1.x(), p2.x(), p2.y(), rgb);
 }
 
 //-------------------------------------------------------------------------
 
 void
 boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb)
 {
-    const auto sign_y = (p1.y() <= p2.y()) ? 1 : -1;
-    auto y = p1.y();
+    trim(iface, p1, p2);
 
-    horizontalLine(image, p1.x(), p2.x(), y, rgb);
-
-    while (y != p2.y())
+    if (p1.y() > p2.y())
     {
-        y += sign_y;
-        horizontalLine(image, p1.x(), p2.x(), y, rgb);
+        std::swap(p1, p2);
+    }
+
+    for (auto y = p1.y(); y <= p2.y(); ++y)
+    {
+         horizontalLine(iface, p1.x(), p2.x(), y, rgb);
     }
 }
 
@@ -81,105 +161,138 @@ boxFilled(
 
 void
 boxFilled(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     const RGB8880& rgb,
     uint8_t alpha)
 {
-    const auto sign_x = (p1.x() <= p2.x()) ? 1 : -1;
-    const auto sign_y = (p1.y() <= p2.y()) ? 1 : -1;
+    trim(iface, p1, p2);
 
-    for (auto j = p1.y() ; j <= p2.y() ; j += sign_y)
+    Interface8880Point pa{std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y())};
+    Interface8880Point pb{std::max(p1.x(), p2.x()), std::max(p1.y(), p2.y())};
+
+    for (auto j = pa.y() ; j <= pb.y() ; ++j)
     {
-        for (auto i = p1.x() ; i <= p2.x() ; i += sign_x)
+        for (auto i = pa.x() ; i <= pb.x() ; ++i)
         {
             const Point p{i, j};
-            auto background = image.getPixelRGB(p);
+            auto background = iface.getPixelRGB(p);
 
             if (background.has_value())
             {
-                image.setPixelRGB(p, rgb.blend(alpha, *background));
+                iface.setPixelRGB(p, rgb.blend(alpha, *background));
             }
         }
     }
 }
 
-//-------------------------------------------------------------------------
+//=========================================================================
 
 void
 line(
-    Interface8880& image,
-    const Interface8880Point& p1,
-    const Interface8880Point& p2,
+    Interface8880& iface,
+    Interface8880Point p1,
+    Interface8880Point p2,
     uint32_t rgb)
 {
+    trim(iface, p1, p2);
+
+    const auto minX = std::min(p1.x(), p2.x());
+    const auto maxX = std::max(p1.x(), p2.x());
+
+    if ((maxX < 0) or (minX >= iface.getWidth()))
+    {
+        return;
+    }
+
+    const auto minY = std::min(p1.y(), p2.y());
+    const auto maxY = std::max(p1.y(), p2.y());
+
+    if ((maxY < 0) or (minY >= iface.getHeight()))
+    {
+        return;
+    }
+
     if (p1.y() == p2.y())
     {
-        horizontalLine(image, p1.x(), p2.x(), p1.y(), rgb);
+        horizontalLine(iface, p1.x(), p2.x(), p1.y(), rgb);
+        return;
     }
-    else if (p1.x() == p2.x())
+
+    if (p1.x() == p2.x())
     {
-        verticalLine(image, p1.x(), p1.y(), p2.y(), rgb);
+        verticalLine(iface, p1.x(), p1.y(), p2.y(), rgb);
+        return;
+    }
+
+    const auto dx = std::abs(p2.x() - p1.x());
+    const auto dy = std::abs(p2.y() - p1.y());
+
+    if (dx > dy)
+    {
+        if (p1.x() > p2.x())
+        {
+            std::swap(p1, p2);
+        }
+
+        const auto sign_y = (p1.y() <= p2.y()) ? 1 : -1;
+        auto y = p1.y();
+        auto d = 2 * dy - dx;
+        const auto incrE = 2 * dy;
+        const auto incrNE = 2 * (dy - dx);
+
+        if (d > 0)
+        {
+            iface.setPixel(p1, rgb);
+        }
+
+        for (auto x = p1.x(); x != p2.x(); ++x)
+        {
+            if (d <= 0)
+            {
+                d += incrE;
+            }
+            else
+            {
+                d += incrNE;
+                y += sign_y;
+            }
+
+            iface.setPixel(Point(x, y), rgb);
+        }
     }
     else
     {
-        const auto dx = std::abs(p2.x() - p1.x());
-        const auto dy = std::abs(p2.y() - p1.y());
+        if (p1.y() > p2.y())
+        {
+            std::swap(p1, p2);
+        }
 
         const auto sign_x = (p1.x() <= p2.x()) ? 1 : -1;
-        const auto sign_y = (p1.y() <= p2.y()) ? 1 : -1;
-
         auto x = p1.x();
-        auto y = p1.y();
+        auto d = 2 * dx - dy;
+        const auto incrN = 2 * dx;
+        const auto incrNE = 2 * (dx - dy);
 
-        image.setPixel(p1, rgb);
-
-        if (dx > dy)
+        if (d > 0)
         {
-            auto d = 2 * dy - dx;
-            const auto incrE = 2 * dy;
-            const auto incrNE = 2 * (dy - dx);
-
-            while (x != p2.x())
-            {
-                x += sign_x;
-
-                if (d <= 0)
-                {
-                    d += incrE;
-                }
-                else
-                {
-                    d += incrNE;
-                    y += sign_y;
-                }
-
-                image.setPixel(Point(x, y), rgb);
-            }
+            iface.setPixel(p1, rgb);
         }
-        else
+
+        for (auto y = p1.y(); y != p2.y(); ++y)
         {
-            auto d = 2 * dx - dy;
-            const auto incrN = 2 * dx;
-            const auto incrNE = 2 * (dx - dy);
-
-            while (y != p2.y())
+            if (d <= 0)
             {
-                y += sign_y;
-
-                if (d <= 0)
-                {
-                    d += incrN;
-                }
-                else
-                {
-                    d += incrNE;
-                    x += sign_x;
-                }
-
-                image.setPixel(Point(x, y), rgb);
+                d += incrN;
             }
+            else
+            {
+                d += incrNE;
+                x += sign_x;
+            }
+
+            iface.setPixel(Point(x, y), rgb);
         }
     }
 }
@@ -188,43 +301,65 @@ line(
 
 void
 horizontalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x1,
     int x2,
     int y,
     uint32_t rgb)
 {
-    const auto sign_x = (x1 <= x2) ? 1 : -1;
-    auto x = x1;
-
-    image.setPixel(Point(x, y), rgb);
-
-    while (x != x2)
+    if ((y < 0) or (y >= iface.getHeight()))
     {
-        x += sign_x;
-        image.setPixel(Point(x, y), rgb);
+        return;
     }
+
+    if (x1 > x2)
+    {
+        std::swap(x1, x2);
+    }
+
+    x1 = std::max(x1, 0);
+    x2 = std::min(x2, iface.getWidth() - 1);
+
+    if ((x1 >= iface.getWidth()) or (x2 < 0))
+    {
+        return;
+    }
+
+    std::span<uint32_t> row = iface.getRow(y).subspan(x1, x2 - x1 + 1);
+    std::fill(row.begin(), row.end(), rgb);
 }
 
 //-------------------------------------------------------------------------
 
 void
 verticalLine(
-    Interface8880& image,
+    Interface8880& iface,
     int x,
     int y1,
     int y2,
     uint32_t rgb)
 {
-    const auto sign_y = (y1 <= y2) ? 1 : -1;
-    auto y = y1;
-
-    image.setPixel(Point(x, y), rgb);
-
-    while (y != y2)
+    if (x < 0 or x >= iface.getWidth())
     {
-        y += sign_y;
-        image.setPixel(Point(x, y), rgb);
+        return;
+    }
+
+    if (y1 > y2)
+    {
+        std::swap(y1, y2);
+    }
+
+    y1 = std::max(y1, 0);
+    y2 = std::min(y2, iface.getHeight() - 1);
+
+    if ((y1 >= iface.getHeight()) or (y2 < 0))
+    {
+        return;
+    }
+
+    for (auto y = y1; y <= y2; ++y)
+    {
+        iface.setPixel(Point(x, y), rgb);
     }
 }
 
@@ -232,39 +367,39 @@ verticalLine(
 
 void
 circleLines(
-    Interface8880& image,
+    Interface8880& iface,
     int x,
     int y,
     int i,
     int j,
     uint32_t rgb)
 {
-    horizontalLine(image, x + i, x - i, y + j, rgb);
-    horizontalLine(image, x + i, x - i, y - j, rgb);
+    horizontalLine(iface, x + i, x - i, y + j, rgb);
+    horizontalLine(iface, x + i, x - i, y - j, rgb);
 }
 
 //-------------------------------------------------------------------------
 
 void
 circlePoints(
-    Interface8880& image,
+    Interface8880& iface,
     int x,
     int y,
     int i,
     int j,
     uint32_t rgb)
 {
-    image.setPixel(Point(x + i, y + j), rgb);
-    image.setPixel(Point(x - i, y + j), rgb);
-    image.setPixel(Point(x + i, y - j), rgb);
-    image.setPixel(Point(x - i, y - j), rgb);
+    iface.setPixel(Point(x + i, y + j), rgb);
+    iface.setPixel(Point(x - i, y + j), rgb);
+    iface.setPixel(Point(x + i, y - j), rgb);
+    iface.setPixel(Point(x - i, y - j), rgb);
 
     if (i != j)
     {
-        image.setPixel(Point(x + j, y + i), rgb);
-        image.setPixel(Point(x + j, y - i), rgb);
-        image.setPixel(Point(x - j, y + i), rgb);
-        image.setPixel(Point(x - j, y - i), rgb);
+        iface.setPixel(Point(x + j, y + i), rgb);
+        iface.setPixel(Point(x + j, y - i), rgb);
+        iface.setPixel(Point(x - j, y + i), rgb);
+        iface.setPixel(Point(x - j, y - i), rgb);
     }
 }
 
@@ -272,8 +407,8 @@ circlePoints(
 
 void
 circle(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     uint32_t rgb)
 {
@@ -284,7 +419,7 @@ circle(
 
     for (int i = 0 ;  i <= j ; ++i)
     {
-        circlePoints(image, p.x(), p.y(), i, j, rgb);
+        circlePoints(iface, p.x(), p.y(), i, j, rgb);
 
         deltaE += 2;
         if (d < 0)
@@ -305,8 +440,8 @@ circle(
 
 void
 circleFilled(
-    Interface8880& image,
-    const Interface8880Point& p,
+    Interface8880& iface,
+    Interface8880Point p,
     int r,
     uint32_t rgb)
 {
@@ -321,7 +456,7 @@ circleFilled(
         }
         else
         {
-            circleLines(image, p.x(), p.y(), i - 1, j, rgb);
+            circleLines(iface, p.x(), p.y(), i - 1, j, rgb);
 
             d += (2 * (i - j)) + 5;
             --j;
@@ -332,7 +467,7 @@ circleFilled(
 
     while (j > 0)
     {
-        circleLines(image, p.x(), p.y(), i, j, rgb);
+        circleLines(iface, p.x(), p.y(), i, j, rgb);
 
         if (d < 0)
         {
@@ -346,9 +481,142 @@ circleFilled(
         --j;
     }
 
-    circleLines(image, p.x(), p.y(), r - 1, 0, rgb);
+    circleLines(iface, p.x(), p.y(), r - 1, 0, rgb);
+}
+
+//=========================================================================
+
+void
+polygon(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb)
+{
+    if (vertices.size() == 0)
+    {
+        return;
+    }
+
+    if (vertices.size() == 1)
+    {
+        iface.setPixel(vertices[0], rgb);
+        return;
+    }
+
+    for (std::size_t i = 0; i < vertices.size(); ++i)
+    {
+        const auto& p1 = vertices[i];
+        const auto& p2 = vertices[(i + 1) % vertices.size()];
+
+        line(iface, p1, p2, rgb);
+    }
 }
 
 //-------------------------------------------------------------------------
+
+void
+polygonFilled(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb)
+{
+    if (vertices.size() == 0)
+    {
+        return;
+    }
+
+    if (vertices.size() == 1)
+    {
+        iface.setPixel(vertices[0], rgb);
+        return;
+    }
+
+    auto xIntersection = [](const Interface8880Point& p1,
+                            const Interface8880Point& p2,
+                            int y) -> std::optional<int>
+    {
+        const auto minY = std::min(p1.y(), p2.y());
+        const auto maxY = std::max(p1.y(), p2.y());
+
+        if (y < minY or y >= maxY)
+        {
+            return std::nullopt;
+        }
+
+        const auto xChange = p2.x() - p1.x();
+        const auto yChange = p2.y() - p1.y();
+
+        return p1.x() + (y - p1.y()) * xChange / yChange;
+    };
+
+    auto minY = vertices[0].y();
+    auto maxY = vertices[0].y();
+
+    for (const auto& p : vertices)
+    {
+        minY = std::min(minY, p.y());
+        maxY = std::max(maxY, p.y());
+    }
+
+    for (int y = minY; y <= maxY; ++y)
+    {
+        std::vector<int> intersects;
+
+        for (auto i = 0U; i < vertices.size(); ++i)
+        {
+            const auto p1 = vertices[i];
+            const auto p2 = vertices[(i + 1) % vertices.size()];
+
+            const auto x = xIntersection(p1, p2, y);
+            if (x.has_value())
+            {
+                intersects.push_back(x.value());
+            }
+        }
+
+        std::ranges::sort(intersects);
+
+        for (std::size_t i = 0; i + 1 < intersects.size(); i += 2)
+        {
+            const auto x1 = intersects[i];
+            const auto x2 = intersects[i + 1];
+
+            if (x2 >= 0 and x1 < iface.getWidth())
+            {
+                horizontalLine(iface, x1, x2, y, rgb);
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+polyline(
+    Interface8880& iface,
+    std::span<const Interface8880Point> vertices,
+    uint32_t rgb)
+{
+    if (vertices.size() == 0)
+    {
+        return;
+    }
+
+    if (vertices.size() == 1)
+    {
+        iface.setPixel(vertices[0], rgb);
+        return;
+    }
+
+    for (std::size_t i = 0; i < vertices.size() - 1; ++i)
+    {
+        const auto& p1 = vertices[i];
+        const auto& p2 = vertices[i + 1];
+
+        line(iface, p1, p2, rgb);
+    }
+}
+
+//=========================================================================
 
 } // namespace fb32

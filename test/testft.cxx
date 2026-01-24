@@ -154,17 +154,17 @@ main(
         p = ft.drawString(p, "0123456789", white, image);
 
         p.setX(0);
-        p.incrY(ft.getPixelHeight());
+        p.translateY(ft.getPixelHeight());
 
         p = ft.drawString(p, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", white, image);
 
         p.setX(0);
-        p.incrY(ft.getPixelHeight());
+        p.translateY(ft.getPixelHeight());
 
         p = ft.drawChar(p, '@', white, image);
 
         p.setX(0);
-        p.incrY(ft.getPixelHeight());
+        p.translateY(ft.getPixelHeight());
 
         for (int j = 0 ; j < 16 ; ++j)
         {
@@ -175,7 +175,7 @@ main(
                 ft.drawChar(p, c, white, image);
             }
 
-            p.incrY(ft.getPixelHeight());
+            p.translateY(ft.getPixelHeight());
         }
 
         //-----------------------------------------------------------------

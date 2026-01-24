@@ -4693,7 +4693,7 @@ Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const
 
 Interface8880Point
 Image8880Font8x16::drawChar(
-    const Interface8880Point& p,
+    Interface8880Point p,
     uint8_t c,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4705,7 +4705,7 @@ Image8880Font8x16::drawChar(
 
 Interface8880Point
 Image8880Font8x16::drawChar(
-    const Interface8880Point& p,
+    Interface8880Point p,
     uint8_t c,
     uint32_t rgb,
     Interface8880& image)
@@ -4737,7 +4737,7 @@ Image8880Font8x16::drawChar(
 
 Interface8880Point
 Image8880Font8x16::drawString(
-    const Interface8880Point& p,
+    Interface8880Point p,
     std::string_view sv,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4749,7 +4749,7 @@ Image8880Font8x16::drawString(
 
 Interface8880Point
 Image8880Font8x16::drawString(
-    const Interface8880Point& p,
+    Interface8880Point p,
     std::string_view sv,
     uint32_t rgb,
     Interface8880& image)

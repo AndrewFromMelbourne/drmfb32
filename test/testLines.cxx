@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2024 Andrew Duncan
+// Copyright (c) 2026 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -30,16 +30,14 @@
 #include <unistd.h>
 
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <print>
 #include <system_error>
 #include <thread>
 
 #include "framebuffer8880.h"
-#include "image8880.h"
-#include "image8880Font8x16.h"
 #include "image8880Graphics.h"
-#include "image8880Process.h"
 #include "point.h"
 
 //-------------------------------------------------------------------------
@@ -125,53 +123,42 @@ main(
     {
         FrameBuffer8880 fb{device, connector};
 
-        constexpr RGB8880 darkBlue{0, 0, 63};
+        //-----------------------------------------------------------------
+
         constexpr RGB8880 white{255, 255, 255};
 
-        constexpr int width{248};
-        constexpr int height{16};
+        const auto halfWidth = fb.getWidth() / 2;
+        const auto halfHeight = fb.getHeight() / 2;
 
-        Image8880 image(width, height);
-        image.clear(darkBlue);
-
-        //-----------------------------------------------------------------
-
-        Image8880Font8x16 font;
-
-        font.drawString(
-            Interface8880Point{4, 0},
-            "Lorem ipsum dolor sit amet ...",
-            white,
-            image);
+        const auto outerRadius = static_cast<int>(std::hypot(halfWidth,
+                                                             halfHeight));
+        constexpr auto innerRadius = 25;
 
         //-----------------------------------------------------------------
 
-        constexpr int scale{3};
-        constexpr int swidth{scale * width};
-        constexpr int sheight{scale * height};
-        constexpr int imageOffset{200};
-        constexpr int yStep{sheight + 8};
+        constexpr auto lines = 32;
 
-        const auto imageSu = scaleUp(image, scale);
-        const auto imageNn = resizeNearestNeighbour(image, swidth, sheight);
-        const auto imageBi = resizeBilinearInterpolation(image, swidth, sheight);
-        const auto imageLi = resizeLanczos3Interpolation(image, swidth, sheight);
-
-        Interface8880Point t{0, 0};
-        Interface8880Point p{ imageOffset, 0 };
-
-        auto show = [&](std::string_view title, const Image8880& image)
+        for (auto i = 0; i < lines; ++i)
         {
-            font.drawString(t, title, white, fb);
-            fb.putImage(p, image);
-            t.translateY(yStep);
-            p.translateY(yStep);
-        };
+            const fb32::Interface8880Point center{ halfWidth, halfHeight };
 
-        show("Scale up:", imageSu);
-        show("Nearest neighbour:", imageNn);
-        show("Bilinear interpolation:", imageBi);
-        show("Lanczos3 interpolation:", imageLi);
+            const auto sinValue = std::sin((i * 2.0 * M_PI) / lines);
+            const auto cosValue = std::cos((i * 2.0 * M_PI) / lines);
+
+            fb32::Interface8880Point inner{
+                center.x() + static_cast<int>(innerRadius * sinValue),
+                center.y() - static_cast<int>(innerRadius * cosValue)
+            };
+
+            fb32::Interface8880Point outer{
+                center.x() + static_cast<int>(outerRadius * sinValue),
+                center.y() - static_cast<int>(outerRadius * cosValue)
+            };
+
+            fb32::line(fb, inner, outer, white);
+        }
+
+        //-----------------------------------------------------------------
 
         fb.update();
 

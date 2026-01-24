@@ -426,7 +426,7 @@ Viewer::placeImage(
     const fb32::Image8880& image) const noexcept
 {
     auto p = center(m_buffer, image);
-    p.incr(m_offset.x(), m_offset.y());
+    p.translate(m_offset.x(), m_offset.y());
 
     return p;
 }
