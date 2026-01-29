@@ -76,6 +76,7 @@ printUsage(
     std::println(stream, "");
     std::println(stream, "Usage: {} <options>", name);
     std::println(stream, "");
+    std::println(stream, "    --background,-b - background colour");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
     std::println(stream, "    --folder,-f - folder containing images");
@@ -92,6 +93,7 @@ main(
     int argc,
     char *argv[])
 {
+    fb32::RGB8880 background{fb32::RGB8{0, 0, 0}};
     uint32_t connector{0};
     std::string device{};
     const std::string program{basename(argv[0])};
@@ -101,9 +103,10 @@ main(
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:f:hj:q:";
+    static const char* sopts = "b:c:d:f:hj:q:";
     static option lopts[] =
     {
+        { "background", required_argument, nullptr, 'b' },
         { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "folder", required_argument, nullptr, 'f' },
@@ -119,6 +122,26 @@ main(
     {
         switch (opt)
         {
+        case 'b':
+        {
+            auto bg = parseRGB8880(optarg);
+
+            if (bg.has_value())
+            {
+                background = bg.value();
+            }
+            else
+            {
+                std::println(
+                    std::cerr,
+                    "Error: invalid background colour \"{}\"",
+                    optarg);
+
+                ::exit(EXIT_FAILURE);
+            }
+
+            break;
+        }
         case 'c':
 
             connector = std::stol(optarg);
@@ -193,8 +216,10 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
+        fb.clearBuffers(background);
+
         Joystick js{joystick, true};
-        Viewer viewer{fb, folder, quality};
+        Viewer viewer{background, fb, folder, quality};
 
         viewer.draw(fb);
         fb.update();

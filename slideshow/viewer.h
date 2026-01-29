@@ -30,6 +30,7 @@
 // ------------------------------------------------------------------------
 
 #include <limits>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -52,6 +53,29 @@ public:
         MEDIUM,
         HIGH
     };
+
+    enum Type
+    {
+        JPEG,
+        PNG,
+        QOI
+    };
+
+    // --------------------------------------------------------------------
+
+    struct ImageFile
+    {
+        std::string m_filename;
+        Type m_type;
+
+        auto operator<(const ImageFile& other) const
+        {
+            return m_filename < other.m_filename;
+        }
+    };
+
+
+    // --------------------------------------------------------------------
 
     [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
@@ -107,7 +131,12 @@ public:
 
     // --------------------------------------------------------------------
 
-    Viewer(fb32::Interface8880& interface, const std::string& folder, Quality quality);
+    Viewer(
+        fb32::RGB8880 background,
+        fb32::Interface8880& interface,
+        const std::string& folder,
+        Quality quality);
+
     ~Viewer();
 
     Viewer(const Viewer&) = delete;
@@ -144,11 +173,13 @@ private:
     static const int SCALE_OVERSIZED{0};
 
     bool m_annotate;
+    fb32::RGB8880 m_background;
     fb32::Image8880 m_buffer;
     std::size_t m_current;
     std::string m_directory;
     int m_enlighten;
-    std::vector<std::string> m_files;
+    std::map<std::string, Type> m_extToType;
+    std::vector<ImageFile> m_files;
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;

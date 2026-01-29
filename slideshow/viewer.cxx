@@ -30,6 +30,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <map>
 #include <print>
 #include <ranges>
 
@@ -37,6 +38,8 @@
 #include "image8880Graphics.h"
 #include "image8880Process.h"
 #include "image8880Jpeg.h"
+#include "image8880Png.h"
+#include "image8880Qoi.h"
 #include "viewer.h"
 
 // ------------------------------------------------------------------------
@@ -51,7 +54,9 @@ namespace
 
 // ------------------------------------------------------------------------
 
-std::string tolower(std::string_view s)
+std::string
+    tolower(
+        std::string_view s)
 {
     std::string result;
     std::ranges::copy(std::views::transform(s, ::tolower), std::back_inserter(result));
@@ -60,7 +65,23 @@ std::string tolower(std::string_view s)
 
 // ------------------------------------------------------------------------
 
+[[nodiscard]] bool
+isImageFile(
+    std::string_view ext)
+{
+    static constexpr const char* extensions[] = {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".qoi"
+    };
+
+    return std::ranges::find(extensions, ext) != std::end(extensions);
 }
+
+// ------------------------------------------------------------------------
+
+} // namespace
 
 // ========================================================================
 
@@ -115,17 +136,25 @@ Viewer::qualityToString(
 // ------------------------------------------------------------------------
 
 Viewer::Viewer(
+    fb32::RGB8880 background,
     fb32::Interface8880& interface,
     const std::string& folder,
     Viewer::Quality quality)
 :
     m_annotate{true},
+    m_background{background},
     m_buffer{interface.getWidth(), interface.getHeight()},
     m_current{INVALID_INDEX},
     m_directory{folder},
     m_enlighten{0},
+    m_extToType{
+        {".jpg", Type::JPEG},
+        {".jpeg", Type::JPEG},
+        {".png", Type::PNG},
+        {".qoi", Type::QOI}
+    },
     m_files{},
-    m_fitToScreen{false},
+    m_fitToScreen{true},
     m_image{},
     m_imageProcessed{},
     m_offset{0, 0},
@@ -175,8 +204,8 @@ Viewer::annotate()
         return;
     }
 
-    auto name = m_files[m_current];
-    auto annotation = name.substr(name.find_last_of('/') + 1);
+    auto [name, type] = m_files[m_current];
+    auto annotation = fs::path(name).filename().string();
 
     annotation += std::format(" ( {} x {} )",
                               m_image.getWidth(),
@@ -359,13 +388,26 @@ Viewer::imagePrevious()
 void
 Viewer::openImage()
 {
+    auto [name, type] = m_files[m_current];
+
     try
     {
-        m_image = fb32::readJpeg(m_files[m_current]);
+        switch (type)
+        {
+        case Type::JPEG:
+            m_image = fb32::readJpeg(name);
+            break;
+        case Type::PNG:
+            m_image = fb32::readPng(name, m_background);
+            break;
+        case Type::QOI:
+            m_image = fb32::readQoi(name, m_background);
+            break;
+        }
     }
     catch (std::invalid_argument& e)
     {
-        std::println(std::cerr, "{} {}", m_files[m_current], e.what());
+        std::println(std::cerr, "{} {}", name, e.what());
     }
 
     m_enlighten = 0;
@@ -397,7 +439,7 @@ Viewer::oversize() const noexcept
 void
 Viewer::paint()
 {
-    m_buffer.clear(0);
+    m_buffer.clear(m_background);
 
     if (not oversize())
     {
@@ -436,6 +478,12 @@ Viewer::placeImage(
 void
 Viewer::processImage()
 {
+    if (m_image.getWidth() == 0 or m_image.getHeight() == 0)
+    {
+        m_imageProcessed = m_image;
+        return;
+    }
+
     if (m_enlighten)
     {
         m_imageProcessed = enlighten(m_image, m_enlighten / 10.0);
@@ -518,18 +566,25 @@ Viewer::readDirectory()
         for (const auto& entry :
              fs::recursive_directory_iterator(m_directory))
         {
+            if (not entry.is_regular_file())
+            {
+                continue;
+            }
+
             auto ext = tolower(entry.path().extension().string());
 
-            if (((ext == ".jpg") or (ext == ".jpeg")) and (entry.file_size() > 0))
+            if ((entry.file_size() > 0) and isImageFile(ext))
             {
-                m_files.push_back(entry.path().string());
+                m_files.emplace_back(
+                    entry.path().string(),
+                    m_extToType.at(ext));
             }
         }
     }
 
     if (m_files.size() > 0)
     {
-        std::ranges::sort(m_files);
+        std::sort(m_files.begin(), m_files.end());
 
         m_current = 0;
         openImage();
