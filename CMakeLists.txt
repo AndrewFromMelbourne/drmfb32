@@ -35,6 +35,7 @@ endif()
 
 find_package(Freetype)
 pkg_check_modules(TURBOJPEG libturbojpeg)
+pkg_check_modules(LIBPNG libpng)
 
 #--------------------------------------------------------------------------
 
@@ -60,6 +61,11 @@ endif()
 if (TURBOJPEG_FOUND)
 target_include_directories(drmfb32 PUBLIC ${TURBJPEG_INCLUDE_DIRS})
 target_sources(drmfb32 PRIVATE libdrmfb32/image8880Jpeg.cxx)
+endif()
+
+if (LIBPNG_FOUND)
+target_include_directories(drmfb32 PUBLIC ${LIBPNG_INCLUDE_DIRS})
+target_sources(drmfb32 PRIVATE libdrmfb32/image8880Png.cxx)
 endif()
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
@@ -160,6 +166,15 @@ endif()
 
 #--------------------------------------------------------------------------
 
+if (LIBPNG_FOUND)
+add_executable(showpng showpng/showpng.cxx)
+target_link_libraries(showpng drmfb32 ${DRM_LIBRARIES}
+                                      ${LIBPNG_LIBRARIES}
+                                      ${BS_THREAD_LIBRARIES})
+endif()
+
+#--------------------------------------------------------------------------
+
 add_executable(showqoi showqoi/showqoi.cxx)
 target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES}
                                       ${BS_THREAD_LIBRARIES})
@@ -174,11 +189,12 @@ target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-if (TURBOJPEG_FOUND)
+if (LIBPNG_FOUND AND TURBOJPEG_FOUND)
 add_executable(slideshow slideshow/slideshow.cxx
                          slideshow/viewer.cxx)
 
 target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
+                                        ${LIBPNG_LIBRARIES}
                                         ${TURBOJPEG_LIBRARIES}
                                         ${BS_THREAD_LIBRARIES})
 endif()
