@@ -77,6 +77,7 @@ printUsage(
     std::println(stream, "");
     std::println(stream , "Usage: {} <options>", name);
     std::println(stream, "");
+    std::println(stream, "    --background,-b - background colour");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
     std::println(stream, "    --fit,-f - fit image to screen");
@@ -92,6 +93,7 @@ main(
     int argc,
     char *argv[])
 {
+    fb32::RGB8880 background{0, 0, 0};
     uint32_t connector{0};
     std::string device{""};
     const std::string program{basename(argv[0])};
@@ -100,9 +102,10 @@ main(
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "c:d:fhq:";
+    static const char* sopts = "b:c:d:fhq:";
     static option lopts[] =
     {
+        { "background", required_argument, nullptr, 'b' },
         { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "fit", no_argument, nullptr, 'f' },
@@ -117,6 +120,26 @@ main(
     {
         switch (opt)
         {
+        case 'b':
+        {
+            auto bg = parseRGB8880(optarg);
+
+            if (bg.has_value())
+            {
+                background = bg.value();
+            }
+            else
+            {
+                std::println(
+                    std::cerr,
+                    "Error: invalid background colour \"{}\"",
+                    optarg);
+
+                ::exit(EXIT_FAILURE);
+            }
+
+            break;
+        }
         case 'c':
 
             connector = std::stol(optarg);
@@ -185,8 +208,9 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
+        fb.clearBuffers(background);
 
-        auto image = readQoi(qoi);
+        auto image = readQoi(qoi, background);
 
         if (fitToScreen)
         {
