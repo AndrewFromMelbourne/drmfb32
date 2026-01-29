@@ -30,6 +30,8 @@
 //-------------------------------------------------------------------------
 
 #include <cstdint>
+#include <optional>
+#include <string_view>
 
 //-------------------------------------------------------------------------
 
@@ -125,6 +127,8 @@ public:
         return (red << 16) | (green << 8) | blue;
     }
 
+
+
 private:
 
     uint32_t m_rgb;
@@ -139,6 +143,8 @@ inline bool operator == (const RGB8880& lhs, const RGB8880& rhs) noexcept
 {
     return !(lhs != rhs);
 }
+
+[[nodiscard]] std::optional<RGB8880> parseRGB8880(std::string_view str);
 
 //-------------------------------------------------------------------------
 

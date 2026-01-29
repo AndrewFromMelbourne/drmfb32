@@ -25,9 +25,36 @@
 //
 //-------------------------------------------------------------------------
 
+#include <algorithm>
+#include <cstdint>
+#include <ranges>
+#include <regex>
+#include <string>
+
+
 #include "rgb8880.h"
 
-//-------------------------------------------------------------------------
+// ========================================================================
+
+namespace
+{
+
+// ------------------------------------------------------------------------
+
+std::string
+    toupper(
+        std::string_view s)
+{
+    std::string result;
+    std::ranges::copy(std::views::transform(s, ::toupper), std::back_inserter(result));
+    return result;
+}
+
+// ------------------------------------------------------------------------
+
+} // namespace
+
+// ========================================================================
 
 fb32::RGB8880::RGB8880(
     RGB8 rgb) noexcept
@@ -85,5 +112,66 @@ fb32::RGB8880::blend(
     const auto blue = blendChannel(alpha, a.getBlue(), b.getBlue());
 
     return RGB8880(red, green, blue);
+}
+
+//-------------------------------------------------------------------------
+
+std::optional<fb32::RGB8880>
+fb32::parseRGB8880(
+    std::string_view str)
+{
+    auto s{toupper(str)};
+    std::smatch match;
+
+    //---------------------------------------------------------------------
+    // Match #RRGGBB or RRGGBB
+
+    const std::regex hexRegex(R"(#?([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2}))");
+
+    if (std::regex_match(s, match, hexRegex))
+    {
+        return fb32::RGB8880{
+            static_cast<uint8_t>(std::stoi(match[1].str(), nullptr, 16)),
+            static_cast<uint8_t>(std::stoi(match[2].str(), nullptr, 16)),
+            static_cast<uint8_t>(std::stoi(match[3].str(), nullptr, 16))};
+    }
+
+    //---------------------------------------------------------------------
+    // Match #RGB or RGB
+
+    const std::regex shortHexRegex(R"(#?([0-9A-F])([0-9A-F])([0-9A-F]))");
+
+    if (std::regex_match(s, match, shortHexRegex))
+    {
+        auto red = std::stoi(match[1].str(), nullptr, 16);
+        auto green = std::stoi(match[2].str(), nullptr, 16);
+        auto blue = std::stoi(match[3].str(), nullptr, 16);
+
+        red += (red << 4);
+        green += (green << 4);
+        blue += (blue << 4);
+
+        return fb32::RGB8880{
+            static_cast<uint8_t>(red),
+            static_cast<uint8_t>(green),
+            static_cast<uint8_t>(blue)};
+    }
+
+    //---------------------------------------------------------------------
+    // Match RGB(r,g,b)
+
+    const std::regex rgbFuncRegex(R"(RGB\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\))");
+    if (std::regex_match(s, match, rgbFuncRegex))
+    {
+        return fb32::RGB8880{
+            static_cast<uint8_t>(std::stoi(match[1].str())),
+            static_cast<uint8_t>(std::stoi(match[2].str())),
+            static_cast<uint8_t>(std::stoi(match[3].str()))};
+    }
+
+    //---------------------------------------------------------------------
+    // No match
+
+    return std::nullopt;
 }
 
