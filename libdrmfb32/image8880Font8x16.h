@@ -60,10 +60,10 @@ public:
     Image8880Font8x16() = default;
     ~Image8880Font8x16() override = default;
 
-    Image8880Font8x16(const Image8880Font8x16&) = default;
-    Image8880Font8x16(Image8880Font8x16&&) = default;
-    Image8880Font8x16& operator=(const Image8880Font8x16&) = default;
-    Image8880Font8x16& operator=(Image8880Font8x16&&) = default;
+    Image8880Font8x16(const Image8880Font8x16&) = delete;
+    Image8880Font8x16(Image8880Font8x16&&) = delete;
+    Image8880Font8x16& operator=(const Image8880Font8x16&) = delete;
+    Image8880Font8x16& operator=(Image8880Font8x16&&) = delete;
 
     [[nodiscard]] int getPixelHeight() const noexcept override;
     [[nodiscard]] int getPixelWidth() const noexcept override;

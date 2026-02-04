@@ -123,10 +123,6 @@ main(
 
         //-----------------------------------------------------------------
 
-        constexpr RGB8880 red{255, 0, 0};
-
-        //-----------------------------------------------------------------
-
         constexpr int iwidth{30};
         constexpr int ihwidth{iwidth/2};
         const auto fwidth{fb.getWidth()};
