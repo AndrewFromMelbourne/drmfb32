@@ -16,6 +16,7 @@ This project uses the following libraries. You will need to install the develope
 * libbsd
 * libdrm
 * libfreetype2
+* libpng
 * libturbojpeg
 
 It uses pkg-config to find these libraries.
