@@ -172,6 +172,11 @@ Puzzle::update(Joystick& js)
         return false;
     }
 
+    if (value.x and value.y)
+    {
+        return false;
+    }
+
     const auto dx = (value.x) ? (value.x / std::abs(value.x)) : 0;
     const auto dy = (value.y) ? (value.y / std::abs(value.y)) : 0;
 

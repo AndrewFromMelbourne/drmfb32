@@ -124,6 +124,12 @@ Boxworld::update(Joystick& js)
             return;
         }
 
+        if (value.x and value.y)
+        {
+            // Diagonal movement is not allowed.
+            return;
+        }
+
         const auto dx = (value.x)
                       ? (value.x / std::abs(value.x))
                       : 0;
