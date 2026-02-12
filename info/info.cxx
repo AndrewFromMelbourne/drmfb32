@@ -45,6 +45,7 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <print>
 #include <string_view>
@@ -87,42 +88,35 @@ messageLog(
     }
     else
     {
+        const auto now = floor<std::chrono::seconds>(std::chrono::system_clock::now());
+        const auto localTime = std::chrono::current_zone()->to_local(now);
+
+        std::print(std::cerr, "{:%b %e %T} ", localTime);
+        std::print(std::cerr, "{} ", "localhost");
         std::print(std::cerr, "{}[{}]:", name, getpid());
 
-        switch (priority)
+        const static std::map<int, std::string> priorityMap
         {
-        case LOG_DEBUG:
+            { LOG_EMERG, "emergency" },
+            { LOG_ALERT, "alert" },
+            { LOG_CRIT, "critical" },
+            { LOG_ERR, "error" },
+            { LOG_WARNING, "warning" },
+            { LOG_NOTICE, "notice" },
+            { LOG_INFO, "info" },
+            { LOG_DEBUG, "debug" }
+        };
 
-            std::print(std::cerr, "debug");
-            break;
-
-        case LOG_INFO:
-
-            std::print(std::cerr, "info");
-            break;
-
-        case LOG_NOTICE:
-
-            std::print(std::cerr, "notice");
-            break;
-
-        case LOG_WARNING:
-
-            std::print(std::cerr, "warning");
-            break;
-
-        case LOG_ERR:
-
-            std::print(std::cerr, "error");
-            break;
-
-        default:
-
+        if (const auto it = priorityMap.find(priority); it != priorityMap.end())
+        {
+            std::print(std::cerr, "{}", it->second);
+        }
+        else
+        {
             std::print(std::cerr, "unknown({})", priority);
-            break;
         }
 
-        std::print(std::cerr, ":{}\n", message);
+        std::println(std::cerr, ":{}", message);
     }
 }
 
