@@ -227,21 +227,21 @@ drm::drmModeGetResources(
 
 //=========================================================================
 
-int
+bool
 drm::drmDropMaster(
     fd::FileDescriptor& fd) noexcept
 {
-    return ::drmDropMaster(fd.fd());
+    return ::drmDropMaster(fd.fd()) == 0;
 }
 
 //-------------------------------------------------------------------------
 
-int
+bool
 drm::drmHandleEvent(
     fd::FileDescriptor& fd,
     drmEventContext* ev) noexcept
 {
-    return ::drmHandleEvent(fd.fd(), ev);
+    return ::drmHandleEvent(fd.fd(), ev) == 0;
 }
 
 //-------------------------------------------------------------------------
@@ -257,11 +257,11 @@ drm::drmIoctl(
 
 //-------------------------------------------------------------------------
 
-int
+bool
 drm::drmIsMaster(
     fd::FileDescriptor& fd) noexcept
 {
-    return ::drmIsMaster(fd.fd());
+    return ::drmIsMaster(fd.fd()) != 0;
 }
 
 //-------------------------------------------------------------------------
@@ -349,12 +349,12 @@ drm::drmModePageFlip(
 
 //-------------------------------------------------------------------------
 
-int
+bool
 drm::drmModeRmFB(
     fd::FileDescriptor& fd,
     uint32_t bufferId) noexcept
 {
-    return ::drmModeRmFB(fd.fd(), bufferId);
+    return ::drmModeRmFB(fd.fd(), bufferId) == 0;
 }
 
 //-------------------------------------------------------------------------
@@ -382,11 +382,11 @@ drm::drmModeSetCrtc(
 
 //-------------------------------------------------------------------------
 
-int
+bool
 drm::drmSetMaster(
     fd::FileDescriptor& fd) noexcept
 {
-    return ::drmSetMaster(fd.fd());
+    return ::drmSetMaster(fd.fd()) == 0;
 }
 
 //-------------------------------------------------------------------------
@@ -407,11 +407,10 @@ drm::addDrmPropertyToAtomicRequest(
 
     if (propertyId)
     {
-        drmModeAtomicAddProperty(atomicReq,
-                                 objectId,
-                                 propertyId,
-                                 value);
-        return true;
+        return drmModeAtomicAddProperty(atomicReq,
+                                        objectId,
+                                        propertyId,
+                                        value);
     }
 
     return false;
@@ -419,7 +418,7 @@ drm::addDrmPropertyToAtomicRequest(
 
 //-------------------------------------------------------------------------
 
-int
+bool
 drm::drmModeAtomicAddProperty(
     drmModeAtomicReq_ptr& atomicReq,
     uint32_t object_id,
@@ -429,7 +428,7 @@ drm::drmModeAtomicAddProperty(
     return ::drmModeAtomicAddProperty(atomicReq.get(),
                                      object_id,
                                      property_id,
-                                     value);
+                                     value) == 0;
 }
 
 //-------------------------------------------------------------------------

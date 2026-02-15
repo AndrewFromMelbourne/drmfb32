@@ -186,6 +186,30 @@ fb32::FrameBuffer8880::getBufferSize() const noexcept
 
 //-------------------------------------------------------------------------
 
+bool
+fb32::FrameBuffer8880::isMaster() noexcept
+{
+    return drm::drmIsMaster(m_fd);
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::FrameBuffer8880::masterSet() noexcept
+{
+    drm::drmSetMaster(m_fd);
+}
+
+//-------------------------------------------------------------------------
+
+void
+fb32::FrameBuffer8880::masterDrop() noexcept
+{
+    drm::drmDropMaster(m_fd);
+}
+
+//-------------------------------------------------------------------------
+
 std::size_t
 fb32::FrameBuffer8880::offset(
     Interface8880Point p) const noexcept

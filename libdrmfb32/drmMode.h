@@ -124,10 +124,10 @@ addDrmPropertyToAtomicRequest(
     const std::string& propertyName,
     uint64_t value) noexcept;
 
-int drmDropMaster(fd::FileDescriptor& fd) noexcept;
-int drmHandleEvent(fd::FileDescriptor& fd, drmEventContext* ev) noexcept;
+bool drmDropMaster(fd::FileDescriptor& fd) noexcept;
+bool drmHandleEvent(fd::FileDescriptor& fd, drmEventContext* ev) noexcept;
 int drmIoctl(fd::FileDescriptor& fd, unsigned long request, void *arg) noexcept;
-int drmIsMaster(fd::FileDescriptor& fd) noexcept;
+[[nodiscard]] bool drmIsMaster(fd::FileDescriptor& fd) noexcept;
 
 int
 drmModeAddFB2(
@@ -142,12 +142,12 @@ drmModeAddFB2(
     uint32_t flags) noexcept;
 
 int drmModeAtomicCommit(fd::FileDescriptor& fd, drmModeAtomicReq_ptr& req, uint32_t flags, void* user_data);
-int drmModeAtomicAddProperty(drmModeAtomicReq_ptr& atomicReq, uint32_t object_id, uint32_t property_id, uint64_t value) noexcept;
+bool drmModeAtomicAddProperty(drmModeAtomicReq_ptr& atomicReq, uint32_t object_id, uint32_t property_id, uint64_t value) noexcept;
 int drmModeCreatePropertyBlob(fd::FileDescriptor& fd, const void *data, size_t size, uint32_t *id) noexcept;
 int drmGetCap(fd::FileDescriptor& fd, uint64_t capability, uint64_t *value) noexcept;
 int drmModeDestroyPropertyBlob(fd::FileDescriptor& fd, uint32_t id) noexcept;
 int drmModePageFlip(fd::FileDescriptor& fd, uint32_t crtc_id, uint32_t fb_id, uint32_t flags, void *user_data) noexcept;
-int drmModeRmFB(fd::FileDescriptor& fd, uint32_t bufferId) noexcept;
+bool drmModeRmFB(fd::FileDescriptor& fd, uint32_t bufferId) noexcept;
 
 int
 drmModeSetCrtc(
@@ -160,7 +160,7 @@ drmModeSetCrtc(
     int count,
     drmModeModeInfoPtr mode) noexcept;
 
-int drmSetMaster(fd::FileDescriptor& fd) noexcept;
+bool drmSetMaster(fd::FileDescriptor& fd) noexcept;
 
 std::string findDrmDevice() noexcept;
 std::string findDrmDeviceWithConnector(uint32_t connectorId) noexcept;

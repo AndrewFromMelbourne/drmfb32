@@ -90,6 +90,7 @@ if (BSD_FOUND AND FREETYPE_FOUND)
 add_executable(info info/info.cxx
                     info/cpuTrace.cxx
                     info/dynamicInfo.cxx
+                    info/main.cxx
                     info/memoryTrace.cxx
                     info/networkTrace.cxx
                     info/panel.cxx

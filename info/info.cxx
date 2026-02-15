@@ -38,12 +38,13 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include <array>
+#include <atomic>
 #include <chrono>
-#include <csignal>
 #include <cstdint>
 #include <cstring>
 #include <exception>
+#include <filesystem>
+#include <format>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -57,6 +58,7 @@
 #include "cpuTrace.h"
 #include "dynamicInfo.h"
 #include "framebuffer8880.h"
+#include "info.h"
 #include "networkTrace.h"
 #include "memoryTrace.h"
 #include "temperatureTrace.h"
@@ -67,24 +69,145 @@ using namespace std::chrono_literals;
 
 //-------------------------------------------------------------------------
 
-namespace
+Info::Info(
+    std::atomic<bool>* display,
+    std::atomic<bool>* run)
+:
+    m_connector(0),
+    m_device{},
+    m_display(display),
+    m_fb(nullptr),
+    m_font(nullptr),
+    m_fontConfig(),
+    m_hostname(),
+    m_isDaemon(false),
+    m_panels(),
+    m_pidFile{},
+    m_programName{},
+    m_run(run)
 {
-volatile static std::sig_atomic_t run{1};
-volatile static std::sig_atomic_t display{1};
+}
+
+//-------------------------------------------------------------------------
+
+pidFile_ptr
+Info::daemonize()
+{
+    pidFile_ptr pfh{nullptr, &pidfile_remove};
+
+    if (not m_pidFile.empty())
+    {
+        pid_t otherpid;
+        pfh.reset(::pidfile_open(m_pidFile.c_str(), 0600, &otherpid));
+
+        if (not pfh)
+        {
+            messageLog(
+                LOG_ERR,
+                std::format(
+                    "{} is already running with pid {}",
+                    m_programName,
+                    otherpid));
+            ::exit(EXIT_FAILURE);
+        }
+    }
+
+    if (::daemon(0, 0) == -1)
+    {
+        messageLog(LOG_ERR, "Cannot daemonize");
+        ::exit(EXIT_FAILURE);
+    }
+
+    if (pfh)
+    {
+        ::pidfile_write(pfh.get());
+    }
+
+    return pfh;
+}
+
+//-------------------------------------------------------------------------
+
+std::string
+Info::getHostname()
+{
+    char hostname[256];
+    if (::gethostname(hostname, sizeof(hostname)) == 0)
+    {
+        return hostname;
+    }
+    else
+    {
+        perrorLog("Error getting hostname");
+        return "localhost";
+    }
 }
 
 //-------------------------------------------------------------------------
 
 void
-messageLog(
-    bool isDaemon,
-    const std::string& name,
-    int priority,
-    const std::string& message)
+Info::init()
 {
-    if (isDaemon)
+    setFontConfig();
+
+    m_fb = std::make_unique<fb32::FrameBuffer8880>(m_device, m_connector);
+    m_fb->clearBuffers();
+
+    //-----------------------------------------------------------------
+
+    constexpr int traceHeight = 100;
+    constexpr int gridHeight = traceHeight / 5;
+
+    m_panels.push_back(
+        std::make_unique<DynamicInfo>(m_fb->getWidth(),
+                                      m_font->getPixelHeight(),
+                                      panelTop()));
+
+    m_panels.push_back(
+        std::make_unique<CpuTrace>(m_fb->getWidth(),
+                                   traceHeight,
+                                   m_font->getPixelHeight(),
+                                   panelTop(),
+                                   gridHeight));
+
+    m_panels.push_back(
+        std::make_unique<MemoryTrace>(m_fb->getWidth(),
+                                      traceHeight,
+                                      m_font->getPixelHeight(),
+                                      panelTop(),
+                                      gridHeight));
+
+    if (m_fb->getHeight() >= 400)
     {
-        ::syslog(LOG_MAKEPRI(LOG_USER, priority), "%s", message.c_str());
+        m_panels.push_back(
+            std::make_unique<NetworkTrace>(m_fb->getWidth(),
+                                           traceHeight,
+                                           m_font->getPixelHeight(),
+                                           panelTop(),
+                                           gridHeight));
+    }
+
+    //-----------------------------------------------------------------
+
+    for (auto& panel : m_panels)
+    {
+        panel->init(*m_font);
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+Info::messageLog(
+    int priority,
+    std::string_view message)
+{
+    m_hostname = getHostname();
+
+    if (m_isDaemon)
+    {
+        std::string messageString(message);
+        ::syslog(LOG_MAKEPRI(LOG_USER, priority), "%s", messageString.c_str());
     }
     else
     {
@@ -92,8 +215,8 @@ messageLog(
         const auto localTime = std::chrono::current_zone()->to_local(now);
 
         std::print(std::cerr, "{:%b %e %T} ", localTime);
-        std::print(std::cerr, "{} ", "localhost");
-        std::print(std::cerr, "{}[{}]:", name, getpid());
+        std::print(std::cerr, "{} ", m_hostname);
+        std::print(std::cerr, "{}[{}]:", m_programName, getpid());
 
         const static std::map<int, std::string> priorityMap
         {
@@ -122,77 +245,26 @@ messageLog(
 
 //-------------------------------------------------------------------------
 
-void
-perrorLog(
-    bool isDaemon,
-    const std::string& name,
-    const std::string& s)
-{
-    messageLog(isDaemon, name, LOG_ERR, s + " - " + ::strerror(errno));
-}
-
-//-------------------------------------------------------------------------
-
-
-void
-printUsage(
-    std::ostream& stream,
-    const std::string& name)
-{
-    std::println(stream, "");
-    std::println(stream, "Usage: {}", name);
-    std::println(stream, "");
-    std::println(stream, "    --daemon,-D - start in the background as a daemon");
-    std::println(stream, "    --connector,-c - dri connector to use");
-    std::println(stream, "    --device,-d - dri device to use");
-    std::println(stream, "    --font,-f - font file to use[:pixel height]");
-    std::println(stream, "    --help,-h - println usage and exit");
-    std::println(stream, "    --pidfile,-p <pidfile> - create and lock PID file (if being run as a daemon)");
-    std::println(stream, "");
-}
-
-//-------------------------------------------------------------------------
-
-static void
-signalHandler(
-    int signalNumber) noexcept
-{
-    switch (signalNumber)
-    {
-    case SIGINT:
-    case SIGTERM:
-
-        run = 0;
-        break;
-
-    case SIGUSR1:
-
-        display = 0;
-        break;
-
-    case SIGUSR2:
-
-        display = 1;
-        break;
-    };
-}
-
-//-------------------------------------------------------------------------
-
 int
-main(
-    int argc,
-    char *argv[])
+Info::panelTop() const
 {
-    uint32_t connector{0};
-    std::string device{};
-    const std::string program{basename(argv[0])};
-    fb32::FontConfig fontConfig;
-    char* pidfile{};
-    bool isDaemon{false};
+    if (m_panels.empty())
+    {
+        return 0;
+    }
+    else
+    {
+        return m_panels.back()->getBottom();
+    }
+}
 
-    //---------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
+std::optional<int>
+Info::parseCommandLine(
+    int argc,
+    char* argv[])
+{
     static const char* sopts = "c:d:f:hp:D";
     static option lopts[] =
     {
@@ -213,228 +285,149 @@ main(
         {
         case 'c':
 
-            connector = std::stol(optarg);
-
+            m_connector = std::stol(optarg);
             break;
 
         case 'd':
 
-            device = optarg;
-
+            m_device = optarg;
             break;
 
         case 'f':
 
-            fontConfig = fb32::parseFontConfig(optarg, 16);
-
+            m_fontConfig = fb32::parseFontConfig(optarg, 16);
             break;
 
         case 'h':
 
-            printUsage(std::cout, program);
-            ::exit(EXIT_SUCCESS);
-
-            break;
+            printUsage(std::cout);
+            return EXIT_SUCCESS;
 
         case 'p':
 
-            pidfile = optarg;
-
+            m_pidFile = optarg;
             break;
 
         case 'D':
 
-            isDaemon = true;
-
+            m_isDaemon = true;
             break;
 
         default:
 
-            printUsage(std::cerr, program);
-            ::exit(EXIT_FAILURE);
-
-            break;
+            printUsage(std::cerr);
+            return EXIT_FAILURE;
         }
     }
 
-    //---------------------------------------------------------------------
+    return std::nullopt;
+}
 
-    using pidFile_ptr = std::unique_ptr<pidfh, decltype(&pidfile_remove)>;
-    pidFile_ptr pfh{nullptr, &pidfile_remove};
+//-------------------------------------------------------------------------
 
-    if (isDaemon)
+void
+Info::perrorLog(
+    std::string_view s)
+{
+    messageLog(LOG_ERR, std::string(s) + " - " + ::strerror(errno));
+}
+
+//-------------------------------------------------------------------------
+
+void
+Info::printUsage(
+    std::ostream& stream)
+{
+    std::println(stream, "");
+    std::println(stream, "Usage: {}", m_programName);
+    std::println(stream, "");
+    std::println(stream, "    --daemon,-D - start in the background as a daemon");
+    std::println(stream, "    --connector,-c - dri connector to use");
+    std::println(stream, "    --device,-d - dri device to use");
+    std::println(stream, "    --font,-f - font file to use[:pixel height]");
+    std::println(stream, "    --help,-h - println usage and exit");
+    std::println(stream, "    --pidfile,-p <pidfile> - create and lock PID file (if being run as a daemon)");
+    std::println(stream, "");
+}
+
+//-------------------------------------------------------------------------
+
+void
+Info::run()
+{
+    init();
+    std::this_thread::sleep_for(1s);
+    messageLog(LOG_INFO, "starting");
+
+    while (*m_run)
     {
-        if (pidfile)
-        {
-            pid_t otherpid;
-            pfh.reset(::pidfile_open(pidfile, 0600, &otherpid));
+        const auto now = std::chrono::system_clock::now();
+        const auto now_t = std::chrono::system_clock::to_time_t(now);
 
-            if (not pfh)
+        if (*m_display)
+        {
+            if (not m_fb->isMaster())
             {
-                std::println(
-                    std::cerr,
-                    "{} is already running with pid {}",
-                    program,
-                    otherpid);
-                ::exit(EXIT_FAILURE);
+                m_fb->masterSet();
+                messageLog(LOG_INFO, "display enabled");
+            }
+
+            for (auto& panel : m_panels)
+            {
+                panel->update(now_t, *m_font);
+                panel->show(*m_fb);
+            }
+
+            m_fb->update();
+
+        }
+        else
+        {
+            if (m_fb->isMaster())
+            {
+                m_fb->masterDrop();
+                messageLog(LOG_INFO, "display disabled");
+            }
+
+            for (auto& panel : m_panels)
+            {
+                panel->update(now_t, *m_font);
             }
         }
 
-        if (::daemon(0, 0) == -1)
-        {
-            std::println(std::cerr, "Cannot daemonize");
-
-            ::exit(EXIT_FAILURE);
-        }
-
-        if (pfh)
-        {
-            ::pidfile_write(pfh.get());
-        }
-
-        ::openlog(program.c_str(), LOG_PID, LOG_USER);
+        const auto nextSecond = std::chrono::round<std::chrono::seconds>(now) + 1s;
+        std::this_thread::sleep_until(nextSecond);
     }
 
-    //---------------------------------------------------------------------
+    messageLog(LOG_INFO, "exiting");
+}
 
-    for (auto signal : { SIGINT, SIGTERM, SIGUSR1, SIGUSR2 })
-    {
-        if (std::signal(signal, signalHandler) == SIG_ERR)
-        {
-            std::println(
-                std::cerr,
-                "Error: installing {} signal handler : {}",
-                strsignal(signal),
-                strerror(errno));
+//-------------------------------------------------------------------------
 
-            ::exit(EXIT_FAILURE);
-        }
-    }
 
-    //---------------------------------------------------------------------
-
-    std::unique_ptr<fb32::Interface8880Font> font{std::make_unique<fb32::Image8880Font8x16>()};
-
-    if (not fontConfig.m_fontFile.empty())
+void
+Info::setFontConfig() noexcept
+{
+    if (not m_fontConfig.m_fontFile.empty())
     {
         try
         {
-            font = std::make_unique<fb32::Image8880FreeType>(fontConfig);
+            m_font = std::make_unique<fb32::Image8880FreeType>(m_fontConfig);
         }
         catch (std::exception& error)
         {
-            std::println(std::cerr, "Warning: {}", error.what());
+            messageLog(
+                LOG_WARNING,
+                std::format(
+                    "Error: loading font {} : {}",
+                    m_fontConfig.m_fontFile,
+                    error.what()));
         }
     }
 
-    //---------------------------------------------------------------------
-
-    try
+    if (not m_font)
     {
-        fb32::FrameBuffer8880 fb(device, connector);
-
-        fb.clearBuffers();
-
-        //-----------------------------------------------------------------
-
-        using Panels = std::vector<std::unique_ptr<Panel>>;
-
-        auto panelTop = [](const Panels& panels) -> int
-        {
-            if (panels.empty())
-            {
-                return 0;
-            }
-            else
-            {
-                return panels.back()->getBottom();
-            }
-        };
-
-        //-----------------------------------------------------------------
-
-        constexpr int traceHeight = 100;
-        constexpr int gridHeight = traceHeight / 5;
-
-        Panels panels;
-
-        panels.push_back(
-            std::make_unique<DynamicInfo>(fb.getWidth(),
-                                          font->getPixelHeight(),
-                                          panelTop(panels)));
-
-        panels.push_back(
-            std::make_unique<CpuTrace>(fb.getWidth(),
-                                       traceHeight,
-                                       font->getPixelHeight(),
-                                       panelTop(panels),
-                                       gridHeight));
-
-        panels.push_back(
-            std::make_unique<MemoryTrace>(fb.getWidth(),
-                                          traceHeight,
-                                          font->getPixelHeight(),
-                                          panelTop(panels),
-                                          gridHeight));
-
-        if (fb.getHeight() >= 400)
-        {
-            panels.push_back(
-            std::make_unique<NetworkTrace>(fb.getWidth(),
-                                           traceHeight,
-                                           font->getPixelHeight(),
-                                           panelTop(panels),
-                                           gridHeight));
-        }
-
-        //-----------------------------------------------------------------
-
-        for (auto& panel : panels)
-        {
-            panel->init(*font);
-        }
-
-        //-----------------------------------------------------------------
-
-        std::this_thread::sleep_for(1s);
-
-        while (run)
-        {
-            const auto now = std::chrono::system_clock::now();
-            const auto now_t = std::chrono::system_clock::to_time_t(now);
-
-            for (auto& panel : panels)
-            {
-                panel->update(now_t, *font);
-
-                if (display)
-                {
-                    panel->show(fb);
-                }
-            }
-
-            fb.update();
-
-            const auto nextSecond = std::chrono::round<std::chrono::seconds>(now) + 1s;
-            std::this_thread::sleep_until(nextSecond);
-        }
+        m_font = std::make_unique<fb32::Image8880Font8x16>();
     }
-    catch (std::exception& error)
-    {
-        std::println(std::cerr, "Warning: {}", error.what());
-        exit(EXIT_FAILURE);
-    }
-
-    //---------------------------------------------------------------------
-
-    messageLog(isDaemon, program, LOG_INFO, "exiting");
-
-    if (isDaemon)
-    {
-        ::closelog();
-    }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
+
