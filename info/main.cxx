@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <cstring>
 #include <exception>
+#include <format>
 
 #include "info.h"
 
