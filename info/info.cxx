@@ -26,21 +26,14 @@
 //-------------------------------------------------------------------------
 
 #include <errno.h>
-#include <fcntl.h>
 #include <getopt.h>
 #include <syslog.h>
 #include <unistd.h>
 
-#include <bsd/libutil.h>
-
-
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <systemd/sd-journal.h>
 
 #include <atomic>
 #include <chrono>
-#include <cstdint>
 #include <cstring>
 #include <exception>
 #include <filesystem>
@@ -52,6 +45,8 @@
 #include <string_view>
 #include <thread>
 #include <vector>
+
+#include "config.h"
 
 #include "image8880FreeType.h"
 
@@ -79,51 +74,11 @@ Info::Info(
     m_fb(nullptr),
     m_font(nullptr),
     m_fontConfig(),
-    m_hostname(),
-    m_isDaemon(false),
+    m_hostname(getHostname()),
     m_panels(),
-    m_pidFile{},
     m_programName{},
     m_run(run)
 {
-}
-
-//-------------------------------------------------------------------------
-
-pidFile_ptr
-Info::daemonize()
-{
-    pidFile_ptr pfh{nullptr, &pidfile_remove};
-
-    if (not m_pidFile.empty())
-    {
-        pid_t otherpid;
-        pfh.reset(::pidfile_open(m_pidFile.c_str(), 0600, &otherpid));
-
-        if (not pfh)
-        {
-            messageLog(
-                LOG_ERR,
-                std::format(
-                    "{} is already running with pid {}",
-                    m_programName,
-                    otherpid));
-            ::exit(EXIT_FAILURE);
-        }
-    }
-
-    if (::daemon(0, 0) == -1)
-    {
-        messageLog(LOG_ERR, "Cannot daemonize");
-        ::exit(EXIT_FAILURE);
-    }
-
-    if (pfh)
-    {
-        ::pidfile_write(pfh.get());
-    }
-
-    return pfh;
 }
 
 //-------------------------------------------------------------------------
@@ -200,14 +155,12 @@ Info::init()
 void
 Info::messageLog(
     int priority,
-    std::string_view message)
+    std::string_view message) const
 {
-    m_hostname = getHostname();
-
-    if (m_isDaemon)
+    if (getenv("JOURNAL_STREAM") != nullptr)
     {
         std::string messageString(message);
-        ::syslog(LOG_MAKEPRI(LOG_USER, priority), "%s", messageString.c_str());
+        sd_journal_print(priority, "%s", messageString.c_str());
     }
     else
     {
@@ -265,15 +218,13 @@ Info::parseCommandLine(
     int argc,
     char* argv[])
 {
-    static const char* sopts = "c:d:f:hp:D";
+    static const char* sopts = "c:f:hD";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
         { "device", required_argument, nullptr, 'd' },
         { "font", required_argument, nullptr, 'f' },
         { "help", no_argument, nullptr, 'h' },
-        { "pidfile", required_argument, nullptr, 'p' },
-        { "daemon", no_argument, nullptr, 'D' },
         { nullptr, no_argument, nullptr, 0 }
     };
 
@@ -303,16 +254,6 @@ Info::parseCommandLine(
             printUsage(std::cout);
             return EXIT_SUCCESS;
 
-        case 'p':
-
-            m_pidFile = optarg;
-            break;
-
-        case 'D':
-
-            m_isDaemon = true;
-            break;
-
         default:
 
             printUsage(std::cerr);
@@ -327,16 +268,23 @@ Info::parseCommandLine(
 
 void
 Info::perrorLog(
-    std::string_view s)
+    std::string_view s) const
 {
-    messageLog(LOG_ERR, std::string(s) + " - " + ::strerror(errno));
+    if (getenv("JOURNAL_STREAM") != nullptr)
+    {
+        sd_journal_perror(std::string(s).c_str());
+    }
+    else
+    {
+        messageLog(LOG_ERR, std::string(s) + " - " + ::strerror(errno));
+    }
 }
 
 //-------------------------------------------------------------------------
 
 void
 Info::printUsage(
-    std::ostream& stream)
+    std::ostream& stream) const
 {
     std::println(stream, "");
     std::println(stream, "Usage: {}", m_programName);
@@ -347,6 +295,9 @@ Info::printUsage(
     std::println(stream, "    --font,-f - font file to use[:pixel height]");
     std::println(stream, "    --help,-h - println usage and exit");
     std::println(stream, "    --pidfile,-p <pidfile> - create and lock PID file (if being run as a daemon)");
+    std::println(stream, "");
+    std::println(stream, "Version: {}", c_projectVersion);
+    std::println(stream, "Git commit hash: {}", c_gitCommitHash);
     std::println(stream, "");
 }
 
@@ -403,7 +354,6 @@ Info::run()
 }
 
 //-------------------------------------------------------------------------
-
 
 void
 Info::setFontConfig() noexcept

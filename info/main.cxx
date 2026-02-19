@@ -28,8 +28,6 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <bsd/libutil.h>
-
 #include <atomic>
 #include <csignal>
 #include <cstdint>
@@ -115,16 +113,6 @@ main(
 
     //---------------------------------------------------------------------
 
-    pidFile_ptr pfh{nullptr, nullptr};
-
-    if (info.isDaemon())
-    {
-        ::openlog(info.programName().c_str(), LOG_PID, LOG_USER);
-        pfh = info.daemonize();
-    }
-
-    //---------------------------------------------------------------------
-
     setSignalHandler(info);
 
     //---------------------------------------------------------------------
@@ -135,15 +123,8 @@ main(
     }
     catch (std::exception& error)
     {
-        info.messageLog(LOG_ERR, std::format("Error: {}", error.what()));
+        info.messageLog(LOG_ERR, std::format("exception caught: {}", error.what()));
         ::exit(EXIT_FAILURE);
-    }
-
-    //---------------------------------------------------------------------
-
-    if (info.isDaemon())
-    {
-        ::closelog();
     }
 
     //---------------------------------------------------------------------

@@ -50,10 +50,6 @@ class FrameBuffer8880;
 
 //-------------------------------------------------------------------------
 
-using pidFile_ptr = std::unique_ptr<struct pidfh, decltype(&pidfile_remove)>;
-
-//-------------------------------------------------------------------------
-
 class Info
 {
 public:
@@ -62,11 +58,9 @@ public:
         std::atomic<bool>* display,
         std::atomic<bool>* run);
 
-    pidFile_ptr daemonize();
-    [[nodiscard]] bool isDaemon() const noexcept { return m_isDaemon; }
-    void messageLog(int priority, std::string_view message);
+    void messageLog(int priority, std::string_view message) const;
     std::optional<int> parseCommandLine(int argc, char* argv[]);
-    void perrorLog(std::string_view s);
+    void perrorLog(std::string_view s) const;
     [[nodiscard]] std::string programName() const noexcept { return m_programName; }
     void run();
 
@@ -75,7 +69,7 @@ private:
     std::string getHostname();
     void init();
     int panelTop() const;
-    void printUsage(std::ostream& stream);
+    void printUsage(std::ostream& stream) const;
     void setFontConfig() noexcept;
 
     uint32_t m_connector{0};
@@ -85,9 +79,7 @@ private:
     std::unique_ptr<fb32::Interface8880Font> m_font{nullptr};
     fb32::FontConfig m_fontConfig;
     std::string m_hostname{};
-    bool m_isDaemon{false};
     std::vector<std::unique_ptr<Panel>> m_panels{};
-    std::string m_pidFile{};
     std::string m_programName{};
     std::atomic<bool>* m_run{nullptr};
 };

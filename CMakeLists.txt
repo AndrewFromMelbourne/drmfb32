@@ -1,14 +1,27 @@
 cmake_minimum_required(VERSION 3.10)
-project(drmfb32)
+project(drmfb32 VERSION 1.0.0
+                 DESCRIPTION "A simple framebuffer library for Linux using DRM/KMS"
+                 LANGUAGES CXX)
+
+#--------------------------------------------------------------------------
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+set(CMAKE_CXX_STANDARD 23)
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-psabi")
+set(CMAKE_COMPILE_WARNING_AS_ERROR ON)#--------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+#--------------------------------------------------------------------------
+
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(BSD REQUIRED libbsd)
 pkg_check_modules(DRM REQUIRED libdrm)
+pkg_check_modules(SYSTEMD REQUIRED libsystemd)
+
+#--------------------------------------------------------------------------
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
 set(CMAKE_BUILD_TYPE Release)
@@ -16,9 +29,22 @@ endif()
 
 message("Build type ${CMAKE_BUILD_TYPE}")
 
-set(CMAKE_CXX_STANDARD 23)
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-psabi")
-set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
+#--------------------------------------------------------------------------
+
+execute_process(
+    COMMAND git log -1 --format=%h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+#--------------------------------------------------------------------------
+
+configure_file(
+    "${CMAKE_SOURCE_DIR}/config.h.in"
+    "${CMAKE_BINARY_DIR}/config.h"
+    @ONLY)
+
+#--------------------------------------------------------------------------
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
@@ -86,7 +112,7 @@ set(EXTRA_LIBS ${EXTRA_LIBS} drmfb32)
 
 #--------------------------------------------------------------------------
 
-if (BSD_FOUND AND FREETYPE_FOUND)
+if (SYSTEMD_FOUND AND FREETYPE_FOUND)
 add_executable(info info/info.cxx
                     info/cpuTrace.cxx
                     info/dynamicInfo.cxx
@@ -100,11 +126,10 @@ add_executable(info info/info.cxx
                     info/traceGraph.cxx
                     info/traceStack.cxx)
 
-target_link_libraries(info drmfb32 ${BSD_LIBRARIES}
-                                   ${DRM_LIBRARIES}
-                                   ${FREETYPE_LIBRARIES})
-target_include_directories(info PUBLIC ${BSD_INCLUDE_DIRS})
-target_compile_options(info PUBLIC ${BSD_CFLAGS_OTHER})
+target_include_directories(info PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_link_libraries(info drmfb32 ${DRM_LIBRARIES}
+                                   ${FREETYPE_LIBRARIES}
+                                   ${SYSTEMD_LIBRARIES})
 
 set_property(TARGET info PROPERTY SKIP_BUILD_RPATH TRUE)
 install (TARGETS info RUNTIME DESTINATION bin)
