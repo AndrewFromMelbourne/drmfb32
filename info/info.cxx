@@ -218,7 +218,7 @@ Info::parseCommandLine(
     int argc,
     char* argv[])
 {
-    static const char* sopts = "c:f:hD";
+    static const char* sopts = "c:d:f:h";
     static option lopts[] =
     {
         { "connector", required_argument, nullptr, 'c' },
@@ -289,12 +289,10 @@ Info::printUsage(
     std::println(stream, "");
     std::println(stream, "Usage: {}", m_programName);
     std::println(stream, "");
-    std::println(stream, "    --daemon,-D - start in the background as a daemon");
     std::println(stream, "    --connector,-c - dri connector to use");
     std::println(stream, "    --device,-d - dri device to use");
     std::println(stream, "    --font,-f - font file to use[:pixel height]");
     std::println(stream, "    --help,-h - println usage and exit");
-    std::println(stream, "    --pidfile,-p <pidfile> - create and lock PID file (if being run as a daemon)");
     std::println(stream, "");
     std::println(stream, "Version: {}", c_projectVersion);
     std::println(stream, "Git commit hash: {}", c_gitCommitHash);
