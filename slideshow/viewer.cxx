@@ -153,7 +153,7 @@ qualityStrings()
 zoomStrings(
     int maximum)
 {
-    std::vector<std::string> result{"FTS"};
+    std::vector<std::string> result{"fit"};
 
     for (int zoom = 1 ; zoom <= maximum ; ++zoom)
     {
