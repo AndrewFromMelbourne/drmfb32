@@ -76,7 +76,6 @@ printUsage(
     std::println(stream, "");
     std::println(stream, "Usage: {} <options>", name);
     std::println(stream, "");
-    std::println(stream,"    --FPS,-F - set the desired frames per second");
     std::println(stream,"    --connector,-c - dri connector to use");
     std::println(stream,"    --device,-d - dri device to use");
     std::println(stream,"    --fit,-f - fit image to screen");
