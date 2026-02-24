@@ -64,12 +64,12 @@ public:
 
     enum MenuIds
     {
+        ANNOTATE,
         ENLIGHTEN,
         FIT_TO_SCREEN,
+        PAN_STEP,
         QUALITY,
-        ZOOM,
-        ANNOTATE,
-        PAN_STEP
+        ZOOM
     };
 
     // --------------------------------------------------------------------
