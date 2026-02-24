@@ -19,6 +19,8 @@ Display a slide show of jpeg images from a directory and its sub-directories.
         B Button - decrease zoom
         Control pad - pan zoomed image
 ### menu
+        Start Button - exit program
+        Select Button - exit menu
         A Button - increase value
         Y Button - decrease value
         X Button - previous item
