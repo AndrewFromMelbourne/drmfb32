@@ -12,12 +12,17 @@ Display a slide show of jpeg images from a directory and its sub-directories.
         --joystick,-j - joystick device
 ## controls
         Start Button - exit
-        Select Button - enlighten
+        Select Button - menu
         A Button - next image
         Y Button - previous image
         X Button - increase zoom
         B Button - decrease zoom
-        Left Shoulder Button - toggle fit to screen
-        Right Shoulder Button - toggle annotation
         Control pad - pan zoomed image
+### menu
+        A Button - increase value
+        Y Button - decrease value
+        X Button - previous item
+        B Button - next item
+        Control pad up/down - previous/next menu item
+        Control pad left/right - decrease/increase value
 

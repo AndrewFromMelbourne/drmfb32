@@ -76,6 +76,7 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/image8880Qoi.cxx
                            libdrmfb32/interface8880.cxx
                            libdrmfb32/interface8880Font.cxx
+                           libdrmfb32/interface8880Menu.cxx
                            libdrmfb32/joystick.cxx
                            libdrmfb32/rgb8880.cxx)
 
@@ -268,6 +269,11 @@ target_link_libraries(testLines drmfb32 ${DRM_LIBRARIES})
 
 add_executable(testPolygon test/testPolygon.cxx)
 target_link_libraries(testPolygon drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
+add_executable(testPolygonSeam test/testPolygonSeam.cxx)
+target_link_libraries(testPolygonSeam drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 

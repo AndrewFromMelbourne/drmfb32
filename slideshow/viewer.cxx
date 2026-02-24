@@ -26,6 +26,7 @@
 //-------------------------------------------------------------------------
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <filesystem>
 #include <format>
@@ -33,6 +34,7 @@
 #include <map>
 #include <print>
 #include <ranges>
+#include <span>
 
 #include "image8880Font8x16.h"
 #include "image8880Graphics.h"
@@ -46,6 +48,7 @@
 
 namespace fs = std::filesystem;
 using Point = fb32::Interface8880Point;
+using MenuItem = fb32::Interface8880Menu::MenuItem;
 
 // ========================================================================
 
@@ -80,6 +83,87 @@ isImageFile(
 }
 
 // ------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+boolStrings()
+{
+    return std::vector<std::string>{ "no", "yes" };
+}
+
+// ------------------------------------------------------------------------
+
+[[nodiscard]] std::span<const std::size_t>
+panStep() noexcept
+{
+    static std::array steps{ 1UL, 2UL, 5UL, 10UL, 20UL, 50UL, 100UL };
+
+    return steps;
+}
+
+
+// ------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+panStepStrings() noexcept
+{
+    std::vector<std::string> result;
+
+    for (const auto step : panStep())
+    {
+        result.push_back(std::to_string(step));
+    }
+
+    return result;
+}
+
+// ------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+percentageStrings(
+    int step)
+{
+    std::vector<std::string> result;
+
+    for (int percent = 0 ; percent <= 100 ; percent += step)
+    {
+        result.push_back(std::format("{}%", percent));
+    }
+
+    return result;
+}
+
+// ------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+qualityStrings()
+{
+    std::vector<std::string> result;
+
+    for (const auto quality : { Viewer::LOW, Viewer::MEDIUM, Viewer::HIGH })
+    {
+        result.push_back(Viewer::qualityToString(quality));
+    }
+
+    return result;
+}
+
+// ------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+zoomStrings(
+    int maximum)
+{
+    std::vector<std::string> result{"FTS"};
+
+    for (int zoom = 1 ; zoom <= maximum ; ++zoom)
+    {
+        result.push_back(std::format("{}x", zoom));
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
 
 } // namespace
 
@@ -157,7 +241,22 @@ Viewer::Viewer(
     m_fitToScreen{true},
     m_image{},
     m_imageProcessed{},
+    m_menu{
+        fb32::RGB8880{0x00FFFFFF},
+        fb32::RGB8880{0x00000000},
+        fb32::RGB8880{0x003F3F3F},
+        {
+            MenuItem{ANNOTATE, "Annotate", 1, boolStrings()},
+            MenuItem{ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
+            MenuItem{FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
+            MenuItem{PAN_STEP, "Pan step", 3, panStepStrings()},
+            MenuItem{QUALITY, "Quality", quality, qualityStrings()},
+            MenuItem{ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
+        }
+    },
+    m_menuShow{false},
     m_offset{0, 0},
+    m_panStep{10},
     m_percent{100},
     m_quality{quality},
     m_zoom{0}
@@ -183,6 +282,13 @@ Viewer::draw(
     fb32::FrameBuffer8880& fb) const
 {
     fb.putImage(Point{0, 0}, m_buffer);
+
+    if (m_menuShow)
+    {
+        fb32::Image8880Font8x16 font;
+
+        m_menu.draw(fb, font);
+    }
 }
 
 // ------------------------------------------------------------------------
@@ -191,6 +297,44 @@ bool
 Viewer::update(
     fb32::Joystick& js)
 {
+    if (js.buttonPressed(fb32::Joystick::BUTTON_SELECT))
+    {
+        m_menuShow = not m_menuShow;
+
+        if (m_menuShow)
+        {
+            setMenuValues();
+        }
+
+        return true;
+    }
+
+    if (m_menuShow)
+    {
+        const auto updated = m_menu.update(js);
+
+        switch (updated)
+        {
+        case fb32::Interface8880Menu::NO_UPDATE:
+
+            return false;
+            break;
+
+        case fb32::Interface8880Menu::MENU_UPDATE:
+
+            return true;
+            break;
+
+        case fb32::Interface8880Menu::VALUE_UPDATE:
+
+            readValuesFromMenu();
+            processImage();
+            paint();
+            return true;
+            break;
+        }
+    }
+
     return handleImageViewing(js);
 }
 
@@ -294,38 +438,7 @@ Viewer::handleImageViewing(
         }
     }
 
-    if (js.buttonPressed(fb32::Joystick::BUTTON_SELECT))
-    {
-        if (m_enlighten < 10)
-        {
-            ++m_enlighten;
-        }
-        else
-        {
-            m_enlighten = 0;
-        }
-
-        processImage();
-        paint();
-        return true;
-    }
-
-    if (js.buttonPressed(fb32::Joystick::BUTTON_LEFT_SHOULDER))
-    {
-            m_fitToScreen = !m_fitToScreen;
-            processImage();
-            paint();
-            return true;
-    }
-
-    if (js.buttonPressed(fb32::Joystick::BUTTON_RIGHT_SHOULDER))
-    {
-        m_annotate = not m_annotate;
-        paint();
-        return true;
-    }
-
-    auto value = js.getAxes(0);
+    const auto value = js.getAxes(0);
 
     if (not value.x and not value.y)
     {
@@ -333,10 +446,10 @@ Viewer::handleImageViewing(
     }
 
     const auto dx = (value.x)
-                  ? (10 * value.x / std::abs(value.x))
+                  ? (m_panStep * value.x / std::abs(value.x))
                   : 0;
     const auto dy = (value.y)
-                  ? (10 * value.y / std::abs(value.y))
+                  ? (m_panStep * value.y / std::abs(value.y))
                   : 0;
 
     pan(dx, dy);
@@ -594,6 +707,46 @@ Viewer::readDirectory()
         m_current = INVALID_INDEX;
         m_offset.center();
     }
+}
+
+// ------------------------------------------------------------------------
+
+void
+Viewer::readValuesFromMenu()
+{
+    m_enlighten = m_menu.getValue(ENLIGHTEN);
+    m_fitToScreen = m_menu.getValue(FIT_TO_SCREEN);
+    m_quality = static_cast<Quality>(m_menu.getValue(QUALITY));
+    m_zoom = m_menu.getValue(ZOOM);
+    m_annotate = m_menu.getValue(ANNOTATE);
+
+    const auto panStepIndex = m_menu.getValue(PAN_STEP);
+    const auto panSteps = panStep();
+    m_panStep =  panSteps[panStepIndex];
+}
+
+// ------------------------------------------------------------------------
+
+void
+Viewer::setMenuValues()
+{
+    m_menu.setValue(ENLIGHTEN, m_enlighten);
+    m_menu.setValue(FIT_TO_SCREEN, m_fitToScreen);
+    m_menu.setValue(QUALITY, m_quality);
+    m_menu.setValue(ZOOM, m_zoom);
+    m_menu.setValue(ANNOTATE, m_annotate);
+
+    std::size_t index = 0UL;
+    for (const auto step : panStep())
+    {
+        if (static_cast<int>(step) == m_panStep)
+        {
+            m_menu.setValue(PAN_STEP, index);
+            break;
+        }
+        ++index;
+    }
+
 }
 
 // ------------------------------------------------------------------------

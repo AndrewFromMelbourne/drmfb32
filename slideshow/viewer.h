@@ -37,6 +37,7 @@
 #include "framebuffer8880.h"
 #include "image8880.h"
 #include "interface8880.h"
+#include "interface8880Menu.h"
 #include "joystick.h"
 
 // ------------------------------------------------------------------------
@@ -59,6 +60,16 @@ public:
         JPEG,
         PNG,
         QOI
+    };
+
+    enum MenuIds
+    {
+        ENLIGHTEN,
+        FIT_TO_SCREEN,
+        QUALITY,
+        ZOOM,
+        ANNOTATE,
+        PAN_STEP
     };
 
     // --------------------------------------------------------------------
@@ -165,6 +176,8 @@ private:
     void processImage();
     void processResize(int width, int height);
     void readDirectory();
+    void readValuesFromMenu();
+    void setMenuValues();
     [[nodiscard]] int zoomedHeight() const noexcept;
     [[nodiscard]] int zoomedWidth() const noexcept;
 
@@ -183,7 +196,10 @@ private:
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
+    fb32::Interface8880Menu m_menu;
+    bool m_menuShow;
     Offset m_offset;
+    int m_panStep;
     int m_percent;
     Quality m_quality;
     int m_zoom;
