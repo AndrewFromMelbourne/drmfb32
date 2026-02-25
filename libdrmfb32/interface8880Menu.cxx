@@ -262,6 +262,8 @@ Interface8880Menu::setValue(
     std::size_t id,
     std::size_t value)
 {
+    m_selected = 0;
+
     if (id >= m_items.size())
     {
         return false;
