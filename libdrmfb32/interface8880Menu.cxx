@@ -25,6 +25,7 @@
 //
 //-------------------------------------------------------------------------
 
+#include <algorithm>
 #include <format>
 #include <stdexcept>
 
@@ -80,6 +81,8 @@ Interface8880Menu::Interface8880Menu(
     m_titleMaximum{0},
     m_valueMaximum{0}
 {
+    std::ranges::sort(m_items, std::less());
+
     for (const auto& item : m_items)
     {
         const auto titleLength = item.m_title.length();
@@ -154,10 +157,22 @@ Interface8880Menu::getValue(
 {
     if (id >= m_items.size())
     {
-        throw std::range_error(std::format("Id {} is outside the menu range", id));
+        throw std::invalid_argument(std::format("Id {} - not in menu", id));
     }
 
-    return m_items[id].m_value;
+    auto compare = [](const MenuItem& item, std::size_t id)
+    {
+        return item.m_id < id;
+    };
+
+    const auto item = std::lower_bound(begin(m_items), end(m_items), id, compare);
+
+    if ((item != m_items.end()) and (item->m_id == id))
+    {
+        return item->m_value;
+    }
+
+    throw std::invalid_argument(std::format("Id {} - not in menu", id));
 }
 
 //-------------------------------------------------------------------------
@@ -252,9 +267,20 @@ Interface8880Menu::setValue(
         return false;
     }
 
-    m_selected = 0;
-    m_items[id].m_value = value;
-    return true;
+    auto compare = [](const MenuItem& item, std::size_t id)
+    {
+        return item.m_id < id;
+    };
+
+    auto item = std::lower_bound(begin(m_items), end(m_items), id, compare);
+
+    if ((item != m_items.end()) and (item->m_id == id))
+    {
+        item->m_value = value;
+        return true;
+    }
+
+    return false;
 }
 
 //-------------------------------------------------------------------------

@@ -29,6 +29,7 @@
 
 //-------------------------------------------------------------------------
 
+#include <compare>
 #include <initializer_list>
 #include <string>
 #include <string_view>
@@ -53,7 +54,7 @@ public:
     struct MenuItem
     {
         MenuItem(
-            int id,
+            std::size_t id,
             std::string_view title,
             std::size_t value,
             std::vector<std::string>&& values)
@@ -69,7 +70,12 @@ public:
         bool decrementValue() noexcept;
         bool incrementValue() noexcept;
 
-        int m_id;
+        auto operator<=>(const MenuItem& rhs) const
+        {
+            return m_id <=> rhs.m_id;
+        }
+
+        std::size_t m_id;
         std::string m_title;
         std::size_t m_value;
         std::vector<std::string> m_values;
