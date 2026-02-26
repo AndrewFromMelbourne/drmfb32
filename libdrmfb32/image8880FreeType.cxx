@@ -90,19 +90,13 @@ Image8880FreeType::getFontStyleName() const noexcept
 
 //-------------------------------------------------------------------------
 
-int
-Image8880FreeType::getPixelHeight() const noexcept
+Dimensions8880
+Image8880FreeType::getPixelDimension() const noexcept
 {
-    return (m_face->size->metrics.ascender +
-            abs(m_face->size->metrics.descender)) >> 6;
-}
-
-//-------------------------------------------------------------------------
-
-int
-Image8880FreeType::getPixelWidth() const noexcept
-{
-    return m_face->size->metrics.max_advance >> 6;
+    const auto width = m_face->size->metrics.max_advance >> 6;
+    const auto height = (m_face->size->metrics.ascender +
+                         abs(m_face->size->metrics.descender)) >> 6;
+    return Dimensions8880(width, height);
 }
 
 //-------------------------------------------------------------------------
@@ -206,6 +200,7 @@ Image8880FreeType::drawString(
     const RGB8880& rgb,
     Interface8880& image)
 {
+    const auto d = getPixelDimension();
     Point8880 position{p};
     position.translateY(m_face->size->metrics.ascender >> 6);
 
@@ -217,7 +212,7 @@ Image8880FreeType::drawString(
     {
         if (c == '\n')
         {
-            position.set(p.x(), position.y() + getPixelHeight());
+            position.set(p.x(), position.y() + d.height());
         }
         else
         {

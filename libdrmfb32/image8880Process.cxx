@@ -111,8 +111,10 @@ boxBlurRows(
         return std::clamp(value, 0, end - 1);
     };
 
+    const auto d = input.getDimensions();
+
     const auto diameter = 2 * radius + 1;
-    const auto width = input.getWidth();
+    const auto width = d.width();
     auto inputi = input.getBuffer().data();
     auto rbi = rb.getBuffer().data();
 
@@ -155,8 +157,9 @@ boxBlurColumns(
         return std::clamp(value, 0, end - 1);
     };
 
+    const auto d = rb.getDimensions();
     const auto diameter = 2 * radius + 1;
-    const auto height = rb.getHeight();
+    const auto height = d.height();
     const auto rbi = rb.getBuffer().data();
     auto outputi = output.getBuffer().data();
 
@@ -193,16 +196,18 @@ rowsBilinearInterpolation(
     int jStart,
     int jEnd)
 {
-    const auto xScale = (output.getWidth() > 1)
-                      ? (input.getWidth() - 1.0f) / (output.getWidth() - 1.0f)
+    const auto id = input.getDimensions();
+    const auto od = output.getDimensions();
+    const auto xScale = (od.width() > 1)
+                      ? (id.width() - 1.0f) / (od.width() - 1.0f)
                       : 0.0f;
-    const auto yScale = (output.getHeight() > 1)
-                      ? (input.getHeight() - 1.0f) / (output.getHeight() - 1.0f)
+    const auto yScale = (od.height() > 1)
+                      ? (id.height() - 1.0f) / (od.height() - 1.0f)
                       : 0.0f;
 
     for (int j = jStart; j < jEnd; ++j)
     {
-        for (int i = 0; i < output.getWidth(); ++i)
+        for (int i = 0; i < od.width(); ++i)
         {
             int xLow = static_cast<int>(std::floor(xScale * i));
             int yLow = static_cast<int>(std::floor(yScale * j));
@@ -271,25 +276,27 @@ rowsLanczos3Interpolation(
     int jStart,
     int jEnd)
 {
+    const auto id = input.getDimensions();
+    const auto od = output.getDimensions();
     constexpr int a{3};
-    const auto xScale = (output.getWidth() > 1)
-                      ? (input.getWidth() - 1.0f) / (output.getWidth() - 1.0f)
+    const auto xScale = (od.width() > 1)
+                      ? (id.width() - 1.0f) / (od.width() - 1.0f)
                       : 0.0f;
-    const auto yScale = (output.getHeight() > 1)
-                      ? (input.getHeight() - 1.0f) / (output.getHeight() - 1.0f)
+    const auto yScale = (od.height() > 1)
+                      ? (id.height() - 1.0f) / (od.height() - 1.0f)
                       : 0.0f;
 
     for (int j = jStart; j < jEnd; ++j)
     {
-        for (int i = 0; i < output.getWidth(); ++i)
+        for (int i = 0; i < od.width(); ++i)
         {
             const auto xMid = i * xScale;
             const auto yMid = j * yScale;
 
             const auto xLow = std::max(0, static_cast<int>(std::floor(xMid)) - a + 1);
-            const auto xHigh = std::min(input.getWidth() - 1, static_cast<int>(std::floor(xMid)) + a);
+            const auto xHigh = std::min(id.width() - 1, static_cast<int>(std::floor(xMid)) + a);
             const auto yLow = std::max(0, static_cast<int>(std::floor(yMid)) - a + 1);
-            const auto yHigh = std::min(input.getHeight() - 1, static_cast<int>(std::floor(yMid)) + a);
+            const auto yHigh = std::min(id.height() - 1, static_cast<int>(std::floor(yMid)) + a);
 
             float weightsSum{};
             float redSum{};
@@ -337,20 +344,17 @@ rowsNearestNeighbour(
     int jStart,
     int jEnd)
 {
-    const auto inputWidth = input.getWidth();
-    const auto inputHeight = input.getHeight();
-    const auto outputWidth = output.getWidth();
-    const auto outputHeight = output.getHeight();
-
-    const int a = (outputWidth > inputWidth) ? 0 : 1;
-    const int b = (output.getHeight() > inputHeight) ? 0 : 1;
+    const auto id = input.getDimensions();
+    const auto od = output.getDimensions();
+    const int a = (od.width() > id.width()) ? 0 : 1;
+    const int b = (od.height() > id.height()) ? 0 : 1;
 
     for (int j = jStart ; j < jEnd ; ++j)
     {
-        const int y = (j * (inputHeight - b)) / (outputHeight - b);
-        for (int i = 0 ; i < outputWidth ; ++i)
+        const int y = (j * (id.height() - b)) / (od.height() - b);
+        for (int i = 0 ; i < od.width() ; ++i)
         {
-            const int x = (i * (inputWidth - a)) / (outputWidth - a);
+            const int x = (i * (id.width() - a)) / (od.width() - a);
             auto pixel{input.getPixel(Point{x, y})};
 
             if (pixel.has_value())
@@ -371,12 +375,12 @@ rowsScaleUp(
     int jStart,
     int jEnd)
 {
-    const auto width = input.getWidth();
-    auto inputi = input.getBuffer().data() + (jStart * width);
+    const auto id = input.getDimensions();
+    auto inputi = input.getBuffer().data() + (jStart * id.width());
 
     for (auto j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < width ; ++i)
+        for (int i = 0 ; i < id.width() ; ++i)
         {
             auto pixel = *(inputi++);
             for (int b = 0 ; b < scale ; ++b)
@@ -402,10 +406,10 @@ rowsRotate(
     int jStart,
     int jEnd)
 {
-    const auto inputHeight = image.getHeight();
-    const auto outputWidth = output.getWidth();
+    const auto id = image.getDimensions();
+    const auto od = output.getDimensions();
 
-    const auto y00 = inputHeight * cosAngle;
+    const auto y00 = id.height() * cosAngle;
 
     for (int j = jStart ; j < jEnd ; ++j)
     {
@@ -413,7 +417,7 @@ rowsRotate(
         const auto bSinAngle = b * sinAngle;
         const auto bCosAngle = b * cosAngle;
 
-        for (int i = 0 ; i < outputWidth ; ++i)
+        for (int i = 0 ; i < od.width() ; ++i)
         {
             const auto x = (i * cosAngle) - bSinAngle;
             const auto y = (i * sinAngle) + bCosAngle;
@@ -424,10 +428,10 @@ rowsRotate(
             const auto x1 = static_cast<int>(ceil(x));
             const auto y1 = static_cast<int>(ceil(y));
 
-            const auto pixel00 = image.getPixel(Point{x0, inputHeight - 1 - y0});
-            const auto pixel01 = image.getPixel(Point{x0, inputHeight - 1 - y1});
-            const auto pixel10 = image.getPixel(Point{x1, inputHeight - 1 - y0});
-            const auto pixel11 = image.getPixel(Point{x1, inputHeight - 1 - y1});
+            const auto pixel00 = image.getPixel(Point{x0, id.height() - 1 - y0});
+            const auto pixel01 = image.getPixel(Point{x0, id.height() - 1 - y1});
+            const auto pixel10 = image.getPixel(Point{x1, id.height() - 1 - y0});
+            const auto pixel11 = image.getPixel(Point{x1, id.height() - 1 - y1});
 
             if (pixel00.has_value() and
                 pixel01.has_value() and
@@ -475,11 +479,9 @@ fb32::boxBlur(
     const fb32::Interface8880& input,
     int radius)
 {
-    const auto width = input.getWidth();
-    const auto height = input.getHeight();
-
-    Image8880 rb{width, height};
-    Image8880 output{width, height};
+    const auto d = input.getDimensions();
+    Image8880 rb{d};
+    Image8880 output{d};
 
 #ifdef WITH_BS_THREAD_POOL
 
@@ -490,7 +492,7 @@ fb32::boxBlur(
         boxBlurRows(input, rb, radius, start, end);
     };
 
-    tPool.detach_blocks<int>(0, height, iterateRows);
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
     tPool.wait();
 
     auto iterateColumns = [&rb, &output, radius](int start, int end)
@@ -498,13 +500,13 @@ fb32::boxBlur(
         boxBlurColumns(rb, output, radius, start, end);
     };
 
-    tPool.detach_blocks<int>(0, width, iterateColumns);
+    tPool.detach_blocks<int>(0, d.width(), iterateColumns);
     tPool.wait();
 
 #else
 
-    boxBlurRows(input, rb, radius, 0, height);
-    boxBlurColumns(rb, output, radius, 0, width);
+    boxBlurRows(input, rb, radius, 0, d.height());
+    boxBlurColumns(rb, output, radius, 0, d.width());
 
 #endif
 
@@ -518,6 +520,7 @@ fb32::enlighten(
     const fb32::Interface8880& input,
     double strength)
 {
+    const auto d = input.getDimensions();
     auto flerp = [](double value1, double value2, double alpha)->double
     {
         return (value1 * (1.0 - alpha)) + (value2 * alpha);
@@ -530,7 +533,7 @@ fb32::enlighten(
 
     const auto mb = boxBlur(maxRGB(input), 12);
 
-    Image8880 output{input.getWidth(), input.getHeight()};
+    Image8880 output{d};
 
     const auto strength2 = strength * strength;
     const auto minI = 1.0 / flerp(1.0, 10.0, strength2);
@@ -568,7 +571,8 @@ fb32::Image8880
 fb32::maxRGB(
     const fb32::Interface8880& input)
 {
-    Image8880 output{input.getWidth(), input.getHeight()};
+    const auto d = input.getDimensions();
+    Image8880 output{d};
     auto* buffer = output.getBuffer().data();
 
     for (const auto pixel : input.getBuffer())
@@ -586,15 +590,14 @@ fb32::maxRGB(
 fb32::Image8880
 fb32::resizeBilinearInterpolation(
     const fb32::Interface8880& input,
-    int width,
-    int height)
+    fb32::Dimensions8880 d)
 {
-    if ((width <= 0) or (height <= 0))
+    if ((d.width() <= 0) or (d.height() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    Image8880 output{width, height};
+    Image8880 output{d};
     resizeToBilinearInterpolation(input, output);
 
     return output;
@@ -605,15 +608,14 @@ fb32::resizeBilinearInterpolation(
 fb32::Image8880
 fb32::resizeLanczos3Interpolation(
     const fb32::Interface8880& input,
-    int width,
-    int height)
+    fb32::Dimensions8880 d)
 {
-    if ((width <= 0) or (height <= 0))
+    if ((d.width() <= 0) or (d.height() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    Image8880 output{width, height};
+    Image8880 output{d};
     resizeToLanczos3Interpolation(input, output);
 
     return output;
@@ -624,15 +626,14 @@ fb32::resizeLanczos3Interpolation(
 fb32::Image8880
 fb32::resizeNearestNeighbour(
     const fb32::Interface8880& input,
-    int width,
-    int height)
+    fb32::Dimensions8880 d)
 {
-    if ((width <= 0) or (height <= 0))
+    if ((d.width() <= 0) or (d.height() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
 
-    Image8880 output{width, height};
+    Image8880 output{d};
     resizeToNearestNeighbour(input, output);
 
     return output;
@@ -645,6 +646,7 @@ fb32::resizeToBilinearInterpolation(
     const fb32::Interface8880& input,
     fb32::Image8880& output)
 {
+    const auto od = output.getDimensions();
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
     auto iterateRows = [&input, &output](int start, int end)
@@ -652,10 +654,10 @@ fb32::resizeToBilinearInterpolation(
         rowsBilinearInterpolation(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.detach_blocks<int>(0, od.height(), iterateRows);
     tPool.wait();
 #else
-    rowsBilinearInterpolation(input, output, 0, output.getHeight());
+    rowsBilinearInterpolation(input, output, 0, od.height());
 #endif
     return output;
 }
@@ -667,6 +669,7 @@ fb32::resizeToLanczos3Interpolation(
     const fb32::Interface8880& input,
     fb32::Image8880& output)
 {
+    const auto od = output.getDimensions();
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
     auto iterateRows = [&input, &output](int start, int end)
@@ -674,10 +677,10 @@ fb32::resizeToLanczos3Interpolation(
         rowsLanczos3Interpolation(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.detach_blocks<int>(0, od.height(), iterateRows);
     tPool.wait();
 #else
-    rowsLanczos3Interpolation(input, output, 0, output.getHeight());
+    rowsLanczos3Interpolation(input, output, 0, od.height());
 #endif
     return output;
 }
@@ -689,6 +692,7 @@ fb32::resizeToNearestNeighbour(
     const fb32::Interface8880& input,
     fb32::Image8880& output)
 {
+    const auto od = output.getDimensions();
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
     auto iterateRows = [&input, &output](int start, int end)
@@ -696,10 +700,10 @@ fb32::resizeToNearestNeighbour(
         rowsNearestNeighbour(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.detach_blocks<int>(0, od.height(), iterateRows);
     tPool.wait();
 #else
-    rowsNearestNeighbour(input, output, 0, output.getHeight());
+    rowsNearestNeighbour(input, output, 0, od.height());
 #endif
 
     return output;
@@ -743,7 +747,7 @@ fb32::rotate(
     }
     else
     {
-        image = Image8880(input.getWidth(), input.getHeight(), input.getBuffer());
+        image = input;
     }
 
     // now angle is in the range 0 to 90
@@ -772,17 +776,16 @@ fb32::rotate(
     const auto cosAngle = std::cos(radians);
     const auto sinAngle = std::sin(radians);
 
-    const auto inputWidth = image.getWidth();
-    const auto inputHeight = image.getHeight();
+    const auto id = image.getDimensions();
 
-    const auto x10 = (inputWidth * cosAngle) + (inputHeight * sinAngle);
-    const auto y00 = inputHeight * cosAngle;
-    const auto y11 = -(inputWidth * sinAngle);
+    const auto x10 = (id.width() * cosAngle) + (id.height() * sinAngle);
+    const auto y00 = id.height() * cosAngle;
+    const auto y11 = -(id.width() * sinAngle);
 
-    const auto outputWidth = static_cast<int>(std::ceil(x10));
-    const auto outputHeight = static_cast<int>(std::ceil(y00 - y11 + 1.0));
+    const Dimensions8880 od{ static_cast<int>(std::ceil(x10)),
+                             static_cast<int>(std::ceil(y00 - y11 + 1.0))};
 
-    Image8880 output{outputWidth, outputHeight};
+    Image8880 output{od};
     output.clear(background);
 
 #ifdef WITH_BS_THREAD_POOL
@@ -792,10 +795,10 @@ fb32::rotate(
         rowsRotate(image, output, sinAngle, cosAngle, start, end);
     };
 
-    tPool.detach_blocks<int>(0, output.getHeight(), iterateRows);
+    tPool.detach_blocks<int>(0, od.height(), iterateRows);
     tPool.wait();
 #else
-    rowsRotate(image, output, sinAngle, cosAngle, 0, output.getHeight());
+    rowsRotate(image, output, sinAngle, cosAngle, 0, od.height());
 #endif
 
     return output;
@@ -807,20 +810,22 @@ fb32::Image8880
 fb32::rotate90(
     const fb32::Interface8880& input)
 {
-    const auto width = input.getWidth();
-    const auto height = input.getHeight();
-    Image8880 output{height, width};
+    const auto id = input.getDimensions();
+    const Dimensions8880 od{id.height(), id.width()};
+    Image8880 output{od};
 
-    for (auto j = 0 ; j < height ; ++j)
+    for (auto j = 0 ; j < id.height() ; ++j)
     {
-        for (auto i = 0 ; i < width ; ++i)
+        for (auto i = 0 ; i < id.width() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
-            if (pixel.has_value())
+            if (not pixel.has_value())
             {
-                output.setPixel(Point{height - j - 1, i}, pixel.value());
+                continue;
             }
+
+            output.setPixel(Point{id.height() - j - 1, i}, pixel.value());
         }
     }
 
@@ -833,20 +838,21 @@ fb32::Image8880
 fb32::rotate180(
     const fb32::Interface8880& input)
 {
-    const auto width = input.getWidth();
-    const auto height = input.getHeight();
-    Image8880 output{width, height};
+    const auto d = input.getDimensions();
+    Image8880 output{d};
 
-    for (auto j = 0 ; j < height ; ++j)
+    for (auto j = 0 ; j < d.height() ; ++j)
     {
-        for (auto i = 0 ; i < width ; ++i)
+        for (auto i = 0 ; i < d.width() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
-            if (pixel.has_value())
+            if (not pixel.has_value())
             {
-                output.setPixel(Point{width - i - 1, height - j - 1}, pixel.value());
+                continue;
             }
+
+            output.setPixel(Point{d.width() - i - 1, d.height() - j - 1}, pixel.value());
         }
     }
 
@@ -859,20 +865,22 @@ fb32::Image8880
 fb32::rotate270(
     const fb32::Interface8880& input)
 {
-    const auto width = input.getWidth();
-    const auto height = input.getHeight();
-    Image8880 output{height, width};
+    const auto id = input.getDimensions();
+    const Dimensions8880 od{ id.height(), id.width() };
+    Image8880 output{od};
 
-    for (auto j = 0 ; j < height ; ++j)
+    for (auto j = 0 ; j < id.height() ; ++j)
     {
-        for (auto i = 0 ; i < width ; ++i)
+        for (auto i = 0 ; i < id.width() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
-            if (pixel.has_value())
+            if (not pixel.has_value())
             {
-                output.setPixel(Point{j, width - i - 1}, pixel.value());
+                continue;
             }
+
+            output.setPixel(Point{j, id.width() - i - 1}, pixel.value());
         }
     }
 
@@ -886,9 +894,9 @@ fb32::scaleUp(
     const fb32::Interface8880& input,
     uint8_t scale)
 {
-    const auto width = input.getWidth();
-    const auto height = input.getHeight();
-    Image8880 output{width * scale, height * scale};
+    const auto id = input.getDimensions();
+    const Dimensions8880 od { id.width() * scale, id.height() * scale };
+    Image8880 output{od};
 
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
@@ -897,10 +905,10 @@ fb32::scaleUp(
         rowsScaleUp(input, output, scale, start, end);
     };
 
-    tPool.detach_blocks<int>(0, height, iterateRows);
+    tPool.detach_blocks<int>(0, id.height(), iterateRows);
     tPool.wait();
 #else
-    rowsScaleUp(input, output, scale, 0, height);
+    rowsScaleUp(input, output, scale, 0, id.height());
 #endif
 
     return output;

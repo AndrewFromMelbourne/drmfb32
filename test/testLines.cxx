@@ -92,27 +92,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -122,13 +118,14 @@ main(
     try
     {
         FrameBuffer8880 fb{device, connector};
+        const auto fbd = fb.getDimensions();
 
         //-----------------------------------------------------------------
 
         constexpr RGB8880 white{255, 255, 255};
 
-        const auto halfWidth = fb.getWidth() / 2;
-        const auto halfHeight = fb.getHeight() / 2;
+        const auto halfWidth = fbd.width() / 2;
+        const auto halfHeight = fbd.height() / 2;
 
         const auto outerRadius = static_cast<int>(std::hypot(halfWidth,
                                                              halfHeight));
@@ -171,7 +168,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

@@ -218,7 +218,7 @@ DynamicInfo::DynamicInfo(
     int fontHeight,
     int yPosition)
 :
-    Panel{width, fontHeight + 4, yPosition},
+    Panel{fb32::Dimensions8880{width, fontHeight + 4}, yPosition},
     m_heading(255, 255, 0),
     m_foreground(255, 255, 255),
     m_warning(255, 0, 0),

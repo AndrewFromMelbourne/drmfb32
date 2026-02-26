@@ -48,12 +48,6 @@ class Webcam
 {
 public:
 
-    struct Dimensions
-    {
-        int width;
-        int height;
-    };
-
     struct VideoBuffer
     {
         int length;
@@ -74,7 +68,7 @@ public:
     Webcam(Webcam&& wc) = delete;
     Webcam& operator=(Webcam&& wc) = delete;
 
-    [[nodiscard]] const Dimensions& dimensions() const noexcept
+    [[nodiscard]] const fb32::Dimensions8880 dimensions() const noexcept
     {
         return m_dimensions;
     }
@@ -100,7 +94,7 @@ private:
     bool initVideo() noexcept;
     bool setFPS(int fps) const noexcept;
 
-    Dimensions m_dimensions;
+    fb32::Dimensions8880 m_dimensions;
     fd::FileDescriptor m_fd;
     bool m_fitToScreen;
     uint32_t m_format;

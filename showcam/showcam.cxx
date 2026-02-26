@@ -28,6 +28,7 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstring>
@@ -47,7 +48,7 @@ using namespace std::chrono_literals;
 
 namespace
 {
-volatile static std::sig_atomic_t run{1};
+std::atomic<bool> run{true};
 }
 
 //-------------------------------------------------------------------------
@@ -61,7 +62,7 @@ signalHandler(
     case SIGINT:
     case SIGTERM:
 
-        run = 0;
+        run = false;
         break;
     };
 }
@@ -122,45 +123,38 @@ main(
         case 'F':
 
             requestedFPS = std::stol(optarg);
-
             break;
 
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             fitToScreen = true;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         case 'v':
 
             videoDevice = optarg;
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -188,8 +182,8 @@ main(
 
         //-----------------------------------------------------------------
 
-        const auto [ width, height ] = wc.dimensions();
-        std::println("{} [{} x {}]", wc.formatName(), width, height);
+        const auto d = wc.dimensions();
+        std::println("{} [{} x {}]", wc.formatName(), d.width(), d.height());
 
         //-----------------------------------------------------------------
 
@@ -208,9 +202,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

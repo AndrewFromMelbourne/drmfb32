@@ -91,27 +91,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -130,11 +126,12 @@ main(
 
         //-----------------------------------------------------------------
 
-        const auto side = std::min(fb.getWidth(), fb.getHeight());
+        const auto fbd = fb.getDimensions();
+        const auto side = std::min(fbd.width(), fbd.height());
         const auto boxSide = (side - 15) / 16;
         const auto dimension = (boxSide * 16) + 15;
 
-        Image8880 image{dimension, dimension};
+        Image8880 image{fb32::Dimensions8880{dimension, dimension}};
         image.clear(black);
 
         uint8_t alpha{0};
@@ -167,7 +164,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

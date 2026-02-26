@@ -41,33 +41,29 @@ using Point = fb32::Point8880;
 //-------------------------------------------------------------------------
 
 fb32::Image8880Frames::Image8880Frames(
-    int width,
-    int height,
+    Dimensions8880 d,
     uint8_t numberOfFrames)
 :
-    m_width{width},
-    m_height{height},
+    m_dimensions{d},
     m_frame{0},
     m_numberOfFrames{numberOfFrames},
-    m_buffer(width * height * numberOfFrames)
+    m_buffer(d.width() * d.height() * numberOfFrames)
 {
 }
 
 //-------------------------------------------------------------------------
 
 fb32::Image8880Frames::Image8880Frames(
-    int width,
-    int height,
+    Dimensions8880 d,
     std::initializer_list<uint32_t> buffer,
     uint8_t numberOfFrames)
 :
-    m_width{width},
-    m_height{height},
+    m_dimensions{d},
     m_frame{0},
     m_numberOfFrames{numberOfFrames},
     m_buffer{buffer}
 {
-    std::size_t minBufferSize = width * height * numberOfFrames;
+    std::size_t minBufferSize = d.width() * d.height() * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -78,20 +74,18 @@ fb32::Image8880Frames::Image8880Frames(
 //-------------------------------------------------------------------------
 
 fb32::Image8880Frames::Image8880Frames(
-    int width,
-    int height,
+    Dimensions8880 d,
     std::span<const uint32_t> buffer,
     uint8_t numberOfFrames)
 :
-    m_width{width},
-    m_height{height},
+    m_dimensions{d},
     m_frame{0},
     m_numberOfFrames{numberOfFrames},
     m_buffer{}
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    std::size_t minBufferSize = width * height * numberOfFrames;
+    std::size_t minBufferSize = d.width() * d.height() * numberOfFrames;
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -136,6 +130,7 @@ fb32::Image8880Frames::offset(
     Point8880 p,
     uint8_t frame) const noexcept
 {
-    return p.x() + (p.y() * m_width) + (m_width * m_height * frame);
+    const auto size = m_dimensions.width() * m_dimensions.height();
+    return p.x() + (p.y() * m_dimensions.width()) + (size * frame);
 }
 

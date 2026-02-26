@@ -94,33 +94,28 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             fontConfig = fb32::parseFontConfig(optarg, 32);
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -141,12 +136,13 @@ main(
         constexpr RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device, connector};
 
-        Image8880 image{fb.getWidth(), fb.getHeight()};
+        Image8880 image{fb.getDimensions()};
         image.clear(black);
 
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{fontConfig};
+        const auto ftd = ft.getPixelDimension();
 
         Point8880 p{0, 0};
 
@@ -154,28 +150,28 @@ main(
         p = ft.drawString(p, "0123456789", white, image);
 
         p.setX(0);
-        p.translateY(ft.getPixelHeight());
+        p.translateY(ftd.height());
 
         p = ft.drawString(p, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", white, image);
 
         p.setX(0);
-        p.translateY(ft.getPixelHeight());
+        p.translateY(ftd.height());
 
         p = ft.drawChar(p, '@', white, image);
 
         p.setX(0);
-        p.translateY(ft.getPixelHeight());
+        p.translateY(ftd.height());
 
         for (int j = 0 ; j < 16 ; ++j)
         {
             for (int i = 0 ; i < 16 ; ++i)
             {
                 const uint8_t c = static_cast<uint8_t>(i + (j * 16));
-                p.setX(i * ft.getPixelWidth());
+                p.setX(i * ftd.width());
                 ft.drawChar(p, c, white, image);
             }
 
-            p.translateY(ft.getPixelHeight());
+            p.translateY(ftd.height());
         }
 
         //-----------------------------------------------------------------
@@ -192,9 +188,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

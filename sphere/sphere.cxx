@@ -49,14 +49,14 @@ double dot(vector3 a, vector3 b) noexcept
 Sphere::Sphere(int size)
 :
     m_size{size},
-    m_image(size, size),
+    m_image(fb32::Dimensions8880{size, size}),
     m_ambient{ 0.3 },
 #ifdef WITH_BS_THREAD_POOL
     m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) },
     m_threadPool()
 #else
     m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) }
-    m_image(size, size)
+    m_image(fb32::Dimensions8880{size, size})
 #endif
 {
 }

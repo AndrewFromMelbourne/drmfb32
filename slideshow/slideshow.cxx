@@ -28,6 +28,7 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <csignal>
 #include <cstring>
 #include <iostream>
@@ -46,7 +47,7 @@ using namespace fb32;
 
 namespace
 {
-volatile static std::sig_atomic_t run{1};
+std::atomic<bool> run{true};
 const char* defaultJoystick = "/dev/input/js0";
 }
 
@@ -61,7 +62,7 @@ signalHandler(
     case SIGINT:
     case SIGTERM:
 
-        run = 0;
+        run = false;
         break;
     };
 }
@@ -145,45 +146,38 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             folder = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         case 'j':
 
             joystick = optarg;
-
             break;
 
         case 'q':
 
             quality = Viewer::qualityFromString(optarg);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -230,7 +224,7 @@ main(
 
             if (js.buttonPressed(Joystick::BUTTON_START))
             {
-                run = 0;
+                run = false;
             }
             else if (viewer.update(js))
             {
@@ -245,9 +239,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

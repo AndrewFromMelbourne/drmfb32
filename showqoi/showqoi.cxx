@@ -28,6 +28,7 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstring>
@@ -48,7 +49,7 @@ using namespace std::chrono_literals;
 
 namespace
 {
-volatile static std::sig_atomic_t run{1};
+std::atomic<bool> run{true};
 }
 
 //-------------------------------------------------------------------------
@@ -62,7 +63,7 @@ signalHandler(
     case SIGINT:
     case SIGTERM:
 
-        run = 0;
+        run = false;
         break;
     };
 }
@@ -143,39 +144,33 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             fitToScreen = true;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         case 'q':
 
             qoi = optarg;
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -211,19 +206,25 @@ main(
         fb.clearBuffers(background);
 
         auto image = readQoi(qoi, background);
+        const auto fbd = fb.getDimensions();
+        const auto id = image.getDimensions();
 
         if (fitToScreen)
         {
-            int width = (fb.getHeight() * image.getWidth()) / image.getHeight();
-            int height = fb.getHeight();
-
-            if (width > fb.getWidth())
+            fb32::Dimensions8880 d
             {
-                width = fb.getWidth();
-                height = (fb.getWidth() * image.getHeight()) / image.getWidth();
+                (fbd.height() * id.width()) / id.height(),
+                fbd.height()
+            };
+
+            if (d.width() > fbd.width())
+            {
+                d.set(
+                    fbd.width(),
+                    (fbd.width() * id.height()) / id.width());
             }
 
-            image = resizeBilinearInterpolation(image, width, height);
+            image = resizeBilinearInterpolation(image, d);
         }
 
         fb.putImage(center(fb, image), image);
@@ -241,9 +242,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

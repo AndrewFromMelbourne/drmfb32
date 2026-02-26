@@ -29,6 +29,7 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstring>
@@ -52,7 +53,7 @@ using namespace fb32;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
+std::atomic<bool> run{true};
 }
 
 //-------------------------------------------------------------------------
@@ -66,7 +67,7 @@ signalHandler(
     case SIGINT:
     case SIGTERM:
 
-        run = 0;
+        run = false;
         break;
     };
 }
@@ -118,27 +119,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -169,11 +166,11 @@ main(
 
         FrameBuffer8880 fb{device, connector};
         fb.clearBuffers(darkGrey);
+        const auto fbd = fb.getDimensions();
 
-        constexpr int width{72};
-        constexpr int height{16};
+        constexpr fb32::Dimensions8880 d{72, 16};
 
-        Image8880 image(width, height);
+        Image8880 image(d);
         image.clear(darkBlue);
 
         //-----------------------------------------------------------------
@@ -205,10 +202,11 @@ main(
                 fb);
 
             const auto rotated = rotate(image, darkGrey, angle / 10.0);
+            const auto rd = rotated.getDimensions();
             const Point8880 p
             {
-                (fb.getWidth() - rotated.getWidth()) / 2,
-                (fb.getHeight() - rotated.getHeight()) / 2
+                (fbd.width() - rd.width()) / 2,
+                (fbd.height() - rd.height()) / 2
             };
 
             fb.putImage(p, rotated);
@@ -220,7 +218,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

@@ -94,27 +94,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -124,11 +120,9 @@ main(
     try
     {
         FrameBuffer8880 fb{device, connector};
+        const auto fbd = fb.getDimensions();
 
         //-----------------------------------------------------------------
-
-        const auto fwidth = fb.getWidth();
-        const auto fheight = fb.getHeight();
 
         constexpr RGB8880 white{255, 255, 255};
         constexpr RGB8880 grey(192, 192, 192);
@@ -138,7 +132,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        const int diameter = std::min(fwidth, fheight) / 4;
+        const int diameter = std::min(fbd.width(), fbd.height()) / 4;
         const int radius = (diameter / 2) - 5;
 
         //-----------------------------------------------------------------
@@ -158,14 +152,15 @@ main(
 
         //-----------------------------------------------------------------
 
-        const int jIncrement = fheight / 4;
-        const int iIncrement = fwidth / 4;
+        const int iIncrement = fbd.width() / 4;
+        const int jIncrement = fbd.height() / 4;
 
-        for (int j = 0; j <= fheight; j += jIncrement)
+
+        for (int j = 0; j <= fbd.height(); j += jIncrement)
         {
             const int index = j / jIncrement;
             const int startI = (index % 2 == 0) ? 0 : (iIncrement / 2);
-            for (int i = startI; i <= fwidth; i += iIncrement)
+            for (int i = startI; i <= fbd.width(); i += iIncrement)
             {
                 const std::array<Point8880, 10> starVertices{
                     starVertex(0, radius, i, j),
@@ -198,7 +193,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

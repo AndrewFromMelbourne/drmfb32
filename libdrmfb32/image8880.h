@@ -38,7 +38,6 @@
 
 #include "interface8880.h"
 #include "rgb8880.h"
-#include "point.h"
 
 //-------------------------------------------------------------------------
 
@@ -57,13 +56,9 @@ public:
     // constructors, destructors and assignment
 
     Image8880() = default;
-    Image8880(int width, int height);
-    Image8880(int width,
-              int height,
-              std::initializer_list<uint32_t> buffer);
-    Image8880(int width,
-              int height,
-              std::span<const uint32_t> buffer);
+    Image8880(Dimensions8880 d);
+    Image8880(Dimensions8880 d, std::initializer_list<uint32_t> buffer);
+    Image8880(Dimensions8880 d, std::span<const uint32_t> buffer);
 
     ~Image8880() override = default;
 
@@ -73,11 +68,18 @@ public:
     Image8880(Image8880&& image) = default;
     Image8880& operator=(Image8880&& image) = default;
 
+    Image8880(const Interface8880& i)
+    :
+        Image8880(i.getDimensions(), i.getBuffer())
+    {
+    }
+
+    Image8880& operator=(const Interface8880& i);
+
     //---------------------------------------------------------------------
     // getters and setters
 
-    [[nodiscard]] int getWidth() const noexcept override { return m_width; }
-    [[nodiscard]] int getHeight() const noexcept override { return m_height; }
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
 
     [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
     [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
@@ -86,9 +88,7 @@ public:
 
 private:
 
-    int m_width{};
-    int m_height{};
-
+    Dimensions8880 m_dimensions;
     std::vector<uint32_t> m_buffer{};
 };
 

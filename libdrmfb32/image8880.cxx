@@ -29,6 +29,7 @@
 #include <cmath>
 #include <functional>
 #include <numbers>
+#include <ranges>
 #include <stdexcept>
 
 #include "image8880.h"
@@ -41,27 +42,23 @@ using Point = fb32::Point8880;
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
-    int width,
-    int height)
+    Dimensions8880 d)
 :
-    m_width{width},
-    m_height{height},
-    m_buffer(width * height)
+    m_dimensions{d},
+    m_buffer(d.width() * d.height())
 {
 }
 
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
-    int width,
-    int height,
+    Dimensions8880 d,
     std::initializer_list<uint32_t> buffer)
 :
-    m_width{width},
-    m_height{height},
+    m_dimensions{d},
     m_buffer{buffer}
 {
-    std::size_t minBufferSize = width * height;
+    std::size_t minBufferSize = d.width() * d.height();
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -72,22 +69,32 @@ fb32::Image8880::Image8880(
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
-    int width,
-    int height,
+    Dimensions8880 d,
     std::span<const uint32_t> buffer)
 :
-    m_width{width},
-    m_height{height},
+    m_dimensions{d},
     m_buffer{}
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    std::size_t minBufferSize = width * height;
+    std::size_t minBufferSize = d.width() * d.height();
 
     if (m_buffer.size() < minBufferSize)
     {
         m_buffer.resize(minBufferSize);
     }
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880&
+fb32::Image8880::operator=(
+    const fb32::Interface8880& i)
+{
+    m_dimensions= i.getDimensions();
+    const auto ib = i.getBuffer();
+    m_buffer.assign(begin(ib), end(ib));
+    return *this;
 }
 
 //-------------------------------------------------------------------------
@@ -96,6 +103,6 @@ std::size_t
 fb32::Image8880::offset(
     Point8880 p) const noexcept
 {
-    return p.x() + (p.y() * m_width);
+    return p.x() + (p.y() * m_dimensions.width());
 }
 

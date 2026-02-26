@@ -169,7 +169,8 @@ readJpeg(
 
     TurboJpegDecode tjd{buffer};
     auto details{tjd.details()};
-    fb32::Image8880 image{details.m_width, details.m_height};
+    const fb32::Dimensions8880 d{details.m_width, details.m_height};
+    fb32::Image8880 image{d};
 
     tjd.decode(image);
 

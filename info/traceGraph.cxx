@@ -65,34 +65,26 @@ TraceGraph::TraceGraph(
 void
 TraceGraph::draw()
 {
+    const auto id = getImage().getDimensions();
+
     boxFilled(
         getImage(),
         fb32::Point8880(0, 0),
-        fb32::Point8880(getImage().getWidth() - 1, m_traceHeight),
+        fb32::Point8880(id.width() - 1, m_traceHeight),
         sc_background);
 
     //---------------------------------------------------------------------
 
     for (auto j = 0 ; j < m_traceHeight + 1 ; j+= m_gridHeight)
     {
-        horizontalLine(
-            getImage(),
-            0,
-            getImage().getWidth() - 1,
-            j,
-            sc_gridColour);
+        horizontalLine(getImage(), 0, id.width() - 1, j, sc_gridColour);
     }
 
     for (auto i = 0 ; i < m_columns ; ++i)
     {
         if ((m_time[i] % 60) == 0)
         {
-            verticalLine(
-                getImage(),
-                i,
-                0,
-                m_traceHeight,
-                sc_gridColour);
+            verticalLine(getImage(), i, 0, m_traceHeight, sc_gridColour);
         }
     }
 

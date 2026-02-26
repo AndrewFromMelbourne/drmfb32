@@ -227,7 +227,7 @@ Viewer::Viewer(
 :
     m_annotate{true},
     m_background{background},
-    m_buffer{interface.getWidth(), interface.getHeight()},
+    m_buffer{interface.getDimensions()},
     m_current{INVALID_INDEX},
     m_directory{folder},
     m_enlighten{0},
@@ -350,11 +350,9 @@ Viewer::annotate()
 
     auto [name, type] = m_files[m_current];
     auto annotation = fs::path(name).filename().string();
+    const auto d = m_image.getDimensions();
 
-    annotation += std::format(" ( {} x {} )",
-                              m_image.getWidth(),
-                              m_image.getHeight());
-
+    annotation += std::format(" ( {} x {} )", d.width(), d.height());
     annotation += std::format(" [ {} / {} ]", m_current + 1, m_files.size());
     annotation += std::format(" {}%", m_percent);
 
@@ -378,10 +376,10 @@ Viewer::annotate()
     fb32::Image8880Font8x16 font;
     constexpr int padding{4};
     const auto length = static_cast<int>(annotation.length());
+    const auto ftd = font.getPixelDimension();
 
     Point p1{0, 0};
-    Point p2{length * font.getPixelWidth() + 2 * padding,
-             font.getPixelHeight() + 2 * padding};
+    Point p2{length * ftd.width() + 2 * padding, ftd.height() + 2 * padding};
 
     constexpr fb32::RGB8880 black{0};
     constexpr fb32::RGB8880 green{0, 255, 0};
@@ -536,8 +534,10 @@ Viewer::openImage()
 bool
 Viewer::oversize() const noexcept
 {
-    if ((zoomedWidth() > m_buffer.getWidth()) or
-        (zoomedHeight() > m_buffer.getHeight()))
+    const auto d = m_buffer.getDimensions();
+    const auto zd = zoomedDimensions();
+
+    if ((zd.width() > d.width()) or (zd.height() > d.height()))
     {
         return true;
     }
@@ -591,7 +591,9 @@ Viewer::placeImage(
 void
 Viewer::processImage()
 {
-    if (m_image.getWidth() == 0 or m_image.getHeight() == 0)
+    const auto id = m_image.getDimensions();
+
+    if (id.width() == 0 or id.height() == 0)
     {
         m_imageProcessed = m_image;
         return;
@@ -616,21 +618,23 @@ Viewer::processImage()
     {
         if (m_zoom == SCALE_OVERSIZED)
         {
-            int width = (m_buffer.getHeight() * m_image.getWidth()) /
-                         m_image.getHeight();
-            int height = m_buffer.getHeight();
-
-            if (width > m_buffer.getWidth())
+            const auto bd = m_buffer.getDimensions();
+            fb32::Dimensions8880 d
             {
-                width = m_buffer.getWidth();
-                height = (m_buffer.getWidth() * m_image.getHeight()) /
-                          m_image.getWidth();
+                (bd.height() * id.width()) / id.height(),
+                bd.height()
+            };
+
+            if (d.width() > bd.width())
+            {
+                d.set(
+                    bd.width(),
+                    (bd.width() * id.height()) / id.width());
             }
 
-            processResize(width, height);
+            processResize(d);
 
-            auto percent = (100.0 * m_imageProcessed.getWidth()) /
-                           m_image.getWidth();
+            auto percent = (100.0 * m_imageProcessed.getDimensions().width()) / id.width();
             m_percent = static_cast<int>(0.5 + percent);
         }
         else
@@ -645,24 +649,23 @@ Viewer::processImage()
 
 void
 Viewer::processResize(
-    int width,
-    int height)
+    fb32::Dimensions8880 d)
 {
     switch (m_quality)
     {
     case LOW:
 
-        m_imageProcessed = resizeNearestNeighbour(m_imageProcessed, width, height);
+        m_imageProcessed = resizeNearestNeighbour(m_imageProcessed, d);
         break;
 
     case MEDIUM:
 
-        m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, width, height);
+        m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, d);
         break;
 
     case HIGH:
 
-        m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, width, height);
+        m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, d);
         break;
     }
 }
@@ -751,21 +754,12 @@ Viewer::setMenuValues()
 
 //-------------------------------------------------------------------------
 
-int
-Viewer::zoomedHeight() const noexcept
+fb32::Dimensions8880
+Viewer::zoomedDimensions() const noexcept
 {
+    const auto d = m_image.getDimensions();
     const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 
-    return m_image.getHeight() * zoom;
-}
-
-//-------------------------------------------------------------------------
-
-int
-Viewer::zoomedWidth() const noexcept
-{
-    const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
-
-    return m_image.getWidth() * zoom;
+    return {d.width() * zoom, d.height() * zoom};
 }
 

@@ -90,27 +90,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -120,18 +116,17 @@ main(
     try
     {
         FrameBuffer8880 fb{device, connector};
+        const auto fbd = fb.getDimensions();
 
         //-----------------------------------------------------------------
 
         constexpr int iwidth{30};
         constexpr int ihwidth{iwidth/2};
-        const auto fwidth{fb.getWidth()};
-        const auto fheight{fb.getHeight()};
+        constexpr fb32::Dimensions8880 d{iwidth, iwidth};
 
         const Image8880 image
         {
-            iwidth,
-            iwidth,
+            d,
             {
                 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
                 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -226,9 +221,9 @@ main(
             }
         };
 
-        for (auto y : { -ihwidth, (fheight / 2) - ihwidth, fheight - ihwidth })
+        for (auto y : { -ihwidth, (fbd.height() / 2) - ihwidth, fbd.height() - ihwidth })
         {
-            for (auto x : { -ihwidth, (fwidth / 2) - ihwidth, fwidth - ihwidth })
+            for (auto x : { -ihwidth, (fbd.width() / 2) - ihwidth, fbd.width() - ihwidth })
             {
                 fb.putImage(Point8880{x, y}, image);
             }
@@ -247,6 +242,4 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }

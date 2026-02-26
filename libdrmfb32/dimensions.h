@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2026 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,23 +25,67 @@
 //
 //-------------------------------------------------------------------------
 
-#include "panel.h"
+#pragma once
 
 //-------------------------------------------------------------------------
 
-int
-Panel::getBottom() const noexcept
+namespace fb32
 {
-    const auto d = m_image.getDimensions();
-    return m_yPosition + d.height();
-}
 
 //-------------------------------------------------------------------------
 
-void
-Panel::show(
-    fb32::FrameBuffer8880& fb) const
+template<typename T>
+class Dimensions
 {
-    fb.putImage(fb32::Point8880(0, m_yPosition), m_image);
-}
+public:
+
+    constexpr Dimensions() noexcept
+    :
+        m_width{},
+        m_height{}
+    {
+    }
+
+    constexpr Dimensions(
+        T width,
+        T height) noexcept
+    :
+        m_width(width),
+        m_height(height)
+    {
+    }
+
+    [[nodiscard]] constexpr T width() const noexcept { return m_width; }
+    [[nodiscard]] constexpr T height() const noexcept { return m_height; }
+
+    constexpr void
+    set(
+        T width,
+        T height) noexcept
+    {
+        m_width = width;
+        m_height = height;
+    }
+
+    constexpr void setWidth(T width) noexcept
+    {
+        m_width = width;
+    }
+
+    constexpr void setHeight(T height) noexcept
+    {
+        m_height = height;
+    }
+
+    friend bool operator<=>(const Dimensions& lhs, const Dimensions& rhs) = default;
+
+private:
+
+    T m_width;
+    T m_height;
+};
+
+//-------------------------------------------------------------------------
+
+} // namespace fb32
 

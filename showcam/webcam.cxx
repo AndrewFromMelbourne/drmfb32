@@ -45,7 +45,7 @@ fb32::Webcam::Webcam(
     int requestedFPS,
     Interface8880& interface)
 :
-    m_dimensions{ .width = 0, .height = 0 },
+    m_dimensions{ 0, 0 },
     m_fd{::open(device.c_str(), O_RDWR)},
     m_fitToScreen{fitToScreen},
     m_format{0},
@@ -96,7 +96,7 @@ fb32::Webcam::Webcam(
 
     setFPS(requestedFPS);
 
-    m_image = Image8880(m_dimensions.width, m_dimensions.height);
+    m_image = Image8880(m_dimensions);
 
     if (not initBuffers())
     {
@@ -207,7 +207,8 @@ bool
 fb32::Webcam::chooseBestFit(
     Interface8880& interface)
 {
-    std::vector<Dimensions> dimensions;
+    const auto id = interface.getDimensions();
+    std::vector<fb32::Dimensions8880> dimensions;
 
     v4l2_frmsizeenum frmsize;
     frmsize.index = 0;
@@ -230,25 +231,25 @@ fb32::Webcam::chooseBestFit(
         ++frmsize.index;
     }
 
-    m_dimensions = Dimensions{ 0, 0 };
+    m_dimensions.set(0, 0);
     bool result = false;
 
     if (dimensions.size() > 0)
     {
-        auto reverseSort = [](const Dimensions& a, const Dimensions& b) -> bool
+        auto reverseSort = [](const fb32::Dimensions8880& a, const fb32::Dimensions8880& b) -> bool
         {
-            return (a.height > b.height) or
-                    ((a.height == b.height) and (a.width > b.width));
+            return (a.height() > b.height()) or
+                    ((a.height() == b.height()) and (a.width() > b.width()));
         };
 
         std::ranges::sort(dimensions, reverseSort);
 
         for (const auto d : dimensions)
         {
-            if ((d.width <= interface.getWidth()) and
-                (d.height <= interface.getHeight()) and
-                (d.width > m_dimensions.width) and
-                (d.height > m_dimensions.height))
+            if ((d.width() <= id.width()) and
+                (d.height() <= id.height()) and
+                (d.width() > m_dimensions.width()) and
+                (d.height() > m_dimensions.height()))
             {
                 m_dimensions = d;
                 result = true;
@@ -267,24 +268,21 @@ fb32::Webcam::chooseBestFit(
     {
         const auto& sw = frmsize.stepwise;
 
-        if ((interface.getWidth() < static_cast<int>(sw.min_width)) or
-            (interface.getHeight() < static_cast<int>(sw.min_height)))
+        if ((id.width() < static_cast<int>(sw.min_width)) or
+            (id.height() < static_cast<int>(sw.min_height)))
         {
-            m_dimensions.width = sw.min_width;
-            m_dimensions.height = sw.min_height;
+            m_dimensions.set(sw.min_width, sw.min_height);
         }
-        else if ((interface.getWidth() > static_cast<int>(sw.max_width)) or
-                 (interface.getHeight() > static_cast<int>(sw.max_height)))
+        else if ((id.width() > static_cast<int>(sw.max_width)) or
+                 (id.height() > static_cast<int>(sw.max_height)))
         {
-            m_dimensions.width = sw.max_width;
-            m_dimensions.height = sw.max_height;
+            m_dimensions.set(sw.max_width, sw.max_height);
         }
         else
         {
-            m_dimensions.width = interface.getWidth() -
-                                 (interface.getWidth() % sw.step_width);
-            m_dimensions.height = interface.getHeight() -
-                                  (interface.getHeight() % sw.step_height);
+            m_dimensions.set(
+                id.width() - (id.width() % sw.step_width),
+                id.height() - (id.height() % sw.step_height));
         }
 
         result = true;
@@ -493,18 +491,21 @@ void
 fb32::Webcam::initResizedImage(
     Interface8880& interface)
 {
-    auto width = (m_dimensions.width * interface.getHeight()) /
-                  m_dimensions.height;
-    auto height = interface.getHeight();
+    const auto id = interface.getDimensions();
 
-    if (width > interface.getWidth())
+    auto width = (m_dimensions.width() * id.height()) /
+                  m_dimensions.height();
+    auto height = id.height();
+
+    if (width > id.width())
     {
-        width = interface.getWidth();
-        height = (m_dimensions.height * interface.getWidth()) /
-                  m_dimensions.width;
+        width = id.width();
+        height = (m_dimensions.height() * id.width()) /
+                  m_dimensions.width();
     }
 
-    m_resizedImage = Image8880{width, height};
+    const fb32::Dimensions8880 d{width, height};
+    m_resizedImage = Image8880{d};
 }
 
 //-------------------------------------------------------------------------
@@ -515,8 +516,8 @@ fb32::Webcam::initVideo() noexcept
     v4l2_format fmt{};
 
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-    fmt.fmt.pix.width = m_dimensions.width,
-    fmt.fmt.pix.height = m_dimensions.height,
+    fmt.fmt.pix.width = m_dimensions.width(),
+    fmt.fmt.pix.height = m_dimensions.height(),
     fmt.fmt.pix.field = V4L2_FIELD_ANY;
     fmt.fmt.pix.pixelformat = m_format;
 
@@ -530,8 +531,7 @@ fb32::Webcam::initVideo() noexcept
         return false;
     }
 
-    m_dimensions.width = fmt.fmt.pix.width;
-    m_dimensions.height = fmt.fmt.pix.height;
+    m_dimensions.set(fmt.fmt.pix.width, fmt.fmt.pix.height);
 
     return true;
 }

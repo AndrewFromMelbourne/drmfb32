@@ -89,27 +89,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -119,13 +115,14 @@ main(
     try
     {
         FrameBuffer8880 fb{device, connector};
+        const auto fbd = fb.getDimensions();
 
         //-----------------------------------------------------------------
 
-        std::println("Dimensions: {}x{}", fb.getWidth(), fb.getHeight());
+        std::println("Dimensions: {}x{}", fbd.width(), fbd.height());
         std::println("hasAtomic: {}", fb.hasAtomic());
         std::println("hasUniversalPlanes: {}", fb.hasUniversalPlanes());
-        auto drmVersion = fb.getDrmVersion();
+        const auto drmVersion = fb.getDrmVersion();
         std::println("drmVersion: {} {}.{}.{}",
                      drmVersion->name,
                      drmVersion->version_major,
@@ -162,7 +159,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

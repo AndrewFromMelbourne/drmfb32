@@ -175,8 +175,13 @@ decodeQoi(
     const std::vector<uint8_t>& data,
     const fb32::RGB8880& background)
 {
+    const fb32::Dimensions8880 id
+    {
+        static_cast<int>(header.getWidth()),
+        static_cast<int>(header.getHeight())
+    };
 
-    fb32::Image8880 image(header.getWidth(), header.getHeight());
+    fb32::Image8880 image(id);
 
     QoiRGBA currentRGBA{ .r = 0, .g = 0, .b = 0, .a = 255 };
 

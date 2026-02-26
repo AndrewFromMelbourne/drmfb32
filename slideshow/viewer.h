@@ -174,12 +174,11 @@ private:
     void pan(int dx, int dy) noexcept;
     [[nodiscard]] fb32::Point8880 placeImage(const fb32::Image8880& image) const noexcept;
     void processImage();
-    void processResize(int width, int height);
+    void processResize(fb32::Dimensions8880 d);
     void readDirectory();
     void readValuesFromMenu();
     void setMenuValues();
-    [[nodiscard]] int zoomedHeight() const noexcept;
-    [[nodiscard]] int zoomedWidth() const noexcept;
+    [[nodiscard]] fb32::Dimensions8880 zoomedDimensions() const noexcept;
 
     static const std::size_t INVALID_INDEX{std::numeric_limits<std::size_t>::max()};
     static const int MAX_ZOOM{5};

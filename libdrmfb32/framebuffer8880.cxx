@@ -54,8 +54,7 @@ fb32::FrameBuffer8880::FrameBuffer8880(
     const std::string& device,
     uint32_t connectorId)
 :
-    m_width{0},
-    m_height{0},
+    m_dimensions{},
     m_fd{},
     m_dbs{},
     m_dbFront{0},
@@ -181,7 +180,7 @@ std::size_t
 fb32::FrameBuffer8880::getBufferSize() const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
-    return dbb.m_lineLengthPixels * m_height;
+    return dbb.m_lineLengthPixels * m_dimensions.height();
 }
 
 //-------------------------------------------------------------------------
@@ -517,8 +516,7 @@ fb32::FrameBuffer8880::findResources(
     //---------------------------------------------------------------------
 
     m_mode = resource.m_mode;
-    m_width = m_mode.hdisplay;
-    m_height = m_mode.vdisplay;
+    m_dimensions.set(m_mode.hdisplay, m_mode.vdisplay);
 
     m_connectorId = resource.m_connectorId;
     m_crtcId = resource.m_crtcId;

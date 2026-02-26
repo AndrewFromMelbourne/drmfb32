@@ -111,8 +111,7 @@ public:
 
     [[nodiscard]] drm::drmVersion_ptr getDrmVersion() noexcept { return drm::drmGetVersion(m_fd); }
 
-    [[nodiscard]] int getWidth() const noexcept override { return m_width; }
-    [[nodiscard]] int getHeight() const noexcept override { return m_height; }
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
 
     [[nodiscard]] bool hasAtomic() const noexcept { return m_hasAtomic; }
     [[nodiscard]] bool hasUniversalPlanes() const noexcept { return m_hasUniversalPlanes; }
@@ -147,8 +146,7 @@ private:
 
     [[nodiscard]] bool useAtomic() const noexcept { return m_hasAtomic and m_hasUniversalPlanes; }
 
-    int m_width;
-    int m_height;
+    Dimensions8880 m_dimensions;
 
     fd::FileDescriptor m_fd;
 

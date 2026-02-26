@@ -127,8 +127,4 @@ main(
         info.messageLog(LOG_ERR, std::format("exception caught: {}", error.what()));
         ::exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }

@@ -106,7 +106,8 @@ fb32::Interface8880::getRow(
 
     if (validPixel(p))
     {
-        return  getBuffer().subspan(offset(p), getWidth());
+        const auto d = getDimensions();
+        return  getBuffer().subspan(offset(p), d.width());
     }
     else
     {
@@ -124,7 +125,8 @@ fb32::Interface8880::getRow(
 
     if (validPixel(p))
     {
-        return  getBuffer().subspan(offset(p), getWidth());
+        const auto d = getDimensions();
+        return  getBuffer().subspan(offset(p), d.width());
     }
     else
     {
@@ -140,20 +142,22 @@ fb32::Interface8880::putImage(
     const Interface8880& image)
 {
     Point8880 p{ p_left.x(), p_left.y() };
+    const auto d = getDimensions();
+    const auto id = image.getDimensions();
 
     if ((p.x() < 0) or
-        ((p.x() + image.getWidth()) > getWidth()))
+        ((p.x() + id.width()) > d.width()))
     {
         return putImagePartial(p, image);
     }
 
     if ((p.y() < 0) or
-        ((p.y() + image.getHeight()) > getHeight()))
+        ((p.y() + id.height()) > d.height()))
     {
         return putImagePartial(p, image);
     }
 
-    for (int j = 0 ; j < image.getHeight() ; ++j)
+    for (int j = 0 ; j < id.height() ; ++j)
     {
         auto row = image.getRow(j);
         const auto ost = offset(Point8880{p.x(), j + p.y()});
@@ -171,13 +175,15 @@ fb32::Interface8880::putImagePartial(
     Point8880 p,
     const Interface8880& image)
 {
+    const auto id = image.getDimensions();
+    const auto d = getDimensions();
     auto x = p.x();
     auto xStart = 0;
-    auto xEnd = image.getWidth() - 1;
+    auto xEnd = id.width() - 1;
 
     auto y = p.y();
     auto yStart = 0;
-    auto yEnd = image.getHeight() - 1;
+    auto yEnd = id.height() - 1;
 
     if (x < 0)
     {
@@ -185,9 +191,9 @@ fb32::Interface8880::putImagePartial(
         x = 0;
     }
 
-    if ((x - xStart + image.getWidth()) > getWidth())
+    if ((x - xStart + id.width()) > d.width())
     {
-        xEnd = getWidth() - 1 - (x - xStart);
+        xEnd = d.width() - 1 - (x - xStart);
     }
 
     if (y < 0)
@@ -196,9 +202,9 @@ fb32::Interface8880::putImagePartial(
         y = 0;
     }
 
-    if ((y - yStart + image.getHeight()) > getHeight())
+    if ((y - yStart + id.height()) > d.height())
     {
-        yEnd = getHeight() - 1 - (y - yStart);
+        yEnd = d.height() - 1 - (y - yStart);
     }
 
     if ((xEnd - xStart) <= 0)
@@ -249,8 +255,10 @@ center(
     const Interface8880& frame,
     const Interface8880& image) noexcept
 {
-    return {(frame.getWidth() - image.getWidth()) / 2,
-            (frame.getHeight() - image.getHeight()) / 2};
+    const auto fd = frame.getDimensions();
+    const auto id = image.getDimensions();
+
+    return {(fd.width() - id.width()) / 2, (fd.height() - id.height()) / 2};
 }
 
 //-------------------------------------------------------------------------

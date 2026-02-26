@@ -42,18 +42,17 @@ class Panel
 public:
 
     Panel(
-        int width,
-        int height,
+        fb32::Dimensions8880 d,
         int yPosition)
     :
         m_yPosition{yPosition},
-        m_image{width, height}
+        m_image{d}
     { }
 
 
     virtual ~Panel() = default;
 
-    [[nodiscard]] int getBottom() const noexcept { return m_yPosition + m_image.getHeight(); }
+    [[nodiscard]] int getBottom() const noexcept;
 
     [[nodiscard]] fb32::Image8880& getImage() noexcept { return m_image; }
     [[nodiscard]] const fb32::Image8880& getImage() const noexcept { return m_image; }

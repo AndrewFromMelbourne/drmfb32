@@ -28,7 +28,9 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <csignal>
+#include <cstring>
 #include <iostream>
 #include <print>
 #include <thread>
@@ -47,8 +49,24 @@ using namespace fb32;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
+std::atomic<bool> run{true};
 const char* defaultJoystick = "/dev/input/js0";
+}
+
+//-------------------------------------------------------------------------
+
+static void
+signalHandler(
+    int signalNumber)
+{
+    switch (signalNumber)
+    {
+    case SIGINT:
+    case SIGTERM:
+
+        run = false;
+        break;
+    };
 }
 
 //-------------------------------------------------------------------------
@@ -104,40 +122,50 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             fitToScreen = true;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         case 'j':
 
             joystick = optarg;
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
+        }
+    }
+
+    //---------------------------------------------------------------------
+
+    for (auto signal : { SIGINT, SIGTERM })
+    {
+        if (std::signal(signal, signalHandler) == SIG_ERR)
+        {
+            std::println(
+                std::cerr,
+                "Error: installing {} signal handler : {}",
+                strsignal(signal),
+                strerror(errno));
+
+            ::exit(EXIT_FAILURE);
         }
     }
 
@@ -149,7 +177,7 @@ main(
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
 
-        if (fb.getHeight() < 480)
+        if (fb.getDimensions().height() < 480)
         {
             std::println(std::cerr, "Display too small, must be at least 480 pixels high");
             exit(EXIT_FAILURE);
@@ -167,7 +195,7 @@ main(
 
             if (js.buttonPressed(Joystick::BUTTON_START))
             {
-                run = 0;
+                run = false;
             }
             else
             {
@@ -184,9 +212,5 @@ main(
         std::println(std::cerr, "Error: {} \n",error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

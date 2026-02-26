@@ -33,6 +33,7 @@
 #include <optional>
 #include <span>
 
+#include "dimensions.h"
 #include "point.h"
 #include "rgb8880.h"
 
@@ -43,6 +44,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
+using Dimensions8880 = Dimensions<int>;
 using Point8880 = Point<int>;
 
 //-------------------------------------------------------------------------
@@ -58,8 +60,7 @@ public:
     [[nodiscard]] virtual std::span<uint32_t> getBuffer() noexcept = 0;
     [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
 
-    [[nodiscard]] virtual int getWidth() const noexcept = 0;
-    [[nodiscard]] virtual int getHeight() const noexcept = 0;
+    [[nodiscard]] virtual Dimensions8880 getDimensions() const noexcept = 0;
 
     void clear(const RGB8880& rgb) { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0);
@@ -96,10 +97,12 @@ public:
     [[nodiscard]] bool
     validPixel(Point8880 p) const noexcept
     {
+        const auto d = getDimensions();
+
         return ((p.x() >= 0) and
-                (p.x() < getWidth()) and
+                (p.x() < d.width()) and
                 (p.y() >= 0) and
-                (p.y() < getHeight()));
+                (p.y() < d.height()));
     }
 
 private:

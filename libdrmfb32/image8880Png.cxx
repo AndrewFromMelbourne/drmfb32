@@ -236,8 +236,10 @@ PngDecode::decodeIntoImage(
         const auto width = png_get_image_width(m_readPtr, m_infoPtr);
         const auto height = png_get_image_height(m_readPtr, m_infoPtr);
 
-        if ((image.getWidth() != static_cast<int>(width)) or
-            (image.getHeight() != static_cast<int>(height)))
+        const auto d = image.getDimensions();
+
+        if ((d.width() != static_cast<int>(width)) or
+            (d.height() != static_cast<int>(height)))
         {
             throw std::runtime_error{"PNG image size mismatch"};
         }
@@ -274,7 +276,8 @@ PngDecode::decode()
     {
         const auto width = png_get_image_width(m_readPtr, m_infoPtr);
         const auto height = png_get_image_height(m_readPtr, m_infoPtr);
-        fb32::Image8880 image{static_cast<int>(width), static_cast<int>(height)};
+        const fb32::Dimensions8880 d{static_cast<int>(width), static_cast<int>(height)};
+        fb32::Image8880 image{d};
 
         decodeIntoImage(image);
 

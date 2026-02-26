@@ -28,7 +28,9 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <csignal>
+#include <cstring>
 #include <iostream>
 #include <print>
 
@@ -44,8 +46,24 @@ using namespace fb32;
 
 namespace
 {
-volatile static std::sig_atomic_t run{1};
+std::atomic<bool> run{true};
 const char* defaultJoystick{"/dev/input/js0"};
+}
+
+//-------------------------------------------------------------------------
+
+static void
+signalHandler(
+    int signalNumber)
+{
+    switch (signalNumber)
+    {
+    case SIGINT:
+    case SIGTERM:
+
+        run = false;
+        break;
+    };
 }
 
 //-------------------------------------------------------------------------
@@ -95,37 +113,48 @@ main(
     {
         switch (opt)
         {
-                    case 'c':
+        case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         case 'j':
 
             joystick = optarg;
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
+        }
+    }
+
+    //---------------------------------------------------------------------
+
+    for (auto signal : { SIGINT, SIGTERM })
+    {
+        if (std::signal(signal, signalHandler) == SIG_ERR)
+        {
+            std::println(
+                std::cerr,
+                "Error: installing {} signal handler : {}",
+                strsignal(signal),
+                strerror(errno));
+
+            ::exit(EXIT_FAILURE);
         }
     }
 
@@ -138,9 +167,10 @@ main(
         FrameBuffer8880 fb{device, connector};
         fb.clearBuffers(grey);
 
-        std::println("width = {} height = {}", fb.getWidth(), fb.getHeight());
+        const auto fbd = fb.getDimensions();
+        std::println("width = {} height = {}", fbd.width(), fbd.height());
 
-        Life life(fb.getHeight());
+        Life life(fbd.height());
         life.init();
         life.draw(fb);
 
@@ -152,7 +182,7 @@ main(
 
             if (js.buttonPressed(Joystick::BUTTON_START))
             {
-                run = 0;
+                run = false;
             }
             else
             {
@@ -167,9 +197,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

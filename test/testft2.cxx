@@ -97,39 +97,33 @@ main(
         case 'C':
 
             c = ::strtol(optarg, nullptr, 0);
-
             break;
 
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'f':
 
             fontConfig = fb32::parseFontConfig(optarg, 32);
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -150,7 +144,7 @@ main(
         constexpr RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device, connector};
 
-        Image8880 image{fb.getWidth(), fb.getHeight()};
+        Image8880 image{fb.getDimensions()};
         image.clear(black);
 
         //-----------------------------------------------------------------
@@ -172,9 +166,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

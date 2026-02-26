@@ -94,27 +94,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -128,10 +124,9 @@ main(
         constexpr RGB8880 darkBlue{0, 0, 63};
         constexpr RGB8880 white{255, 255, 255};
 
-        constexpr int width{248};
-        constexpr int height{16};
+        constexpr fb32::Dimensions8880 d{248, 16};
 
-        Image8880 image(width, height);
+        Image8880 image(d);
         image.clear(darkBlue);
 
         //-----------------------------------------------------------------
@@ -147,15 +142,14 @@ main(
         //-----------------------------------------------------------------
 
         constexpr int scale{3};
-        constexpr int swidth{scale * width};
-        constexpr int sheight{scale * height};
+        constexpr fb32::Dimensions8880 sd{d.width() * scale, d.height() * scale};
         constexpr int imageOffset{200};
-        constexpr int yStep{sheight + 8};
+        constexpr int yStep{sd.height() + 8};
 
         const auto imageSu = scaleUp(image, scale);
-        const auto imageNn = resizeNearestNeighbour(image, swidth, sheight);
-        const auto imageBi = resizeBilinearInterpolation(image, swidth, sheight);
-        const auto imageLi = resizeLanczos3Interpolation(image, swidth, sheight);
+        const auto imageNn = resizeNearestNeighbour(image, sd);
+        const auto imageBi = resizeBilinearInterpolation(image, sd);
+        const auto imageLi = resizeLanczos3Interpolation(image, sd);
 
         Point8880 t{0, 0};
         Point8880 p{ imageOffset, 0 };
@@ -184,7 +178,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

@@ -65,8 +65,7 @@ public:
     Image8880Font8x16& operator=(const Image8880Font8x16&) = delete;
     Image8880Font8x16& operator=(Image8880Font8x16&&) = delete;
 
-    [[nodiscard]] int getPixelHeight() const noexcept override;
-    [[nodiscard]] int getPixelWidth() const noexcept override;
+    [[nodiscard]] Dimensions8880 getPixelDimension() const noexcept override;
 
     [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 

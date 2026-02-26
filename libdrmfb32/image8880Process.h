@@ -58,20 +58,17 @@ maxRGB(
 [[nodiscard]] Image8880
 resizeBilinearInterpolation(
     const Interface8880& input,
-    int width,
-    int height);
+    Dimensions8880 d);
 
 [[nodiscard]] Image8880
 resizeLanczos3Interpolation(
     const Interface8880& input,
-    int width,
-    int height);
+    Dimensions8880 d);
 
 [[nodiscard]] Image8880
 resizeNearestNeighbour(
     const Interface8880& input,
-    int width,
-    int height);
+    Dimensions8880 d);
 
 Image8880&
 resizeToBilinearInterpolation(

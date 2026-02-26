@@ -104,15 +104,16 @@ Interface8880Menu::draw(
 {
     constexpr auto characterPadding{5};
     constexpr auto padding{4};
+    const auto d = font.getPixelDimension();
     const auto characters = m_titleMaximum + m_valueMaximum + characterPadding;
-    const auto width = characters * font.getPixelWidth();
+    const auto width = characters * d.width();
 
     boxFilled(
         fb,
         fb32::Point8880(0, 0),
         fb32::Point8880(
             width + (padding * 2),
-            (m_items.size() * font.getPixelHeight()) + (padding * 2)),
+            (m_items.size() * d.height()) + (padding * 2)),
             m_backgroundColour);
 
     box(
@@ -120,17 +121,17 @@ Interface8880Menu::draw(
         fb32::Point8880(0, 0),
         fb32::Point8880(
             width + (padding * 2),
-            (m_items.size() * font.getPixelHeight()) + (padding * 2)),
+            (m_items.size() * d.height()) + (padding * 2)),
             m_selectionColour);
 
     boxFilled(
         fb,
         fb32::Point8880(
             padding,
-            (m_selected * font.getPixelHeight()) + padding),
+            (m_selected * d.height()) + padding),
         fb32::Point8880(
             width + padding,
-            ((m_selected + 1) * font.getPixelHeight()) + padding),
+            ((m_selected + 1) * d.height()) + padding),
             m_selectionColour);
 
     int yOffset = 0;
@@ -145,7 +146,7 @@ Interface8880Menu::draw(
                 item.m_values[item.m_value]),
             m_foregroundColour,
             fb);
-        yOffset += font.getPixelHeight();
+        yOffset += d.height();
     }
 }
 

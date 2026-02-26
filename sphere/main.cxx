@@ -28,6 +28,7 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <cstring>
@@ -47,7 +48,7 @@ using namespace std::chrono_literals;
 
 namespace
 {
-volatile static std::sig_atomic_t run = 1;
+std::atomic<bool> run{true};
 }
 
 //-------------------------------------------------------------------------
@@ -61,7 +62,7 @@ signalHandler(
     case SIGINT:
     case SIGTERM:
 
-        run = 0;
+        run = false;
         break;
     };
 }
@@ -113,27 +114,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -159,10 +156,7 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-
-        std::println("width = {} height = {}", fb.getWidth() ,fb.getHeight());
-
-        Sphere sphere(fb.getHeight() - 10);
+        Sphere sphere(fb.getDimensions().height() - 10);
         sphere.setAmbient(0.1);
 
         //-----------------------------------------------------------------
@@ -185,9 +179,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    return 0 ;
 }
 

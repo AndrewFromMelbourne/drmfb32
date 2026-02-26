@@ -108,36 +108,39 @@ Info::init()
     m_fb = std::make_unique<fb32::FrameBuffer8880>(m_device, m_connector);
     m_fb->clearBuffers();
 
+    const auto fbd = m_fb->getDimensions();
+    const auto ftd = m_font->getPixelDimension();
+
     //-----------------------------------------------------------------
 
     constexpr int traceHeight = 100;
     constexpr int gridHeight = traceHeight / 5;
 
     m_panels.push_back(
-        std::make_unique<DynamicInfo>(m_fb->getWidth(),
-                                      m_font->getPixelHeight(),
+        std::make_unique<DynamicInfo>(fbd.width(),
+                                      ftd.height(),
                                       panelTop()));
 
     m_panels.push_back(
-        std::make_unique<CpuTrace>(m_fb->getWidth(),
+        std::make_unique<CpuTrace>(fbd.width(),
                                    traceHeight,
-                                   m_font->getPixelHeight(),
+                                   ftd.height(),
                                    panelTop(),
                                    gridHeight));
 
     m_panels.push_back(
-        std::make_unique<MemoryTrace>(m_fb->getWidth(),
+        std::make_unique<MemoryTrace>(fbd.width(),
                                       traceHeight,
-                                      m_font->getPixelHeight(),
+                                      ftd.height(),
                                       panelTop(),
                                       gridHeight));
 
-    if (m_fb->getHeight() >= 400)
+    if (fbd.height() >= 400)
     {
         m_panels.push_back(
-            std::make_unique<NetworkTrace>(m_fb->getWidth(),
+            std::make_unique<NetworkTrace>(fbd.width(),
                                            traceHeight,
-                                           m_font->getPixelHeight(),
+                                           ftd.height(),
                                            panelTop(),
                                            gridHeight));
     }

@@ -57,13 +57,11 @@ public:
     // constructors, destructors and assignment
 
     Image8880Frames() = default;
-    Image8880Frames(int width, int height, uint8_t numberOfFrames = 1);
-    Image8880Frames(int width,
-                    int height,
+    Image8880Frames(Dimensions8880 d, uint8_t numberOfFrames = 1);
+    Image8880Frames(Dimensions8880 d,
                     std::initializer_list<uint32_t> buffer,
                     uint8_t numberOfFrames = 1);
-    Image8880Frames(int width,
-                    int height,
+    Image8880Frames(Dimensions8880 d,
                     std::span<const uint32_t> buffer,
                     uint8_t numberOfFrames = 1);
 
@@ -78,8 +76,7 @@ public:
     //---------------------------------------------------------------------
     // getters and setters
 
-    [[nodiscard]] int getWidth() const noexcept override { return m_width; }
-    [[nodiscard]] int getHeight() const noexcept override  { return m_height; }
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
 
     [[nodiscard]] uint8_t getFrame() const { return m_frame; }
     [[nodiscard]] uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
@@ -112,8 +109,7 @@ private:
 
     [[nodiscard]] std::size_t offset(Point8880 p, uint8_t frame) const noexcept;
 
-    int m_width{};
-    int m_height{};
+    Dimensions8880 m_dimensions;
 
     uint8_t m_frame;
     uint8_t m_numberOfFrames{};

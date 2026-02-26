@@ -4658,18 +4658,10 @@ constexpr uint8_t font[256][sc_fontHeight] =
 
 //-------------------------------------------------------------------------
 
-int
-Image8880Font8x16::getPixelHeight() const noexcept
+Dimensions8880
+Image8880Font8x16::getPixelDimension() const noexcept
 {
-    return sc_fontHeight;
-}
-
-//-------------------------------------------------------------------------
-
-int
-Image8880Font8x16::getPixelWidth() const noexcept
-{
-    return sc_fontWidth;
+    return Dimensions8880(sc_fontWidth, sc_fontHeight);
 }
 
 //-------------------------------------------------------------------------
@@ -4710,17 +4702,17 @@ Image8880Font8x16::drawChar(
     uint32_t rgb,
     Interface8880& image)
 {
-    const auto width = getPixelWidth();
+    const auto d = getPixelDimension();
 
-    for (auto j = 0 ; j < getPixelHeight() ; ++j)
+    for (auto j = 0 ; j < d.height() ; ++j)
     {
         const auto byte = font[c][j];
 
         if (byte)
         {
-            for (auto i = 0 ; i < width ; ++i)
+            for (auto i = 0 ; i < d.width() ; ++i)
             {
-                if ((byte >> (width - i - 1)) & 1)
+                if ((byte >> (d.width() - i - 1)) & 1)
                 {
                     image.setPixel(
                         Point8880(p.x() + i, p.y() + j),
@@ -4730,7 +4722,7 @@ Image8880Font8x16::drawChar(
         }
     }
 
-    return Point8880(p.x() + width, p.y());
+    return Point8880(p.x() + d.width(), p.y());
 }
 
 //-------------------------------------------------------------------------
@@ -4754,6 +4746,7 @@ Image8880Font8x16::drawString(
     uint32_t rgb,
     Interface8880& image)
 {
+    const auto d = getPixelDimension();
     Point8880 position{p};
     Point8880 start{p};
 
@@ -4763,14 +4756,14 @@ Image8880Font8x16::drawString(
         {
             position.set(
                 start.x(),
-                position.y() + getPixelHeight());
+                position.y() + d.height());
         }
         else
         {
             drawChar(position, c, rgb, image);
 
             position.set(
-                position.x() + getPixelWidth(),
+                position.x() + d.width(),
                 position.y());
         }
     }

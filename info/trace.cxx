@@ -50,7 +50,7 @@ Trace::Trace(
     const std::string& title,
     std::initializer_list<TraceConfiguration> traces)
 :
-    Panel(width, traceHeight + fontHeight + 4, yPosition),
+    Panel(fb32::Dimensions8880{width, traceHeight + fontHeight + 4}, yPosition),
     m_traceHeight{traceHeight},
     m_fontHeight{fontHeight},
     m_traceScale{traceScale},
@@ -113,14 +113,23 @@ Trace::init(
 
         // draw small box
 
-        const auto quaterWidth = font.getPixelWidth() / 4;
-        const auto quaterHeight = font.getPixelHeight() / 4;
+        const auto d = font.getPixelDimension();
+        const fb32::Dimensions8880 quaterd{ d.width() / 4, d.height() / 4};
 
-        const fb32::Point8880 p1{position.x() + quaterWidth, position.y() + quaterHeight};
-        const fb32::Point8880 p2{position.x() + 3 * quaterWidth, position.y() + 3 * quaterHeight};
+        const fb32::Point8880 p1
+        {
+            position.x() + quaterd.width(),
+            position.y() + quaterd.height()
+        };
+
+        const fb32::Point8880 p2
+        {
+            position.x() + 3 * quaterd.width(),
+            position.y() + 3 * quaterd.height()
+        };
 
         boxFilled(getImage(), p1, p2, trace.traceColour());
-        position.translateX(font.getPixelWidth());
+        position.translateX(d.width());
     }
 
     position = font.drawString(position,
@@ -128,11 +137,13 @@ Trace::init(
                                sc_foreground,
                                getImage());
 
+    const auto id = getImage().getDimensions();
+
     for (auto j = 0 ; j < m_traceHeight + 1 ; j += m_gridHeight)
     {
         horizontalLine(getImage(),
                        0,
-                       getImage().getWidth() - 1,
+                       id.width() - 1,
                        j,
                        sc_gridColour);
     }
@@ -220,7 +231,9 @@ void
 Trace::storeTime(
     time_t now)
 {
-    if (m_columns < getImage().getWidth())
+    const auto d = getImage().getDimensions();
+
+    if (m_columns < d.width())
     {
         ++m_columns;
         m_time.push_back(now);

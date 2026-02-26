@@ -67,6 +67,8 @@ public:
 
     //---------------------------------------------------------------------
 
+    static constexpr fb32::Dimensions8880 c_tileDimensions{ c_tileWidth, c_tileHeight};
+
     static constexpr uint8_t c_targetMask{0x04};
 
     static constexpr int c_boardYoffset{10};

@@ -110,27 +110,23 @@ main(
         case 'c':
 
             connector = std::stol(optarg);
-
             break;
 
         case 'd':
 
             device = optarg;
-
             break;
 
         case 'h':
 
             printUsage(std::cout, program);
             ::exit(EXIT_SUCCESS);
-
             break;
 
         default:
 
             printUsage(std::cerr, program);
             ::exit(EXIT_FAILURE);
-
             break;
         }
     }
@@ -151,7 +147,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        Image8880 image{48, 48};
+        Image8880 image{fb32::Dimensions8880{48, 48}};
         image.clear(red);
 
         auto rgb = image.getPixelRGB(Point8880(0,0));
@@ -181,13 +177,15 @@ main(
         std::println("Dblue: 0x{:08X}", darkBlue.get8880());
         std::println("white: 0x{:08X}", white.get8880());
 
-        Image8880 textImage(248, 16);
+        Image8880 textImage{fb32::Dimensions8880{248, 16}};
         textImage.clear(darkBlue);
+        const auto fbd = fb.getDimensions();
+        const auto tid = textImage.getDimensions();
 
         const Point8880 textLocation
         {
-            (fb.getWidth() - textImage.getWidth()) / 2,
-            (fb.getHeight() - textImage.getHeight()) / 3
+            (fbd.width() - tid.width()) / 2,
+            (fbd.height() - tid.height()) / 3
         };
 
         Image8880Font8x16 font;
@@ -210,7 +208,5 @@ main(
         std::println(std::cerr, "Error: {}", error.what());
         exit(EXIT_FAILURE);
     }
-
-    return 0;
 }
 

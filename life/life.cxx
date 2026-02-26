@@ -50,10 +50,10 @@ Life::Life(int size)
     m_cells(size * size),
     m_cellsNext(size * size),
 #ifdef WITH_BS_THREAD_POOL
-    m_image(size, size),
+    m_image(fb32::Dimensions8880{size, size}),
     m_threadPool()
 #else
-    m_image(size, size)
+    m_image(fb32::Dimensions8880{size, size})
 #endif
 {
 }
