@@ -140,17 +140,17 @@ main(
 
         for (auto i = 0; i < lines; ++i)
         {
-            const fb32::Interface8880Point center{ halfWidth, halfHeight };
+            const fb32::Point8880 center{ halfWidth, halfHeight };
 
             const auto sinValue = std::sin((i * 2.0 * M_PI) / lines);
             const auto cosValue = std::cos((i * 2.0 * M_PI) / lines);
 
-            fb32::Interface8880Point inner{
+            fb32::Point8880 inner{
                 center.x() + static_cast<int>(innerRadius * sinValue),
                 center.y() - static_cast<int>(innerRadius * cosValue)
             };
 
-            fb32::Interface8880Point outer{
+            fb32::Point8880 outer{
                 center.x() + static_cast<int>(outerRadius * sinValue),
                 center.y() - static_cast<int>(outerRadius * cosValue)
             };

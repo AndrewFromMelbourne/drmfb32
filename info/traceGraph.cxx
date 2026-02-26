@@ -67,8 +67,8 @@ TraceGraph::draw()
 {
     boxFilled(
         getImage(),
-        fb32::Interface8880Point(0, 0),
-        fb32::Interface8880Point(getImage().getWidth() - 1, m_traceHeight),
+        fb32::Point8880(0, 0),
+        fb32::Point8880(getImage().getWidth() - 1, m_traceHeight),
         sc_background);
 
     //---------------------------------------------------------------------
@@ -109,8 +109,8 @@ TraceGraph::draw()
 
             line(
                 getImage(),
-                fb32::Interface8880Point(i1, m_traceHeight - y1),
-                fb32::Interface8880Point(i2, m_traceHeight - y2),
+                fb32::Point8880(i1, m_traceHeight - y1),
+                fb32::Point8880(i2, m_traceHeight - y2),
                 trace.traceColour());
         }
     }

@@ -154,14 +154,14 @@ main(
         Image8880 image{48, 48};
         image.clear(red);
 
-        auto rgb = image.getPixelRGB(Interface8880Point(0,0));
+        auto rgb = image.getPixelRGB(Point8880(0,0));
 
         test(rgb.has_value(), "Image8880::getPixelRGB()");
         test((*rgb == red), "Image8880::getPixelRGB()");
 
         line(image,
-             Interface8880Point(0,0),
-             Interface8880Point(47,47),
+             Point8880(0,0),
+             Point8880(47,47),
              green);
 
         const auto imageLocation = center(fb, image);
@@ -184,7 +184,7 @@ main(
         Image8880 textImage(248, 16);
         textImage.clear(darkBlue);
 
-        const Interface8880Point textLocation
+        const Point8880 textLocation
         {
             (fb.getWidth() - textImage.getWidth()) / 2,
             (fb.getHeight() - textImage.getHeight()) / 3
@@ -193,7 +193,7 @@ main(
         Image8880Font8x16 font;
 
         font.drawString(
-            Interface8880Point{4, 0},
+            Point8880{4, 0},
             "Lorem ipsum dolor sit amet ...",
             white,
             textImage);

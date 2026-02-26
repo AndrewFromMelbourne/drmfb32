@@ -212,7 +212,7 @@ fb32::FrameBuffer8880::masterDrop() noexcept
 
 std::size_t
 fb32::FrameBuffer8880::offset(
-    Interface8880Point p) const noexcept
+    Point8880 p) const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
     return p.x() + p.y() * dbb.m_lineLengthPixels;

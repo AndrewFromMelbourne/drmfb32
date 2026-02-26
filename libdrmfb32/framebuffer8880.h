@@ -47,7 +47,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Interface8880Point = Point<int32_t>;
+using Point8880 = Point<int32_t>;
 
 //-------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ public:
     void masterSet() noexcept;
     void masterDrop() noexcept;
 
-    [[nodiscard]] std::size_t offset(Interface8880Point p) const noexcept override;
+    [[nodiscard]] std::size_t offset(Point8880 p) const noexcept override;
 
     void update();
 

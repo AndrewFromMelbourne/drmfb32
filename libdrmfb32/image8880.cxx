@@ -36,7 +36,7 @@
 //-------------------------------------------------------------------------
 
 using size_type = std::vector<uint32_t>::size_type;
-using Point = fb32::Interface8880Point;
+using Point = fb32::Point8880;
 
 //-------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ fb32::Image8880::Image8880(
 
 std::size_t
 fb32::Image8880::offset(
-    Interface8880Point p) const noexcept
+    Point8880 p) const noexcept
 {
     return p.x() + (p.y() * m_width);
 }

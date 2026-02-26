@@ -139,7 +139,7 @@ main(
         Image8880Font8x16 font;
 
         font.drawString(
-            Interface8880Point{4, 0},
+            Point8880{4, 0},
             "Lorem ipsum dolor sit amet ...",
             white,
             image);
@@ -157,8 +157,8 @@ main(
         const auto imageBi = resizeBilinearInterpolation(image, swidth, sheight);
         const auto imageLi = resizeLanczos3Interpolation(image, swidth, sheight);
 
-        Interface8880Point t{0, 0};
-        Interface8880Point p{ imageOffset, 0 };
+        Point8880 t{0, 0};
+        Point8880 p{ imageOffset, 0 };
 
         auto show = [&](std::string_view title, const Image8880& image)
         {

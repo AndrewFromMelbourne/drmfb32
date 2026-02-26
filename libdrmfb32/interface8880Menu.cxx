@@ -109,26 +109,26 @@ Interface8880Menu::draw(
 
     boxFilled(
         fb,
-        fb32::Interface8880Point(0, 0),
-        fb32::Interface8880Point(
+        fb32::Point8880(0, 0),
+        fb32::Point8880(
             width + (padding * 2),
             (m_items.size() * font.getPixelHeight()) + (padding * 2)),
             m_backgroundColour);
 
     box(
         fb,
-        fb32::Interface8880Point(0, 0),
-        fb32::Interface8880Point(
+        fb32::Point8880(0, 0),
+        fb32::Point8880(
             width + (padding * 2),
             (m_items.size() * font.getPixelHeight()) + (padding * 2)),
             m_selectionColour);
 
     boxFilled(
         fb,
-        fb32::Interface8880Point(
+        fb32::Point8880(
             padding,
             (m_selected * font.getPixelHeight()) + padding),
-        fb32::Interface8880Point(
+        fb32::Point8880(
             width + padding,
             ((m_selected + 1) * font.getPixelHeight()) + padding),
             m_selectionColour);
@@ -137,7 +137,7 @@ Interface8880Menu::draw(
     for (const auto& item : m_items)
     {
         font.drawString(
-            fb32::Interface8880Point(padding, yOffset + padding),
+            fb32::Point8880(padding, yOffset + padding),
             std::format(
                 " {0:<{1}} : {2}",
                 item.m_title,

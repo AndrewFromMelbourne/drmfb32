@@ -4691,9 +4691,9 @@ Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 Image8880Font8x16::drawChar(
-    Interface8880Point p,
+    Point8880 p,
     uint8_t c,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4703,9 +4703,9 @@ Image8880Font8x16::drawChar(
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 Image8880Font8x16::drawChar(
-    Interface8880Point p,
+    Point8880 p,
     uint8_t c,
     uint32_t rgb,
     Interface8880& image)
@@ -4723,21 +4723,21 @@ Image8880Font8x16::drawChar(
                 if ((byte >> (width - i - 1)) & 1)
                 {
                     image.setPixel(
-                        Interface8880Point(p.x() + i, p.y() + j),
+                        Point8880(p.x() + i, p.y() + j),
                         rgb);
                 }
             }
         }
     }
 
-    return Interface8880Point(p.x() + width, p.y());
+    return Point8880(p.x() + width, p.y());
 }
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 Image8880Font8x16::drawString(
-    Interface8880Point p,
+    Point8880 p,
     std::string_view sv,
     const RGB8880& rgb,
     Interface8880& image)
@@ -4747,15 +4747,15 @@ Image8880Font8x16::drawString(
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 Image8880Font8x16::drawString(
-    Interface8880Point p,
+    Point8880 p,
     std::string_view sv,
     uint32_t rgb,
     Interface8880& image)
 {
-    Interface8880Point position{p};
-    Interface8880Point start{p};
+    Point8880 position{p};
+    Point8880 start{p};
 
     for (const auto c : sv)
     {

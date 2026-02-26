@@ -230,7 +230,7 @@ main(
         {
             for (auto x : { -ihwidth, (fwidth / 2) - ihwidth, fwidth - ihwidth })
             {
-                fb.putImage(Interface8880Point{x, y}, image);
+                fb.putImage(Point8880{x, y}, image);
             }
         }
 

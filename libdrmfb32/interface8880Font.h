@@ -77,30 +77,30 @@ public:
 
     [[nodiscard]] virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
 
-    virtual Interface8880Point
+    virtual Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         const RGB8880& rgb,
         Interface8880& image) = 0;
 
-    virtual Interface8880Point
+    virtual Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         uint32_t rgb,
         Interface8880& image) = 0;
 
-    virtual Interface8880Point
+    virtual Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view sv,
         const RGB8880& rgb,
         Interface8880& image) = 0;
 
-    virtual Interface8880Point
+    virtual Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view sv,
         uint32_t rgb,
         Interface8880& image) = 0;

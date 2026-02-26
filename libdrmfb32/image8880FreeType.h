@@ -46,7 +46,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Interface8880Point = Point<int>;
+using Point8880 = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -85,37 +85,37 @@ public:
 
     bool setPixelSize(int pixelSize) noexcept;
 
-    Interface8880Point
+    Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         const RGB8880& rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         uint32_t rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawWideChar(
-        Interface8880Point p,
+        Point8880 p,
         uint32_t c,
         const RGB8880& rgb,
         Interface8880& image);
 
-    Interface8880Point
+    Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view sv,
         const RGB8880& rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view sv,
         uint32_t rgb,
         Interface8880& image) override;

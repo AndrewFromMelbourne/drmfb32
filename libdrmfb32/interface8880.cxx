@@ -55,7 +55,7 @@ fb32::Interface8880::clear(
 
 std::optional<fb32::RGB8880>
 fb32::Interface8880::getPixelRGB(
-    Interface8880Point p) const
+    Point8880 p) const
 {
     if (not validPixel(p))
     {
@@ -70,7 +70,7 @@ fb32::Interface8880::getPixelRGB(
 
 std::optional<fb32::RGB8>
 fb32::Interface8880::getPixelRGB8(
-    Interface8880Point p) const
+    Point8880 p) const
 {
     if (not validPixel(p))
     {
@@ -85,7 +85,7 @@ fb32::Interface8880::getPixelRGB8(
 
 std::optional<uint32_t>
 fb32::Interface8880::getPixel(
-    Interface8880Point p) const
+    Point8880 p) const
 {
     if (not validPixel(p))
     {
@@ -102,7 +102,7 @@ std::span<uint32_t>
 fb32::Interface8880::getRow(
     int y)
 {
-    const Interface8880Point p{0, y};
+    const Point8880 p{0, y};
 
     if (validPixel(p))
     {
@@ -120,7 +120,7 @@ std::span<const uint32_t>
 fb32::Interface8880::getRow(
     int y) const
 {
-    const Interface8880Point p{0, y};
+    const Point8880 p{0, y};
 
     if (validPixel(p))
     {
@@ -136,10 +136,10 @@ fb32::Interface8880::getRow(
 
 bool
 fb32::Interface8880::putImage(
-    Interface8880Point p_left,
+    Point8880 p_left,
     const Interface8880& image)
 {
-    Interface8880Point p{ p_left.x(), p_left.y() };
+    Point8880 p{ p_left.x(), p_left.y() };
 
     if ((p.x() < 0) or
         ((p.x() + image.getWidth()) > getWidth()))
@@ -156,7 +156,7 @@ fb32::Interface8880::putImage(
     for (int j = 0 ; j < image.getHeight() ; ++j)
     {
         auto row = image.getRow(j);
-        const auto ost = offset(Interface8880Point{p.x(), j + p.y()});
+        const auto ost = offset(Point8880{p.x(), j + p.y()});
 
         std::ranges::copy(row, getBuffer().subspan(ost).begin());
     }
@@ -168,7 +168,7 @@ fb32::Interface8880::putImage(
 
 bool
 fb32::Interface8880::putImagePartial(
-    Interface8880Point p,
+    Point8880 p,
     const Interface8880& image)
 {
     auto x = p.x();
@@ -216,7 +216,7 @@ fb32::Interface8880::putImagePartial(
     for (auto j = yStart ; j <= yEnd ; ++j)
     {
         auto row = image.getRow(j).subspan(xStart, xLength);
-        const auto ost = offset(Interface8880Point{x, j - yStart + y});
+        const auto ost = offset(Point8880{x, j - yStart + y});
 
         std::ranges::copy(row, getBuffer().subspan(ost).begin());
     }
@@ -228,7 +228,7 @@ fb32::Interface8880::putImagePartial(
 
 bool
 fb32::Interface8880::setPixel(
-    Interface8880Point p,
+    Point8880 p,
     uint32_t rgb)
 {
     bool isValid{validPixel(p)};
@@ -244,7 +244,7 @@ fb32::Interface8880::setPixel(
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 center(
     const Interface8880& frame,
     const Interface8880& image) noexcept

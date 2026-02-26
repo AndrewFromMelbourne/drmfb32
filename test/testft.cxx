@@ -148,7 +148,7 @@ main(
 
         Image8880FreeType ft{fontConfig};
 
-        Interface8880Point p{0, 0};
+        Point8880 p{0, 0};
 
         p = ft.drawString(p, "abcdefghijklmnopqrstuvwxyz ", white, image);
         p = ft.drawString(p, "0123456789", white, image);
@@ -180,7 +180,7 @@ main(
 
         //-----------------------------------------------------------------
 
-        fb.putImage(Interface8880Point{0, 0}, image);
+        fb.putImage(Point8880{0, 0}, image);
         fb.update();
 
         //-----------------------------------------------------------------

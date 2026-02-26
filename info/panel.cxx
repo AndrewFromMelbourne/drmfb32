@@ -33,6 +33,6 @@ void
 Panel::show(
     fb32::FrameBuffer8880& fb) const
 {
-    fb.putImage(fb32::Interface8880Point(0, m_yPosition), m_image);
+    fb.putImage(fb32::Point8880(0, m_yPosition), m_image);
 }
 

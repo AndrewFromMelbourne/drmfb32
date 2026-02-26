@@ -144,18 +144,18 @@ main(
         polygonFilled(
             fb,
             {{
-                Interface8880Point{xOffset, yOffset},
-                Interface8880Point{width + xOffset, yOffset},
-                Interface8880Point{width + xOffset, width + yOffset}
+                Point8880{xOffset, yOffset},
+                Point8880{width + xOffset, yOffset},
+                Point8880{width + xOffset, width + yOffset}
             }},
             white);
 
         polygonFilled(
             fb,
             {{
-                Interface8880Point{xOffset, yOffset},
-                Interface8880Point{xOffset, width + yOffset},
-                Interface8880Point{width + xOffset, width + yOffset}
+                Point8880{xOffset, yOffset},
+                Point8880{xOffset, width + yOffset},
+                Point8880{width + xOffset, width + yOffset}
             }},
             white);
 

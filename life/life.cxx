@@ -97,7 +97,7 @@ Life::setCell(
     updateCell(col, row, 1);
     m_cellsNext[col + (row * m_size)] |= c_aliveCellMask;
 
-    const fb32::Interface8880Point p{ col, row };
+    const fb32::Point8880 p{ col, row };
     m_image.setPixel(p, m_cellColours[1]);
 }
 
@@ -111,7 +111,7 @@ Life::clearCell(
     updateCell(col, row, -1);
     m_cellsNext[col + (row * m_size)] &= ~c_aliveCellMask;
 
-    const fb32::Interface8880Point p{ col, row };
+    const fb32::Point8880 p{ col, row };
     m_image.setPixel(p, m_cellColours[0]);
 }
 

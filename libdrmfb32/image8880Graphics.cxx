@@ -44,8 +44,8 @@ namespace
 void
 trim(
     const fb32::Interface8880& iface,
-    fb32::Interface8880Point& p1,
-    fb32::Interface8880Point& p2)
+    fb32::Point8880& p1,
+    fb32::Point8880& p2)
 {
     if ((p1.x() == p2.x()) or (p1.y() == p2.y()))
     {
@@ -124,8 +124,8 @@ namespace fb32
 void
 box(
     Interface8880& iface,
-    Interface8880Point p1,
-    Interface8880Point p2,
+    Point8880 p1,
+    Point8880 p2,
     uint32_t rgb)
 {
     trim(iface, p1, p2);
@@ -140,8 +140,8 @@ box(
 void
 boxFilled(
     Interface8880& iface,
-    Interface8880Point p1,
-    Interface8880Point p2,
+    Point8880 p1,
+    Point8880 p2,
     uint32_t rgb)
 {
     trim(iface, p1, p2);
@@ -162,15 +162,15 @@ boxFilled(
 void
 boxFilled(
     Interface8880& iface,
-    Interface8880Point p1,
-    Interface8880Point p2,
+    Point8880 p1,
+    Point8880 p2,
     const RGB8880& rgb,
     uint8_t alpha)
 {
     trim(iface, p1, p2);
 
-    Interface8880Point pa{std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y())};
-    Interface8880Point pb{std::max(p1.x(), p2.x()), std::max(p1.y(), p2.y())};
+    Point8880 pa{std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y())};
+    Point8880 pb{std::max(p1.x(), p2.x()), std::max(p1.y(), p2.y())};
 
     for (auto j = pa.y() ; j <= pb.y() ; ++j)
     {
@@ -192,8 +192,8 @@ boxFilled(
 void
 line(
     Interface8880& iface,
-    Interface8880Point p1,
-    Interface8880Point p2,
+    Point8880 p1,
+    Point8880 p2,
     uint32_t rgb)
 {
     trim(iface, p1, p2);
@@ -408,7 +408,7 @@ circlePoints(
 void
 circle(
     Interface8880& iface,
-    Interface8880Point p,
+    Point8880 p,
     int r,
     uint32_t rgb)
 {
@@ -441,7 +441,7 @@ circle(
 void
 circleFilled(
     Interface8880& iface,
-    Interface8880Point p,
+    Point8880 p,
     int r,
     uint32_t rgb)
 {
@@ -489,7 +489,7 @@ circleFilled(
 void
 polygon(
     Interface8880& iface,
-    std::span<const Interface8880Point> vertices,
+    std::span<const Point8880> vertices,
     uint32_t rgb)
 {
     if (vertices.size() == 0)
@@ -517,7 +517,7 @@ polygon(
 void
 polygonFilled(
     Interface8880& iface,
-    std::span<const Interface8880Point> vertices,
+    std::span<const Point8880> vertices,
     uint32_t rgb)
 {
     if (vertices.size() == 0)
@@ -531,8 +531,8 @@ polygonFilled(
         return;
     }
 
-    auto xIntersection = [](const Interface8880Point& p1,
-                            const Interface8880Point& p2,
+    auto xIntersection = [](const Point8880& p1,
+                            const Point8880& p2,
                             int y) -> std::optional<int>
     {
         const auto minY = std::min(p1.y(), p2.y());
@@ -594,7 +594,7 @@ polygonFilled(
 void
 polyline(
     Interface8880& iface,
-    std::span<const Interface8880Point> vertices,
+    std::span<const Point8880> vertices,
     uint32_t rgb)
 {
     if (vertices.size() == 0)

@@ -189,7 +189,7 @@ Boxworld::draw(
         const int xOffset = (fbWidth - zoomed.getWidth()) / 2;
         const int yOffset = (fbHeight - zoomed.getHeight()) / 2;
 
-        const Interface8880Point p{ xOffset, yOffset };
+        const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, zoomed);
     }
     else
@@ -197,7 +197,7 @@ Boxworld::draw(
         const int xOffset = (fbWidth - imageWidth) / 2;
         const int yOffset = (fbHeight - imageHeight) / 2;
 
-        const Interface8880Point p{ xOffset, yOffset };
+        const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, m_image);
     }
 }
@@ -223,7 +223,7 @@ Boxworld::drawBoard(Interface8880& fb)
             }
 
             fb.putImage(
-                Interface8880Point{
+                Point8880{
                     (i * c_tileWidth),
                     (j * c_tileHeight) + yOffset
                 },
@@ -250,7 +250,7 @@ Boxworld::drawText(
 {
     m_topTextImage.clear(m_backgroundRGB);
 
-    Interface8880Point position{ 2, 2 };
+    Point8880 position{ 2, 2 };
     position = font.drawString(position, "level: ", m_boldRGB, m_topTextImage);
     position = font.drawString(position, std::to_string(m_level + 1), m_textRGB, m_topTextImage);
 
@@ -259,24 +259,24 @@ Boxworld::drawText(
         position = font.drawString(position, " [solved]", m_solvedRGB, m_topTextImage);
     }
 
-    fb.putImage(Interface8880Point{ 0, 0 }, m_topTextImage);
+    fb.putImage(Point8880{ 0, 0 }, m_topTextImage);
 
     //---------------------------------------------------------------------
 
-    position = Interface8880Point{ 2, 2 };
+    position = Point8880{ 2, 2 };
     const auto& undoRGB = ((m_canUndo) ? m_textRGB : m_disabledRGB);
 
     position = font.drawString(position, "(X): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "undo box move", undoRGB, m_bottomTextImage);
 
-    position = Interface8880Point{ 2, 18 };
+    position = Point8880{ 2, 18 };
 
     position = font.drawString(position, "(Y): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "restart level", m_textRGB, m_bottomTextImage);
 
     int halfWidth = 2 + (m_bottomTextImage.getWidth() / 2);
 
-    position = Interface8880Point{ halfWidth, 2 };
+    position = Point8880{ halfWidth, 2 };
     const auto& nextRGB = ((m_level < (Level::c_levelCount - 1))
                         ? m_textRGB
                         : m_disabledRGB);
@@ -284,7 +284,7 @@ Boxworld::drawText(
     position = font.drawString(position, "(A): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "next level", nextRGB, m_bottomTextImage);
 
-    position = Interface8880Point{ halfWidth, 18 };
+    position = Point8880{ halfWidth, 18 };
     const auto& previousRGB = ((m_level > 0)
                             ? m_textRGB
                             : m_disabledRGB);
@@ -292,7 +292,7 @@ Boxworld::drawText(
     position = font.drawString(position, "(B): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "previous level", previousRGB, m_bottomTextImage);
 
-    fb.putImage(Interface8880Point{ 0, 440 }, m_bottomTextImage);
+    fb.putImage(Point8880{ 0, 440 }, m_bottomTextImage);
 }
 
 //-------------------------------------------------------------------------

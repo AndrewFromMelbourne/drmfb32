@@ -156,11 +156,11 @@ main(
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{fontConfig};
-        ft.drawWideChar(Interface8880Point{0, 0}, c, white, image);
+        ft.drawWideChar(Point8880{0, 0}, c, white, image);
 
         //-----------------------------------------------------------------
 
-        fb.putImage(Interface8880Point{0, 0}, image);
+        fb.putImage(Point8880{0, 0}, image);
         fb.update();
 
         //-----------------------------------------------------------------

@@ -210,7 +210,7 @@ Puzzle::draw(Interface8880& fb)
     {
         for (int i = 0 ; i < c_puzzleWidth ; ++i)
         {
-           const Interface8880Point p{ i * c_tileWidth,
+           const Point8880 p{ i * c_tileWidth,
                                        j * c_tileHeight };
            const auto tile = m_board[i + (j * c_puzzleWidth)];
 
@@ -240,7 +240,7 @@ Puzzle::draw(Interface8880& fb)
         const int xOffset = (fbWidth - zoomed.getWidth()) / 2;
         const int yOffset = (fbHeight - zoomed.getHeight()) / 2;
 
-        const Interface8880Point p{ xOffset, yOffset };
+        const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, zoomed);
     }
     else
@@ -248,7 +248,7 @@ Puzzle::draw(Interface8880& fb)
         const int xOffset = (fbWidth - imageWidth) / 2;
         const int yOffset = (fbHeight - imageHeight) / 2;
 
-        const Interface8880Point p{ xOffset, yOffset };
+        const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, m_image);
     }
 }

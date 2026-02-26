@@ -43,7 +43,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Interface8880Point = Point<int>;
+using Point8880 = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -70,30 +70,30 @@ public:
 
     [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 
-    Interface8880Point
+    Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         const RGB8880& rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawChar(
-        Interface8880Point p,
+        Point8880 p,
         uint8_t c,
         uint32_t rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view cv,
         const RGB8880& rgb,
         Interface8880& image) override;
 
-    Interface8880Point
+    Point8880
     drawString(
-        Interface8880Point p,
+        Point8880 p,
         std::string_view sv,
         uint32_t rgb,
         Interface8880& image) override;

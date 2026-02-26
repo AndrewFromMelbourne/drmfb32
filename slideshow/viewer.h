@@ -27,7 +27,7 @@
 
 #pragma once
 
-// ------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 #include <limits>
 #include <map>
@@ -40,13 +40,13 @@
 #include "interface8880Menu.h"
 #include "joystick.h"
 
-// ------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 class Viewer
 {
 public:
 
-    // --------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     enum Quality
     {
@@ -72,7 +72,7 @@ public:
         ZOOM
     };
 
-    // --------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     struct ImageFile
     {
@@ -86,12 +86,12 @@ public:
     };
 
 
-    // --------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
 
-    // --------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     class Offset
     {
@@ -140,7 +140,7 @@ public:
         int m_zoomedY{};
     };
 
-    // --------------------------------------------------------------------
+    //---------------------------------------------------------------------
 
     Viewer(
         fb32::RGB8880 background,
@@ -172,7 +172,7 @@ private:
     [[nodiscard]] bool oversize() const noexcept;
     void paint();
     void pan(int dx, int dy) noexcept;
-    [[nodiscard]] fb32::Interface8880Point placeImage(const fb32::Image8880& image) const noexcept;
+    [[nodiscard]] fb32::Point8880 placeImage(const fb32::Image8880& image) const noexcept;
     void processImage();
     void processResize(int width, int height);
     void readDirectory();

@@ -43,7 +43,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Interface8880Point = Point<int>;
+using Point8880 = Point<int>;
 
 //-------------------------------------------------------------------------
 
@@ -64,18 +64,18 @@ public:
     void clear(const RGB8880& rgb) { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0);
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Interface8880Point p) const;
-    [[nodiscard]] virtual std::optional<RGB8> getPixelRGB8(Interface8880Point p) const;
-    [[nodiscard]] virtual std::optional<uint32_t> getPixel(Interface8880Point p) const;
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Point8880 p) const;
+    [[nodiscard]] virtual std::optional<RGB8> getPixelRGB8(Point8880 p) const;
+    [[nodiscard]] virtual std::optional<uint32_t> getPixel(Point8880 p) const;
 
     [[nodiscard]] std::span<uint32_t> getRow(int y);
     [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
 
-    [[nodiscard]] virtual std::size_t offset(Interface8880Point p) const noexcept = 0;
+    [[nodiscard]] virtual std::size_t offset(Point8880 p) const noexcept = 0;
 
     bool
     setPixelRGB(
-        Interface8880Point p,
+        Point8880 p,
         const RGB8880& rgb)
     {
         return setPixel(p, rgb.get8880());
@@ -83,18 +83,18 @@ public:
 
     bool
     setPixelRGB8(
-        Interface8880Point p,
+        Point8880 p,
         RGB8 rgb)
     {
         return setPixel(p, RGB8880(rgb).get8880());
     }
 
-    bool setPixel(Interface8880Point p, uint32_t rgb);
+    bool setPixel(Point8880 p, uint32_t rgb);
 
-    virtual bool putImage(Interface8880Point p, const Interface8880& image);
+    virtual bool putImage(Point8880 p, const Interface8880& image);
 
     [[nodiscard]] bool
-    validPixel(Interface8880Point p) const noexcept
+    validPixel(Point8880 p) const noexcept
     {
         return ((p.x() >= 0) and
                 (p.x() < getWidth()) and
@@ -104,12 +104,12 @@ public:
 
 private:
 
-    bool putImagePartial(Interface8880Point p, const Interface8880& image);
+    bool putImagePartial(Point8880 p, const Interface8880& image);
 };
 
 //-------------------------------------------------------------------------
 
-Interface8880Point
+Point8880
 center(
     const Interface8880& frame,
     const Interface8880& image) noexcept;

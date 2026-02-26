@@ -120,7 +120,7 @@ Sphere::updateRows(
                 grey = (uint8_t)std::ceil(200.0 * (intensity + m_ambient));
             }
 
-            const Interface8880Point p{i, j};
+            const Point8880 p{i, j};
             m_image.setPixelRGB(p, RGB8880(grey, grey, grey));
         }
     }

@@ -181,7 +181,7 @@ main(
         Image8880Font8x16 font;
 
         font.drawString(
-            Interface8880Point{4, 0},
+            Point8880{4, 0},
             "rotating",
             white,
             image);
@@ -199,13 +199,13 @@ main(
             fb.clear(darkGrey);
 
             font.drawString(
-                Interface8880Point{4, 0},
+                Point8880{4, 0},
                 std::format("Angle: {:3d}{}{:02d}'", angle / 10, degreeChar, (angle % 10) * 6),
                 white,
                 fb);
 
             const auto rotated = rotate(image, darkGrey, angle / 10.0);
-            const Interface8880Point p
+            const Point8880 p
             {
                 (fb.getWidth() - rotated.getWidth()) / 2,
                 (fb.getHeight() - rotated.getHeight()) / 2

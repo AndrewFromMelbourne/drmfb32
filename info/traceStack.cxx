@@ -76,13 +76,13 @@ TraceStack::draw()
                 if (((j % m_gridHeight) == 0) or ((m_time[i] % 60) == 0))
                 {
                     getImage().setPixelRGB(
-                        fb32::Interface8880Point{i, j--},
+                        fb32::Point8880{i, j--},
                         trace.gridColour());
                 }
                 else
                 {
                     getImage().setPixelRGB(
-                        fb32::Interface8880Point{i, j--},
+                        fb32::Point8880{i, j--},
                         trace.traceColour());
                 }
             }
@@ -93,13 +93,13 @@ TraceStack::draw()
             if (((j % m_gridHeight) == 0) or ((m_time[i] % 60) == 0))
             {
                 getImage().setPixelRGB(
-                    fb32::Interface8880Point{i, j},
+                    fb32::Point8880{i, j},
                     sc_gridColour);
             }
             else
             {
                 getImage().setPixelRGB(
-                    fb32::Interface8880Point{i, j},
+                    fb32::Point8880{i, j},
                     sc_background);
             }
         }
