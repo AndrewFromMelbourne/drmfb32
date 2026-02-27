@@ -55,6 +55,8 @@ public:
     {
     }
 
+    [[nodiscard]] constexpr T area() const noexcept { return m_width * m_height; }
+
     [[nodiscard]] constexpr T width() const noexcept { return m_width; }
     [[nodiscard]] constexpr T height() const noexcept { return m_height; }
 

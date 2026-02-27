@@ -91,7 +91,7 @@ Image8880FreeType::getFontStyleName() const noexcept
 //-------------------------------------------------------------------------
 
 Dimensions8880
-Image8880FreeType::getPixelDimension() const noexcept
+Image8880FreeType::getPixelDimensions() const noexcept
 {
     const auto width = m_face->size->metrics.max_advance >> 6;
     const auto height = (m_face->size->metrics.ascender +
@@ -200,7 +200,7 @@ Image8880FreeType::drawString(
     const RGB8880& rgb,
     Interface8880& image)
 {
-    const auto d = getPixelDimension();
+    const auto d = getPixelDimensions();
     Point8880 position{p};
     position.translateY(m_face->size->metrics.ascender >> 6);
 

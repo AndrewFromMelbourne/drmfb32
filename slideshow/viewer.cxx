@@ -376,7 +376,7 @@ Viewer::annotate()
     fb32::Image8880Font8x16 font;
     constexpr int padding{4};
     const auto length = static_cast<int>(annotation.length());
-    const auto ftd = font.getPixelDimension();
+    const auto ftd = font.getPixelDimensions();
 
     Point p1{0, 0};
     Point p2{length * ftd.width() + 2 * padding, ftd.height() + 2 * padding};

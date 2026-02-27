@@ -113,7 +113,7 @@ Trace::init(
 
         // draw small box
 
-        const auto d = font.getPixelDimension();
+        const auto d = font.getPixelDimensions();
         const fb32::Dimensions8880 quaterd{ d.width() / 4, d.height() / 4};
 
         const fb32::Point8880 p1

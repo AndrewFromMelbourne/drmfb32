@@ -109,7 +109,7 @@ Info::init()
     m_fb->clearBuffers();
 
     const auto fbd = m_fb->getDimensions();
-    const auto ftd = m_font->getPixelDimension();
+    const auto ftd = m_font->getPixelDimensions();
 
     //-----------------------------------------------------------------
 

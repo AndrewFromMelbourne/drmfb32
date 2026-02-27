@@ -56,7 +56,7 @@ public:
     // constructors, destructors and assignment
 
     Image8880() = default;
-    Image8880(Dimensions8880 d);
+    explicit Image8880(Dimensions8880 d);
     Image8880(Dimensions8880 d, std::initializer_list<uint32_t> buffer);
     Image8880(Dimensions8880 d, std::span<const uint32_t> buffer);
 
@@ -68,12 +68,7 @@ public:
     Image8880(Image8880&& image) = default;
     Image8880& operator=(Image8880&& image) = default;
 
-    Image8880(const Interface8880& i)
-    :
-        Image8880(i.getDimensions(), i.getBuffer())
-    {
-    }
-
+    explicit Image8880(const Interface8880& i);
     Image8880& operator=(const Interface8880& i);
 
     //---------------------------------------------------------------------
@@ -87,6 +82,8 @@ public:
     std::size_t offset(Point8880 p) const noexcept override;
 
 private:
+
+    void copy(const Interface8880& i);
 
     Dimensions8880 m_dimensions;
     std::vector<uint32_t> m_buffer{};

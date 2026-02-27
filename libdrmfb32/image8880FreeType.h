@@ -73,7 +73,7 @@ public:
     [[nodiscard]] std::string getFontFamilyName() const noexcept;
     [[nodiscard]] std::string getFontStyleName() const noexcept;
 
-    [[nodiscard]] Dimensions8880 getPixelDimension() const noexcept override;
+    [[nodiscard]] Dimensions8880 getPixelDimensions() const noexcept override;
 
     [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 

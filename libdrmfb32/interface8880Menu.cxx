@@ -104,7 +104,7 @@ Interface8880Menu::draw(
 {
     constexpr auto characterPadding{5};
     constexpr auto padding{4};
-    const auto d = font.getPixelDimension();
+    const auto d = font.getPixelDimensions();
     const auto characters = m_titleMaximum + m_valueMaximum + characterPadding;
     const auto width = characters * d.width();
 

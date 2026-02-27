@@ -4659,7 +4659,7 @@ constexpr uint8_t font[256][sc_fontHeight] =
 //-------------------------------------------------------------------------
 
 Dimensions8880
-Image8880Font8x16::getPixelDimension() const noexcept
+Image8880Font8x16::getPixelDimensions() const noexcept
 {
     return Dimensions8880(sc_fontWidth, sc_fontHeight);
 }
@@ -4702,7 +4702,7 @@ Image8880Font8x16::drawChar(
     uint32_t rgb,
     Interface8880& image)
 {
-    const auto d = getPixelDimension();
+    const auto d = getPixelDimensions();
 
     for (auto j = 0 ; j < d.height() ; ++j)
     {
@@ -4746,7 +4746,7 @@ Image8880Font8x16::drawString(
     uint32_t rgb,
     Interface8880& image)
 {
-    const auto d = getPixelDimension();
+    const auto d = getPixelDimensions();
     Point8880 position{p};
     Point8880 start{p};
 

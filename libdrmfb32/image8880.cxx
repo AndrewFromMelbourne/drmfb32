@@ -45,7 +45,7 @@ fb32::Image8880::Image8880(
     Dimensions8880 d)
 :
     m_dimensions{d},
-    m_buffer(d.width() * d.height())
+    m_buffer(d.area())
 {
 }
 
@@ -58,7 +58,7 @@ fb32::Image8880::Image8880(
     m_dimensions{d},
     m_buffer{buffer}
 {
-    std::size_t minBufferSize = d.width() * d.height();
+    const std::size_t minBufferSize = d.area();
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -77,7 +77,7 @@ fb32::Image8880::Image8880(
 {
     m_buffer.assign(buffer.begin(), buffer.end());
 
-    std::size_t minBufferSize = d.width() * d.height();
+    const std::size_t minBufferSize = d.area();
 
     if (m_buffer.size() < minBufferSize)
     {
@@ -87,14 +87,44 @@ fb32::Image8880::Image8880(
 
 //-------------------------------------------------------------------------
 
+fb32::Image8880::Image8880(
+    const fb32::Interface8880& i)
+:
+    m_dimensions{},
+    m_buffer{}
+{
+    copy(i);
+}
+
+//-------------------------------------------------------------------------
+
 fb32::Image8880&
 fb32::Image8880::operator=(
     const fb32::Interface8880& i)
 {
-    m_dimensions= i.getDimensions();
-    const auto ib = i.getBuffer();
-    m_buffer.assign(begin(ib), end(ib));
+    if (&i != this)
+    {
+        copy(i);
+    }
     return *this;
+}
+
+
+//-------------------------------------------------------------------------
+
+void
+fb32::Image8880::copy(
+    const fb32::Interface8880& i)
+{
+    m_dimensions = i.getDimensions();
+    m_buffer.resize(m_dimensions.area());
+
+    for (auto y = 0 ; y < m_dimensions.height() ; ++y)
+    {
+        auto destination = getRow(y);
+        const auto source = i.getRow(y).subspan(0, m_dimensions.width());
+        std::ranges::copy(source, begin(destination));
+    }
 }
 
 //-------------------------------------------------------------------------

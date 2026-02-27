@@ -57,7 +57,7 @@ public:
     // constructors, destructors and assignment
 
     Image8880Frames() = default;
-    Image8880Frames(Dimensions8880 d, uint8_t numberOfFrames = 1);
+    explicit Image8880Frames(Dimensions8880 d, uint8_t numberOfFrames = 1);
     Image8880Frames(Dimensions8880 d,
                     std::initializer_list<uint32_t> buffer,
                     uint8_t numberOfFrames = 1);

@@ -72,7 +72,7 @@ public:
     Interface8880Font& operator=(const Interface8880Font&) = delete;
     Interface8880Font& operator=(Interface8880Font&&) = delete;
 
-    [[nodiscard]] virtual Dimensions8880 getPixelDimension() const noexcept = 0;
+    [[nodiscard]] virtual Dimensions8880 getPixelDimensions() const noexcept = 0;
 
     [[nodiscard]] virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
 

@@ -142,7 +142,7 @@ main(
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{fontConfig};
-        const auto ftd = ft.getPixelDimension();
+        const auto ftd = ft.getPixelDimensions();
 
         Point8880 p{0, 0};
 

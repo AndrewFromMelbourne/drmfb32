@@ -232,8 +232,8 @@ Puzzle::draw(Interface8880& fb)
 
     if ((zoom > 1) and m_fitToScreen)
     {
-        auto zoomed = scaleUp(m_image, zoom);
-        auto zd = zoomed.getDimensions();
+        const auto zoomed = scaleUp(m_image, zoom);
+        const auto zd = zoomed.getDimensions();
 
         const int xOffset = (fbd.width() - zd.width()) / 2;
         const int yOffset = (fbd.height() - zd.height()) / 2;
