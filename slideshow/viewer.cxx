@@ -92,10 +92,10 @@ boolStrings()
 
 //-------------------------------------------------------------------------
 
-[[nodiscard]] std::span<const std::size_t>
+[[nodiscard]] std::span<const int>
 panStep() noexcept
 {
-    static std::array steps{ 1UL, 2UL, 5UL, 10UL, 20UL, 50UL, 100UL };
+    static std::array steps{ 1, 2, 5, 10, 20, 50, 100 };
 
     return steps;
 }
