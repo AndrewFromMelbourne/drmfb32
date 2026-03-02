@@ -352,8 +352,8 @@ Viewer::annotate()
     auto annotation = fs::path(name).filename().string();
     const auto d = m_image.getDimensions();
 
-    annotation += std::format(" ({} x {})", d.width(), d.height());
-    annotation += std::format(" [{} / {}]", m_current + 1, m_files.size());
+    annotation += std::format(" ({}x{})", d.width(), d.height());
+    annotation += std::format(" [{}/{}]", m_current + 1, m_files.size());
     annotation += std::format(" {}%", m_percent);
 
     annotation += std::format(" [{}]", qualityToString(m_quality));
