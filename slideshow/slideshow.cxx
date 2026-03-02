@@ -100,7 +100,7 @@ main(
     const std::string program{basename(argv[0])};
     std::string folder{};
     std::string joystick{defaultJoystick};
-    Viewer::Quality quality{Viewer::MEDIUM};
+    Viewer::Quality quality{Viewer::QUALITY_MEDIUM};
 
     //---------------------------------------------------------------------
 

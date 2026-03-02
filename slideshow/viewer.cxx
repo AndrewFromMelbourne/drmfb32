@@ -57,6 +57,22 @@ namespace
 
 //-------------------------------------------------------------------------
 
+[[nodiscard]] std::vector<std::string>
+annotateStrings()
+{
+    std::vector<std::string> result;
+
+    for (const auto annotate : { Viewer::ANNOTATE_OFF, Viewer::ANNOTATE_SHORT, Viewer::ANNOTATE_LONG })
+    {
+        result.push_back(Viewer::annotateToString(annotate));
+    }
+
+    return result;
+}
+
+
+//-------------------------------------------------------------------------
+
 std::string
     tolower(
         std::string_view s)
@@ -139,7 +155,7 @@ qualityStrings()
 {
     std::vector<std::string> result;
 
-    for (const auto quality : { Viewer::LOW, Viewer::MEDIUM, Viewer::HIGH })
+    for (const auto quality : { Viewer::QUALITY_LOW, Viewer::QUALITY_MEDIUM, Viewer::QUALITY_HIGH })
     {
         result.push_back(Viewer::qualityToString(quality));
     }
@@ -169,6 +185,56 @@ zoomStrings(
 
 // ========================================================================
 
+Viewer::Annotate
+Viewer::annotateFromString(
+    std::string_view string) noexcept
+{
+    auto s = tolower(string);
+
+    if (s == "off")
+    {
+        return ANNOTATE_OFF;
+    }
+
+    if (s == "medium")
+    {
+        return ANNOTATE_SHORT;
+    }
+
+    if (s == "high")
+    {
+        return ANNOTATE_LONG;
+    }
+
+    return ANNOTATE_SHORT;
+}
+
+//-------------------------------------------------------------------------
+
+std::string
+Viewer::annotateToString(
+    Viewer::Annotate annotate) noexcept
+{
+    switch (annotate)
+    {
+    case ANNOTATE_OFF:
+
+        return "off";
+
+    case ANNOTATE_SHORT:
+
+        return "short";
+
+    case ANNOTATE_LONG:
+
+        return "long";
+    }
+
+    return "";
+}
+
+//-------------------------------------------------------------------------
+
 Viewer::Quality
 Viewer::qualityFromString(
     std::string_view string) noexcept
@@ -177,20 +243,20 @@ Viewer::qualityFromString(
 
     if (s == "low")
     {
-        return LOW;
+        return QUALITY_LOW;
     }
 
     if (s == "medium")
     {
-        return MEDIUM;
+        return QUALITY_MEDIUM;
     }
 
     if (s == "high")
     {
-        return HIGH;
+        return QUALITY_HIGH;
     }
 
-    return MEDIUM;
+    return QUALITY_MEDIUM;
 }
 
 //-------------------------------------------------------------------------
@@ -201,15 +267,15 @@ Viewer::qualityToString(
 {
     switch (quality)
     {
-    case LOW:
+    case QUALITY_LOW:
 
         return "low";
 
-    case MEDIUM:
+    case QUALITY_MEDIUM:
 
         return "medium";
 
-    case HIGH:
+    case QUALITY_HIGH:
 
         return "high";
     }
@@ -225,7 +291,7 @@ Viewer::Viewer(
     const std::string& folder,
     Viewer::Quality quality)
 :
-    m_annotate{true},
+    m_annotate{ANNOTATE_SHORT},
     m_background{background},
     m_buffer{interface.getDimensions()},
     m_current{INVALID_INDEX},
@@ -246,12 +312,12 @@ Viewer::Viewer(
         fb32::RGB8880{0x00000000},
         fb32::RGB8880{0x003F3F3F},
         {
-            MenuItem{ANNOTATE, "Annotate", 1, boolStrings()},
-            MenuItem{ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
-            MenuItem{FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
-            MenuItem{PAN_STEP, "Pan step", 3, panStepStrings()},
-            MenuItem{QUALITY, "Quality", quality, qualityStrings()},
-            MenuItem{ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
+            MenuItem{MENUID_ANNOTATE, "Annotate", ANNOTATE_SHORT, annotateStrings()},
+            MenuItem{MENUID_ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
+            MenuItem{MENUID_FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
+            MenuItem{MENUID_PAN_STEP, "Pan step", 3, panStepStrings()},
+            MenuItem{MENUID_QUALITY, "Quality", quality, qualityStrings()},
+            MenuItem{MENUID_ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
         }
     },
     m_menuShow{false},
@@ -343,7 +409,7 @@ Viewer::update(
 void
 Viewer::annotate()
 {
-    if (not m_annotate or not haveImages())
+    if (m_annotate == ANNOTATE_OFF or not haveImages())
     {
         return;
     }
@@ -356,7 +422,10 @@ Viewer::annotate()
     annotation += std::format(" [{}/{}]", m_current + 1, m_files.size());
     annotation += std::format(" {}%", m_percent);
 
-    annotation += std::format(" [{}]", qualityToString(m_quality));
+    if (m_annotate == ANNOTATE_LONG)
+    {
+        annotation += std::format(" [{}]", qualityToString(m_quality));
+    }
 
     if (m_zoom)
     {
@@ -371,7 +440,10 @@ Viewer::annotate()
         annotation += " [FOS]";
     }
 
-    annotation += std::format(" [enlighten {}%]", m_enlighten * 10);
+    if (m_annotate == ANNOTATE_LONG)
+    {
+        annotation += std::format(" [enlighten {}%]", m_enlighten * 10);
+    }
 
     fb32::Image8880Font8x16 font;
     constexpr int padding{4};
@@ -653,17 +725,17 @@ Viewer::processResize(
 {
     switch (m_quality)
     {
-    case LOW:
+    case QUALITY_LOW:
 
         m_imageProcessed = resizeNearestNeighbour(m_imageProcessed, d);
         break;
 
-    case MEDIUM:
+    case QUALITY_MEDIUM:
 
         m_imageProcessed = resizeBilinearInterpolation(m_imageProcessed, d);
         break;
 
-    case HIGH:
+    case QUALITY_HIGH:
 
         m_imageProcessed = resizeLanczos3Interpolation(m_imageProcessed, d);
         break;
@@ -717,13 +789,13 @@ Viewer::readDirectory()
 void
 Viewer::readValuesFromMenu()
 {
-    m_enlighten = m_menu.getValue(ENLIGHTEN);
-    m_fitToScreen = m_menu.getValue(FIT_TO_SCREEN);
-    m_quality = static_cast<Quality>(m_menu.getValue(QUALITY));
-    m_zoom = m_menu.getValue(ZOOM);
-    m_annotate = m_menu.getValue(ANNOTATE);
+    m_annotate = static_cast<Annotate>(m_menu.getValue(MENUID_ANNOTATE));
+    m_enlighten = m_menu.getValue(MENUID_ENLIGHTEN);
+    m_fitToScreen = m_menu.getValue(MENUID_FIT_TO_SCREEN);
+    m_quality = static_cast<Quality>(m_menu.getValue(MENUID_QUALITY));
+    m_zoom = m_menu.getValue(MENUID_ZOOM);
 
-    const auto panStepIndex = m_menu.getValue(PAN_STEP);
+    const auto panStepIndex = m_menu.getValue(MENUID_PAN_STEP);
     const auto panSteps = panStep();
     m_panStep =  panSteps[panStepIndex];
 }
@@ -733,18 +805,18 @@ Viewer::readValuesFromMenu()
 void
 Viewer::setMenuValues()
 {
-    m_menu.setValue(ENLIGHTEN, m_enlighten);
-    m_menu.setValue(FIT_TO_SCREEN, m_fitToScreen);
-    m_menu.setValue(QUALITY, m_quality);
-    m_menu.setValue(ZOOM, m_zoom);
-    m_menu.setValue(ANNOTATE, m_annotate);
+    m_menu.setValue(MENUID_ANNOTATE, m_annotate);
+    m_menu.setValue(MENUID_ENLIGHTEN, m_enlighten);
+    m_menu.setValue(MENUID_FIT_TO_SCREEN, m_fitToScreen);
+    m_menu.setValue(MENUID_QUALITY, m_quality);
+    m_menu.setValue(MENUID_ZOOM, m_zoom);
 
     std::size_t index = 0UL;
     for (const auto step : panStep())
     {
         if (static_cast<int>(step) == m_panStep)
         {
-            m_menu.setValue(PAN_STEP, index);
+            m_menu.setValue(MENUID_PAN_STEP, index);
             break;
         }
         ++index;

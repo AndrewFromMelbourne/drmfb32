@@ -48,14 +48,21 @@ public:
 
     //---------------------------------------------------------------------
 
-    enum Quality
+    enum Annotate
     {
-        LOW,
-        MEDIUM,
-        HIGH
+        ANNOTATE_OFF,
+        ANNOTATE_SHORT,
+        ANNOTATE_LONG
     };
 
-    enum Type
+    enum Quality
+    {
+        QUALITY_LOW,
+        QUALITY_MEDIUM,
+        QUALITY_HIGH
+    };
+
+    enum class Type
     {
         JPEG,
         PNG,
@@ -64,12 +71,12 @@ public:
 
     enum MenuIds
     {
-        ANNOTATE,
-        ENLIGHTEN,
-        FIT_TO_SCREEN,
-        PAN_STEP,
-        QUALITY,
-        ZOOM
+        MENUID_ANNOTATE,
+        MENUID_ENLIGHTEN,
+        MENUID_FIT_TO_SCREEN,
+        MENUID_PAN_STEP,
+        MENUID_QUALITY,
+        MENUID_ZOOM
     };
 
     //---------------------------------------------------------------------
@@ -87,6 +94,9 @@ public:
 
 
     //---------------------------------------------------------------------
+
+    [[nodiscard]] static Annotate annotateFromString(std::string_view string) noexcept;
+    [[nodiscard]] static std::string annotateToString(Annotate annotate) noexcept;
 
     [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
@@ -184,7 +194,7 @@ private:
     static const int MAX_ZOOM{5};
     static const int SCALE_OVERSIZED{0};
 
-    bool m_annotate;
+    Annotate m_annotate;
     fb32::RGB8880 m_background;
     fb32::Image8880 m_buffer;
     std::size_t m_current;
