@@ -352,26 +352,26 @@ Viewer::annotate()
     auto annotation = fs::path(name).filename().string();
     const auto d = m_image.getDimensions();
 
-    annotation += std::format(" ( {} x {} )", d.width(), d.height());
-    annotation += std::format(" [ {} / {} ]", m_current + 1, m_files.size());
+    annotation += std::format(" ({} x {})", d.width(), d.height());
+    annotation += std::format(" [{} / {}]", m_current + 1, m_files.size());
     annotation += std::format(" {}%", m_percent);
 
-    annotation += std::format(" [ {} ]", qualityToString(m_quality));
+    annotation += std::format(" [{}]", qualityToString(m_quality));
 
     if (m_zoom)
     {
-        annotation += std::format(" [ x{} ]", m_zoom);
+        annotation += std::format(" [x{}]", m_zoom);
     }
     else if (m_fitToScreen)
     {
-        annotation += " [ FTS ]";
+        annotation += " [FTS]";
     }
     else
     {
-        annotation += " [ FOS ]";
+        annotation += " [FOS]";
     }
 
-    annotation += std::format(" [ enlighten {}% ]", m_enlighten * 10);
+    annotation += std::format(" [enlighten {}%]", m_enlighten * 10);
 
     fb32::Image8880Font8x16 font;
     constexpr int padding{4};
