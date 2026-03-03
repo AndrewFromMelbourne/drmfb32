@@ -67,7 +67,7 @@ fb32::Image8880Frames::Image8880Frames(
 
     if (m_buffer.size() < minBufferSize)
     {
-        m_buffer.resize(minBufferSize);
+        m_buffer.reserve(minBufferSize);
     }
 }
 
@@ -89,7 +89,7 @@ fb32::Image8880Frames::Image8880Frames(
 
     if (m_buffer.size() < minBufferSize)
     {
-        m_buffer.resize(minBufferSize);
+        m_buffer.reserve(minBufferSize);
     }
 }
 

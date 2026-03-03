@@ -62,7 +62,7 @@ fb32::Image8880::Image8880(
 
     if (m_buffer.size() < minBufferSize)
     {
-        m_buffer.resize(minBufferSize);
+        m_buffer.reserve(minBufferSize);
     }
 }
 
@@ -81,7 +81,7 @@ fb32::Image8880::Image8880(
 
     if (m_buffer.size() < minBufferSize)
     {
-        m_buffer.resize(minBufferSize);
+        m_buffer.reserve(minBufferSize);
     }
 }
 
@@ -117,7 +117,7 @@ fb32::Image8880::copy(
     const fb32::Interface8880& i)
 {
     m_dimensions = i.getDimensions();
-    m_buffer.resize(m_dimensions.area());
+    m_buffer.reserve(m_dimensions.area());
 
     for (auto y = 0 ; y < m_dimensions.height() ; ++y)
     {
