@@ -420,10 +420,10 @@ Viewer::annotate()
 
     annotation += std::format(" ({}x{})", d.width(), d.height());
     annotation += std::format(" [{}/{}]", m_current + 1, m_files.size());
-    annotation += std::format(" {}%", m_percent);
 
     if (m_annotate == ANNOTATE_LONG)
     {
+        annotation += std::format(" {}%", m_percent);
         annotation += std::format(" [{}]", qualityToString(m_quality));
     }
 
