@@ -25,6 +25,7 @@ Display a slide show of jpeg images from a directory and its sub-directories.
         Y Button - decrease value
         X Button - previous item
         B Button - next item
+        Right Shoulder Button - toggle screen blanking
         Control pad up/down - previous/next menu item
         Control pad left/right - decrease/increase value
 

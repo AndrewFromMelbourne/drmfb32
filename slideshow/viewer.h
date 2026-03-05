@@ -205,6 +205,7 @@ private:
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
+    bool m_isBlank;
     fb32::Interface8880Menu m_menu;
     bool m_menuShow;
     Offset m_offset;

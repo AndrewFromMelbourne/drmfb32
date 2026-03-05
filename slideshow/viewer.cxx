@@ -307,6 +307,7 @@ Viewer::Viewer(
     m_fitToScreen{true},
     m_image{},
     m_imageProcessed{},
+    m_isBlank{false},
     m_menu{
         fb32::RGB8880{0x00FFFFFF},
         fb32::RGB8880{0x00000000},
@@ -363,9 +364,22 @@ bool
 Viewer::update(
     fb32::Joystick& js)
 {
+    if (js.buttonPressed(fb32::Joystick::BUTTON_RIGHT_SHOULDER) and not m_menuShow)
+    {
+        m_isBlank = not m_isBlank;
+        paint();
+        return true;
+    }
+
+    if (m_isBlank)
+    {
+        return false;
+    }
+
     if (js.buttonPressed(fb32::Joystick::BUTTON_SELECT))
     {
         m_menuShow = not m_menuShow;
+        js.buttonsClear();
 
         if (m_menuShow)
         {
@@ -625,6 +639,11 @@ void
 Viewer::paint()
 {
     m_buffer.clear(m_background);
+
+    if (m_isBlank)
+    {
+        return;
+    }
 
     if (not oversize())
     {
