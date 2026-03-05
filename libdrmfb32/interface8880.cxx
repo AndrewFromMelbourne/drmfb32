@@ -162,7 +162,7 @@ fb32::Interface8880::putImage(
         auto row = image.getRow(j);
         const auto ost = offset(Point8880{p.x(), j + p.y()});
 
-        std::ranges::copy(row, getBuffer().subspan(ost).begin());
+        std::ranges::copy(row, cbegin(getBuffer().subspan(ost)));
     }
 
     return true;
@@ -224,7 +224,7 @@ fb32::Interface8880::putImagePartial(
         auto row = image.getRow(j).subspan(xStart, xLength);
         const auto ost = offset(Point8880{x, j - yStart + y});
 
-        std::ranges::copy(row, getBuffer().subspan(ost).begin());
+        std::ranges::copy(row, cbegin(getBuffer().subspan(ost)));
     }
 
     return true;

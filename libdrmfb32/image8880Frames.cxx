@@ -83,7 +83,7 @@ fb32::Image8880Frames::Image8880Frames(
     m_numberOfFrames{numberOfFrames},
     m_buffer{}
 {
-    m_buffer.assign(buffer.begin(), buffer.end());
+    m_buffer.assign(cbegin(buffer), cend(buffer));
 
     std::size_t minBufferSize = d.area() * numberOfFrames;
 

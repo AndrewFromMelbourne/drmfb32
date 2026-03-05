@@ -204,7 +204,7 @@ Trace::addDataPoint(
 {
     storeTime(now);
 
-    auto value{data.begin()};
+    auto value{cbegin(data)};
     for (auto& trace : m_traceData)
     {
         trace.addData(*(value++));
@@ -240,7 +240,7 @@ Trace::storeTime(
     }
     else
     {
-        std::ranges::rotate(m_time, m_time.begin() + 1);
+        std::ranges::rotate(m_time, begin(m_time) + 1);
         m_time.back() = now;
     }
 }
@@ -257,7 +257,7 @@ TraceData::addData(
     }
     else
     {
-        std::ranges::rotate(m_values, m_values.begin() + 1);
+        std::ranges::rotate(m_values, begin(m_values) + 1);
         m_values.back() = value;
     }
 }

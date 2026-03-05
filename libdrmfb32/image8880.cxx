@@ -75,7 +75,7 @@ fb32::Image8880::Image8880(
     m_dimensions{d},
     m_buffer{}
 {
-    m_buffer.assign(buffer.begin(), buffer.end());
+    m_buffer.assign(cbegin(buffer), cend(buffer));
 
     const std::size_t minBufferSize = d.area();
 

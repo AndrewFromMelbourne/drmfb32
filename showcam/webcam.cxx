@@ -360,7 +360,7 @@ fb32::Webcam::convertYuyv(
     const uint8_t* data,
     std::size_t length)
 {
-    auto buffer = m_image.getBuffer().begin();
+    auto buffer = begin(m_image.getBuffer());
     constexpr std::size_t BytesPerYuyv{4};
 
     for (auto i = 0U ; i < length ; i += BytesPerYuyv)

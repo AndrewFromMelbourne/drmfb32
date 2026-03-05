@@ -100,7 +100,7 @@ void pngReadDataCallback(
         png_error(pngPtr, "Read Error");
     }
 
-    std::copy(data->begin(), data->begin() + byteCountToRead, outBytes);
+    std::copy(cbegin(*data), cbegin(*data) + byteCountToRead, outBytes);
     *data = data->subspan(byteCountToRead);
 }
 

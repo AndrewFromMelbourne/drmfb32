@@ -332,7 +332,7 @@ horizontalLine(
     }
 
     std::span<uint32_t> row = iface.getRow(y).subspan(x1, x2 - x1 + 1);
-    std::fill(row.begin(), row.end(), rgb);
+    std::fill(begin(row), end(row), rgb);
 }
 
 //-------------------------------------------------------------------------

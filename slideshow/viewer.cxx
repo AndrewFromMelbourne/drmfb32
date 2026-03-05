@@ -772,7 +772,7 @@ Viewer::readDirectory()
 
     if (m_files.size() > 0)
     {
-        std::sort(m_files.begin(), m_files.end());
+        std::sort(begin(m_files), end(m_files));
 
         m_current = 0;
         openImage();
