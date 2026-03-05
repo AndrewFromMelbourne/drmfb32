@@ -367,6 +367,7 @@ Viewer::update(
     if (js.buttonPressed(fb32::Joystick::BUTTON_RIGHT_SHOULDER) and not m_menuShow)
     {
         m_isBlank = not m_isBlank;
+        js.buttonsClear();
         paint();
         return true;
     }
