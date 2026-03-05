@@ -106,6 +106,17 @@ fb32::Joystick::Joystick(const std::string& device, bool blocking)
 
 //-------------------------------------------------------------------------
 
+void
+fb32::Joystick::buttonsClear()
+{
+    for (auto& button : m_buttons)
+    {
+        button.pressed = false;
+    }
+}
+
+//-------------------------------------------------------------------------
+
 bool
 fb32::Joystick::buttonDown(int button) const
 {
