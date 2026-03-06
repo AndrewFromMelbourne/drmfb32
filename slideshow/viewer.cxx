@@ -109,6 +109,32 @@ boolStrings()
 //-------------------------------------------------------------------------
 
 [[nodiscard]] std::span<const int>
+fileStep() noexcept
+{
+    static std::array steps{ 1, 2, 5, 10, 20, 50, 100 };
+
+    return steps;
+}
+
+
+//-------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+fileStepStrings() noexcept
+{
+    std::vector<std::string> result;
+
+    for (const auto step : fileStep())
+    {
+        result.push_back(std::to_string(step));
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+[[nodiscard]] std::span<const int>
 panStep() noexcept
 {
     static std::array steps{ 1, 2, 5, 10, 20, 50, 100 };
@@ -304,6 +330,7 @@ Viewer::Viewer(
         {".qoi", Type::QOI}
     },
     m_files{},
+    m_fileStep{1},
     m_fitToScreen{true},
     m_image{},
     m_imageProcessed{},
@@ -315,6 +342,7 @@ Viewer::Viewer(
         {
             MenuItem{MENUID_ANNOTATE, "Annotate", ANNOTATE_SHORT, annotateStrings()},
             MenuItem{MENUID_ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
+            MenuItem{MENUID_FILE_STEP, "File step", 1, fileStepStrings()},
             MenuItem{MENUID_FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
             MenuItem{MENUID_PAN_STEP, "Pan step", 3, panStepStrings()},
             MenuItem{MENUID_QUALITY, "Quality", quality, qualityStrings()},
@@ -550,9 +578,9 @@ Viewer::imageNext()
 {
     if (haveImages())
     {
-        ++m_current;
+        m_current += m_fileStep;
 
-        if (m_current == m_files.size())
+        if (m_current >= m_files.size())
         {
             m_current = 0;
         }
@@ -568,13 +596,13 @@ Viewer::imagePrevious()
 {
     if (haveImages())
     {
-        if (m_current == 0)
+        if (static_cast<int>(m_current) <= m_fileStep)
         {
             m_current = m_files.size() - 1;
         }
         else
         {
-            --m_current;
+            m_current -= m_fileStep;
         }
 
         openImage();
@@ -818,6 +846,10 @@ Viewer::readValuesFromMenu()
     const auto panStepIndex = m_menu.getValue(MENUID_PAN_STEP);
     const auto panSteps = panStep();
     m_panStep =  panSteps[panStepIndex];
+
+    const auto fileStepIndex = m_menu.getValue(MENUID_FILE_STEP);
+    const auto fileSteps = fileStep();
+    m_fileStep = fileSteps[fileStepIndex];
 }
 
 //-------------------------------------------------------------------------
@@ -842,6 +874,16 @@ Viewer::setMenuValues()
         ++index;
     }
 
+    index = 0UL;
+    for (const auto step : fileStep())
+    {
+        if (static_cast<int>(step) == m_fileStep)
+        {
+            m_menu.setValue(MENUID_FILE_STEP, index);
+            break;
+        }
+        ++index;
+    }
 }
 
 //-------------------------------------------------------------------------

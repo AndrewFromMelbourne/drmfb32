@@ -73,6 +73,7 @@ public:
     {
         MENUID_ANNOTATE,
         MENUID_ENLIGHTEN,
+        MENUID_FILE_STEP,
         MENUID_FIT_TO_SCREEN,
         MENUID_PAN_STEP,
         MENUID_QUALITY,
@@ -202,6 +203,7 @@ private:
     int m_enlighten;
     std::map<std::string, Type> m_extToType;
     std::vector<ImageFile> m_files;
+    int m_fileStep;
     bool m_fitToScreen;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
