@@ -71,6 +71,33 @@ signalHandler(
 
 //-------------------------------------------------------------------------
 
+std::unique_ptr<fb32::Interface8880Font>
+getFont(
+    const FontConfig& fontConfig)
+{
+    std::unique_ptr<Interface8880Font> font;
+
+    if (not fontConfig.m_fontFile.empty())
+    {
+        try
+        {
+            return std::make_unique<fb32::Image8880FreeType>(fontConfig);
+        }
+        catch (std::exception& error)
+        {
+            std::println(
+                std::cerr,
+                "Error: loading font {} : {}",
+                fontConfig.m_fontFile,
+                error.what());
+        }
+    }
+
+    return std::make_unique<fb32::Image8880Font8x16>();
+}
+
+//-------------------------------------------------------------------------
+
 void
 printUsage(
     std::ostream& stream,
@@ -194,42 +221,11 @@ main(
     //---------------------------------------------------------------------
 
 
-
-    //---------------------------------------------------------------------
-
-
     if (folder.empty())
     {
         printUsage(std::cerr, program);
         ::exit(EXIT_FAILURE);
     }
-
-    //---------------------------------------------------------------------
-
-    std::unique_ptr<Interface8880Font> font;
-
-    if (not fontConfig.m_fontFile.empty())
-    {
-        try
-        {
-            font = std::make_unique<fb32::Image8880FreeType>(fontConfig);
-        }
-        catch (std::exception& error)
-        {
-            std::println(
-                std::cerr,
-                "Error: loading font {} : {}",
-                fontConfig.m_fontFile,
-                error.what());
-                ::exit(EXIT_FAILURE);
-        }
-    }
-
-    if (not font)
-    {
-        font = std::make_unique<fb32::Image8880Font8x16>();
-    }
-
 
     //---------------------------------------------------------------------
 
@@ -254,7 +250,14 @@ main(
         fb.clearBuffers(background);
 
         Joystick js{joystick, true};
-        Viewer viewer{background, fb, folder, quality, std::move(font)};
+        Viewer viewer
+        {
+            background,
+            fb,
+            folder,
+            quality,
+            getFont(fontConfig)
+        };
 
         viewer.draw(fb);
         fb.update();
