@@ -76,6 +76,8 @@ public:
 
     [[nodiscard]] virtual std::optional<char> getCharacterCode(CharacterCode code) const noexcept = 0;
 
+    [[nodiscard]] virtual Dimensions8880 getStringDimensions(std::string_view s) = 0;
+
     virtual Point8880
     drawChar(
         Point8880 p,

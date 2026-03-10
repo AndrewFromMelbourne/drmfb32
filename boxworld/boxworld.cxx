@@ -168,7 +168,7 @@ Boxworld::update(Joystick& js)
 
 void
 Boxworld::draw(
-    Interface8880& fb,
+    Interface8880Base& fb,
     Interface8880Font& font)
 {
     drawBoard(m_image);
@@ -203,7 +203,7 @@ Boxworld::draw(
 //-------------------------------------------------------------------------
 
 void
-Boxworld::drawBoard(Interface8880& fb)
+Boxworld::drawBoard(Interface8880Base& fb)
 {
     constexpr int yOffset = 20;
     static uint8_t frame = 0;
@@ -243,7 +243,7 @@ Boxworld::drawBoard(Interface8880& fb)
 
 void
 Boxworld::drawText(
-    Interface8880& fb,
+    Interface8880Base& fb,
     Interface8880Font& font)
 {
     m_topTextImage.clear(m_backgroundRGB);

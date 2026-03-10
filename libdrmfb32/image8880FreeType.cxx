@@ -27,6 +27,7 @@
 //-------------------------------------------------------------------------
 
 #include "image8880FreeType.h"
+#include "interface8880Null.h"
 
 #include <stdexcept>
 
@@ -114,6 +115,37 @@ Image8880FreeType::getCharacterCode(Interface8880Font::CharacterCode code) const
     }
 
     return {};
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Dimensions8880
+Image8880FreeType::getStringDimensions(
+    std::string_view s)
+{
+    constexpr RGB8880 c{0};
+    Interface8880Null n{};
+
+    Point8880 p = drawString(Point8880{0, 0}, s, c, n);
+
+    const auto d = getPixelDimensions();
+
+    return Dimensions8880{p.x(), p.y() + d.height()};
+}
+
+
+fb32::Dimensions8880
+Image8880FreeType::getWideCharDimensions(
+    uint32_t c)
+{
+    constexpr RGB8880 rgb{0};
+    Interface8880Null n{};
+
+    Point8880 p = drawWideChar(Point8880{0, 0}, c, rgb, n);
+
+    const auto d = getPixelDimensions();
+
+    return Dimensions8880{p.x(), p.y() + d.height()};
 }
 
 //-------------------------------------------------------------------------

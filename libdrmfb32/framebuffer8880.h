@@ -37,7 +37,7 @@
 #include "drmMode.h"
 #include "point.h"
 #include "fileDescriptor.h"
-#include "interface8880.h"
+#include "interface8880Base.h"
 #include "rgb8880.h"
 
 //-------------------------------------------------------------------------
@@ -57,7 +57,7 @@ class Image8880;
 
 class FrameBuffer8880
 :
-    public Interface8880
+    public Interface8880Base
 {
 public:
 

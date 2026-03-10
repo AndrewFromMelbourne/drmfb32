@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2026 Andrew Duncan
+// Copyright (c) 2023 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -34,6 +34,7 @@
 #include <span>
 
 #include "dimensions.h"
+#include "interface8880.h"
 #include "point.h"
 #include "rgb8880.h"
 
@@ -44,46 +45,68 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-using Dimensions8880 = Dimensions<int>;
-using Point8880 = Point<int>;
-
-//-------------------------------------------------------------------------
-
-class Interface8880
+class Interface8880Base
+:
+    public Interface8880
 {
 public:
 
-    virtual ~Interface8880() = default;
+    static constexpr auto c_bytesPerPixel{4};
+
+    ~Interface8880Base() override = default;
+
+    [[nodiscard]] virtual std::span<uint32_t> getBuffer() noexcept = 0;
+    [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
 
     [[nodiscard]] virtual Dimensions8880 getDimensions() const noexcept = 0;
 
-    virtual void clear(const RGB8880& rgb) = 0;
-    virtual void clear(uint32_t rgb = 0) = 0;
+    void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
+    void clear(uint32_t rgb = 0) override;
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Point8880 p) const = 0;
-    [[nodiscard]] virtual std::optional<RGB8> getPixelRGB8(Point8880 p) const = 0;
-    [[nodiscard]] virtual std::optional<uint32_t> getPixel(Point8880 p) const= 0;
+    [[nodiscard]] std::optional<RGB8880> getPixelRGB(Point8880 p) const override;
+    [[nodiscard]] std::optional<RGB8> getPixelRGB8(Point8880 p) const override;
+    [[nodiscard]] std::optional<uint32_t> getPixel(Point8880 p) const override;
 
-    virtual bool setPixelRGB(Point8880 p, const RGB8880& rgb) = 0;
-    virtual bool setPixelRGB8(Point8880 p, RGB8 rgb) = 0;
-    virtual bool setPixel(Point8880 p, uint32_t rgb) = 0;
+    [[nodiscard]] std::span<uint32_t> getRow(int y);
+    [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
 
-    virtual bool validPixel(Point8880 p) const noexcept = 0;
+    [[nodiscard]] virtual std::size_t offset(Point8880 p) const noexcept = 0;
+
+    bool
+    setPixelRGB(
+        Point8880 p,
+        const RGB8880& rgb) override
+    {
+        return setPixel(p, rgb.get8880());
+    }
+
+    bool
+    setPixelRGB8(
+        Point8880 p,
+        RGB8 rgb) override
+    {
+        return setPixel(p, RGB8880(rgb).get8880());
+    }
+
+    bool setPixel(Point8880 p, uint32_t rgb) override;
+
+    bool putImage(Point8880 p, const Interface8880Base& image);
+
+    [[nodiscard]] bool
+    validPixel(Point8880 p) const noexcept override
+    {
+        const auto d = getDimensions();
+
+        return ((p.x() >= 0) and
+                (p.x() < d.width()) and
+                (p.y() >= 0) and
+                (p.y() < d.height()));
+    }
+
+private:
+
+    bool putImagePartial(Point8880 p, const Interface8880Base& image);
 };
-
-//-------------------------------------------------------------------------
-
-inline Point8880
-center(
-    const Interface8880& frame,
-    const Interface8880& image) noexcept
-{
-    const auto fd = frame.getDimensions();
-    const auto id = image.getDimensions();
-
-    return {(fd.width() - id.width()) / 2,
-            (fd.height() - id.height()) / 2};
-}
 
 //-------------------------------------------------------------------------
 

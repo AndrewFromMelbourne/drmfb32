@@ -122,7 +122,7 @@ fb32::Webcam::~Webcam()
 
 bool
 fb32::Webcam::showFrame(
-    Interface8880& interface)
+    Interface8880Base& interface)
 {
     v4l2_buffer buffer;
     buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;

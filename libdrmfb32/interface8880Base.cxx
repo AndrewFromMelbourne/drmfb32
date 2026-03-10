@@ -26,7 +26,7 @@
 //-------------------------------------------------------------------------
 
 #include "image8880.h"
-#include "interface8880.h"
+#include "interface8880Base.h"
 
 #include <algorithm>
 
@@ -37,14 +37,8 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-Interface8880::~Interface8880()
-{
-}
-
-//-------------------------------------------------------------------------
-
 void
-fb32::Interface8880::clear(
+fb32::Interface8880Base::clear(
     uint32_t rgb)
 {
     auto buffer = getBuffer();
@@ -54,7 +48,7 @@ fb32::Interface8880::clear(
 //-------------------------------------------------------------------------
 
 std::optional<fb32::RGB8880>
-fb32::Interface8880::getPixelRGB(
+fb32::Interface8880Base::getPixelRGB(
     Point8880 p) const
 {
     if (not validPixel(p))
@@ -69,7 +63,7 @@ fb32::Interface8880::getPixelRGB(
 //-------------------------------------------------------------------------
 
 std::optional<fb32::RGB8>
-fb32::Interface8880::getPixelRGB8(
+fb32::Interface8880Base::getPixelRGB8(
     Point8880 p) const
 {
     if (not validPixel(p))
@@ -84,7 +78,7 @@ fb32::Interface8880::getPixelRGB8(
 //-------------------------------------------------------------------------
 
 std::optional<uint32_t>
-fb32::Interface8880::getPixel(
+fb32::Interface8880Base::getPixel(
     Point8880 p) const
 {
     if (not validPixel(p))
@@ -99,7 +93,7 @@ fb32::Interface8880::getPixel(
 //-------------------------------------------------------------------------
 
 std::span<uint32_t>
-fb32::Interface8880::getRow(
+fb32::Interface8880Base::getRow(
     int y)
 {
     const Point8880 p{0, y};
@@ -118,7 +112,7 @@ fb32::Interface8880::getRow(
 //-------------------------------------------------------------------------
 
 std::span<const uint32_t>
-fb32::Interface8880::getRow(
+fb32::Interface8880Base::getRow(
     int y) const
 {
     const Point8880 p{0, y};
@@ -137,9 +131,9 @@ fb32::Interface8880::getRow(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Interface8880::putImage(
+fb32::Interface8880Base::putImage(
     Point8880 p_left,
-    const Interface8880& image)
+    const Interface8880Base& image)
 {
     Point8880 p{ p_left.x(), p_left.y() };
     const auto d = getDimensions();
@@ -171,9 +165,9 @@ fb32::Interface8880::putImage(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Interface8880::putImagePartial(
+fb32::Interface8880Base::putImagePartial(
     Point8880 p,
-    const Interface8880& image)
+    const Interface8880Base& image)
 {
     const auto id = image.getDimensions();
     const auto d = getDimensions();
@@ -233,7 +227,7 @@ fb32::Interface8880::putImagePartial(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Interface8880::setPixel(
+fb32::Interface8880Base::setPixel(
     Point8880 p,
     uint32_t rgb)
 {
@@ -246,19 +240,6 @@ fb32::Interface8880::setPixel(
     }
 
     return isValid;
-}
-
-//-------------------------------------------------------------------------
-
-Point8880
-center(
-    const Interface8880& frame,
-    const Interface8880& image) noexcept
-{
-    const auto fd = frame.getDimensions();
-    const auto id = image.getDimensions();
-
-    return {(fd.width() - id.width()) / 2, (fd.height() - id.height()) / 2};
 }
 
 //-------------------------------------------------------------------------

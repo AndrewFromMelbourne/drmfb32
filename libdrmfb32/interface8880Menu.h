@@ -96,6 +96,7 @@ public:
         RGB8880 forgroundColour,
         RGB8880 backgroundColour,
         RGB8880 selectionColour,
+        Interface8880Font& font,
         std::initializer_list<MenuItem> items);
 
     void draw(fb32::FrameBuffer8880& fb, Interface8880Font& font) const;
@@ -113,8 +114,8 @@ private:
     RGB8880 m_selectionColour;
     std::size_t m_selected;
     std::vector<MenuItem> m_items;
-    std::size_t m_titleMaximum;
-    std::size_t m_valueMaximum;
+    int m_titleMaximumPixels;
+    int m_valueMaximumPixels;
 };
 
 //-------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2026 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -29,14 +29,13 @@
 
 //-------------------------------------------------------------------------
 
-#include <cstddef>
 #include <cstdint>
-#include <initializer_list>
-#include <utility>
+#include <optional>
 #include <span>
-#include <vector>
 
-#include "interface8880Base.h"
+#include "dimensions.h"
+#include "interface8880.h"
+#include "point.h"
 #include "rgb8880.h"
 
 //-------------------------------------------------------------------------
@@ -46,47 +45,74 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-class Image8880
+using Dimensions8880 = Dimensions<int>;
+using Point8880 = Point<int>;
+
+//-------------------------------------------------------------------------
+
+class Interface8880Null
 :
-    public Interface8880Base
+    public Interface8880
 {
 public:
 
-    //---------------------------------------------------------------------
-    // constructors, destructors and assignment
+    virtual ~Interface8880Null() = default;
 
-    Image8880() = default;
-    explicit Image8880(Dimensions8880 d);
-    Image8880(Dimensions8880 d, std::initializer_list<uint32_t> buffer);
-    Image8880(Dimensions8880 d, std::span<const uint32_t> buffer);
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override
+    {
+        return m_dimensions;
+    }
 
-    ~Image8880() override = default;
+    virtual void clear(const RGB8880&) override {};
+    virtual void clear([[maybe_unused]] uint32_t rgb = 0) override {};
 
-    Image8880(const Image8880&) = default;
-    Image8880& operator=(const Image8880&) = default;
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Point8880 p) const override
+    {
+        if (validPixel(p))
+        {
+            return RGB8880{0};
+        }
 
-    Image8880(Image8880&& image) = default;
-    Image8880& operator=(Image8880&& image) = default;
+        return std::nullopt;
+    }
 
-    explicit Image8880(const Interface8880Base& i);
-    Image8880& operator=(const Interface8880Base& i);
+    [[nodiscard]] std::optional<RGB8> getPixelRGB8(Point8880 p) const override
+    {
+        if (validPixel(p))
+        {
+            return RGB8{0, 0, 0};
+        }
 
-    //---------------------------------------------------------------------
-    // getters and setters
+        return std::nullopt;
+    }
 
-    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
+    [[nodiscard]] std::optional<uint32_t> getPixel(Point8880 p) const override
+    {
+        if (validPixel(p))
+        {
+            return 0;
+        }
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
-    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
+        return std::nullopt;
+    }
 
-    std::size_t offset(Point8880 p) const noexcept override;
+    bool setPixelRGB(Point8880 p, const RGB8880&) override { return validPixel(p); }
+    bool setPixelRGB8(Point8880 p, RGB8)  override { return validPixel(p); }
+    bool setPixel(Point8880 p, uint32_t)  override { return validPixel(p); }
+
+    bool validPixel(Point8880 p) const noexcept override
+    {
+        const auto d = getDimensions();
+
+        return ((p.x() >= 0) and
+                (p.x() < d.width()) and
+                (p.y() >= 0) and
+                (p.y() < d.height()));
+    }
 
 private:
 
-    void copy(const Interface8880Base& i);
-
     Dimensions8880 m_dimensions;
-    std::vector<uint32_t> m_buffer{};
 };
 
 //-------------------------------------------------------------------------

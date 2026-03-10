@@ -72,7 +72,7 @@ main(
     uint32_t connector{0};
     std::string device{};
     const std::string program = basename(argv[0]);
-    FontConfig fontConfig;
+    std::string fontConfigString{};
     uint32_t c{'A'};
 
     //---------------------------------------------------------------------
@@ -111,7 +111,7 @@ main(
 
         case 'f':
 
-            fontConfig = fb32::parseFontConfig(optarg, 32);
+            fontConfigString = optarg;
             break;
 
         case 'h':
@@ -130,7 +130,7 @@ main(
 
     //---------------------------------------------------------------------
 
-    if (fontConfig.m_fontFile.empty())
+    if (fontConfigString.empty())
     {
         std::println(std::cerr, "Error: Font file must be specfied");
         exit(EXIT_FAILURE);
@@ -141,20 +141,29 @@ main(
     try
     {
         constexpr RGB8880 black{0, 0, 0};
+        constexpr RGB8880 grey{15, 15, 15};
         constexpr RGB8880 white{255, 255, 255};
         FrameBuffer8880 fb{device, connector};
-
-        Image8880 image{fb.getDimensions()};
-        image.clear(black);
+        FontConfig fontConfig{fb32::parseFontConfig(
+            fontConfigString,
+            fb.getDimensions().height() / 2)
+        };
 
         //-----------------------------------------------------------------
 
         Image8880FreeType ft{fontConfig};
+
+        const auto dimension = ft.getWideCharDimensions(c);
+        Image8880 image{dimension};
+        image.clear(grey);
+
         ft.drawWideChar(Point8880{0, 0}, c, white, image);
+
+        std::println("{} x {}", dimension.width(), dimension.height());
 
         //-----------------------------------------------------------------
 
-        fb.putImage(Point8880{0, 0}, image);
+        fb.putImage(center(fb, image), image);
         fb.update();
 
         //-----------------------------------------------------------------

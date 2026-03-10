@@ -315,7 +315,8 @@ Viewer::Viewer(
     fb32::RGB8880 background,
     fb32::Interface8880& interface,
     const std::string& folder,
-    Viewer::Quality quality)
+    Viewer::Quality quality,
+    std::unique_ptr<fb32::Interface8880Font> font)
 :
     m_annotate{ANNOTATE_SHORT},
     m_background{background},
@@ -332,6 +333,7 @@ Viewer::Viewer(
     m_files{},
     m_fileStep{1},
     m_fitToScreen{true},
+    m_font{},
     m_image{},
     m_imageProcessed{},
     m_isBlank{false},
@@ -339,6 +341,7 @@ Viewer::Viewer(
         fb32::RGB8880{0x00FFFFFF},
         fb32::RGB8880{0x00000000},
         fb32::RGB8880{0x003F3F3F},
+        *font,
         {
             MenuItem{MENUID_ANNOTATE, "Annotate", ANNOTATE_SHORT, annotateStrings()},
             MenuItem{MENUID_ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
@@ -356,6 +359,7 @@ Viewer::Viewer(
     m_quality{quality},
     m_zoom{0}
 {
+    m_font = std::move(font);
     readDirectory();
 
     if (m_files.size() == 0)
@@ -380,9 +384,7 @@ Viewer::draw(
 
     if (m_menuShow)
     {
-        fb32::Image8880Font8x16 font;
-
-        m_menu.draw(fb, font);
+        m_menu.draw(fb, *m_font);
     }
 }
 
@@ -488,19 +490,18 @@ Viewer::annotate()
         annotation += std::format(" [enlighten {}%]", m_enlighten * 10);
     }
 
-    fb32::Image8880Font8x16 font;
     constexpr int padding{4};
-    const auto length = static_cast<int>(annotation.length());
-    const auto ftd = font.getPixelDimensions();
+    constexpr auto padding2(2 * padding);
+    const auto dimensions = m_font->getStringDimensions(annotation);
 
     Point p1{0, 0};
-    Point p2{length * ftd.width() + 2 * padding, ftd.height() + 2 * padding};
+    Point p2{dimensions.width() + padding2, dimensions.height() + padding2};
 
     constexpr fb32::RGB8880 black{0};
     constexpr fb32::RGB8880 green{0, 255, 0};
 
     fb32::boxFilled(m_buffer, p1, p2, black, 127);
-    font.drawString(Point{padding, padding}, annotation, green, m_buffer);
+    m_font->drawString(Point{padding, padding}, annotation, green, m_buffer);
 }
 
 //-------------------------------------------------------------------------

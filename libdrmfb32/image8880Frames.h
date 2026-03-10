@@ -36,7 +36,7 @@
 #include <span>
 #include <vector>
 
-#include "interface8880.h"
+#include "interface8880Base.h"
 #include "rgb8880.h"
 #include "point.h"
 
@@ -49,7 +49,7 @@ namespace fb32
 
 class Image8880Frames
 :
-    public Interface8880
+    public Interface8880Base
 {
 public:
 

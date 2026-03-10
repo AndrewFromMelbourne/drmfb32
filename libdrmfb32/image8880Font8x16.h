@@ -69,6 +69,8 @@ public:
 
     [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
 
+    [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) override;
+
     Point8880
     drawChar(
         Point8880 p,

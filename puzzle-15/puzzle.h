@@ -33,7 +33,7 @@
 #include <cstdint>
 
 #include "image8880.h"
-#include "interface8880.h"
+#include "interface8880Base.h"
 #include "joystick.h"
 
 #include "images.h"
@@ -58,7 +58,7 @@ public:
 
     void init();
     bool update(fb32::Joystick& js);
-    void draw(fb32::Interface8880& fb);
+    void draw(fb32::Interface8880Base& fb);
 
 private:
 

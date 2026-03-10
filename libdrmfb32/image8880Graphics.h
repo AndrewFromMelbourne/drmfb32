@@ -32,7 +32,7 @@
 #include <cstdint>
 #include <span>
 
-#include "image8880.h"
+#include "interface8880Base.h"
 #include "point.h"
 #include "rgb8880.h"
 
@@ -45,14 +45,14 @@ namespace fb32
 
 void
 box(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb);
 
 inline void
 box(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     const RGB8880& rgb)
@@ -64,14 +64,14 @@ box(
 
 void
 boxFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb);
 
 inline void
 boxFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     const RGB8880& rgb)
@@ -81,7 +81,7 @@ boxFilled(
 
 void
 boxFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     const RGB8880& rgb,
@@ -89,7 +89,7 @@ boxFilled(
 
 inline void
 boxFilled(
-        Interface8880& iface,
+        Interface8880Base& iface,
         Point8880 p1,
         Point8880 p2,
         uint32_t rgb,
@@ -102,14 +102,14 @@ boxFilled(
 
 void
 line(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb);
 
 inline void
 line(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     const RGB8880& rgb)
@@ -121,7 +121,7 @@ line(
 
 void
 horizontalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x1,
     int x2,
     int y,
@@ -129,7 +129,7 @@ horizontalLine(
 
 inline void
 horizontalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x1,
     int x2,
     int y,
@@ -142,7 +142,7 @@ horizontalLine(
 
 void
 verticalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x,
     int y1,
     int y2,
@@ -150,7 +150,7 @@ verticalLine(
 
 inline void
 verticalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x,
     int y1,
     int y2,
@@ -163,14 +163,14 @@ verticalLine(
 
 void
 circle(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     uint32_t rgb);
 
 inline void
 circle(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     const RGB8880& rgb)
@@ -182,14 +182,14 @@ circle(
 
 void
 circleFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     uint32_t rgb);
 
 inline void
 circleFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     const RGB8880& rgb)
@@ -201,13 +201,13 @@ circleFilled(
 
 void
 polygon(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb);
 
 inline void
 polygon(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     const RGB8880& rgb)
 {
@@ -218,13 +218,13 @@ polygon(
 
 void
 polygonFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb);
 
 inline void
 polygonFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     const RGB8880& rgb)
 {
@@ -235,13 +235,13 @@ polygonFilled(
 
 void
 polyline(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb);
 
 inline void
 polyline(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     const RGB8880& rgb)
 {

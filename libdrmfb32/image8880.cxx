@@ -88,7 +88,7 @@ fb32::Image8880::Image8880(
 //-------------------------------------------------------------------------
 
 fb32::Image8880::Image8880(
-    const fb32::Interface8880& i)
+    const fb32::Interface8880Base& i)
 :
     m_dimensions{},
     m_buffer{}
@@ -100,7 +100,7 @@ fb32::Image8880::Image8880(
 
 fb32::Image8880&
 fb32::Image8880::operator=(
-    const fb32::Interface8880& i)
+    const fb32::Interface8880Base& i)
 {
     if (&i != this)
     {
@@ -114,7 +114,7 @@ fb32::Image8880::operator=(
 
 void
 fb32::Image8880::copy(
-    const fb32::Interface8880& i)
+    const fb32::Interface8880Base& i)
 {
     m_dimensions = i.getDimensions();
     m_buffer.reserve(m_dimensions.area());

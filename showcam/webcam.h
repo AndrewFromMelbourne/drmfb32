@@ -78,7 +78,7 @@ public:
         return m_formatName;
     }
 
-    bool showFrame(Interface8880& image);
+    bool showFrame(Interface8880Base& image);
     bool startStream() const noexcept;
     bool stopStream() const noexcept;
 

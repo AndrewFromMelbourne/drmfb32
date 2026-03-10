@@ -100,7 +100,7 @@ BS::thread_pool& threadPool()
 
 void
 boxBlurRows(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& rb,
     int radius,
     int jStart,
@@ -191,7 +191,7 @@ boxBlurColumns(
 
 void
 rowsBilinearInterpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output,
     int jStart,
     int jEnd)
@@ -271,7 +271,7 @@ lanczosKernel(float x, int a)
 
 void
 rowsLanczos3Interpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output,
     int jStart,
     int jEnd)
@@ -339,7 +339,7 @@ rowsLanczos3Interpolation(
 
 void
 rowsNearestNeighbour(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output,
     int jStart,
     int jEnd)
@@ -369,7 +369,7 @@ rowsNearestNeighbour(
 
 void
 rowsScaleUp(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output,
     uint8_t scale,
     int jStart,
@@ -476,7 +476,7 @@ rowsRotate(
 
 fb32::Image8880
 fb32::boxBlur(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     int radius)
 {
     const auto d = input.getDimensions();
@@ -517,7 +517,7 @@ fb32::boxBlur(
 
 fb32::Image8880
 fb32::enlighten(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     double strength)
 {
     const auto d = input.getDimensions();
@@ -569,7 +569,7 @@ fb32::enlighten(
 
 fb32::Image8880
 fb32::maxRGB(
-    const fb32::Interface8880& input)
+    const fb32::Interface8880Base& input)
 {
     const auto d = input.getDimensions();
     Image8880 output{d};
@@ -589,7 +589,7 @@ fb32::maxRGB(
 
 fb32::Image8880
 fb32::resizeBilinearInterpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
     if ((d.width() <= 0) or (d.height() <= 0))
@@ -607,7 +607,7 @@ fb32::resizeBilinearInterpolation(
 
 fb32::Image8880
 fb32::resizeLanczos3Interpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
     if ((d.width() <= 0) or (d.height() <= 0))
@@ -625,7 +625,7 @@ fb32::resizeLanczos3Interpolation(
 
 fb32::Image8880
 fb32::resizeNearestNeighbour(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
     if ((d.width() <= 0) or (d.height() <= 0))
@@ -643,7 +643,7 @@ fb32::resizeNearestNeighbour(
 
 fb32::Image8880&
 fb32::resizeToBilinearInterpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output)
 {
     const auto od = output.getDimensions();
@@ -666,7 +666,7 @@ fb32::resizeToBilinearInterpolation(
 
 fb32::Image8880&
 fb32::resizeToLanczos3Interpolation(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output)
 {
     const auto od = output.getDimensions();
@@ -689,7 +689,7 @@ fb32::resizeToLanczos3Interpolation(
 
 fb32::Image8880&
 fb32::resizeToNearestNeighbour(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     fb32::Image8880& output)
 {
     const auto od = output.getDimensions();
@@ -713,7 +713,7 @@ fb32::resizeToNearestNeighbour(
 
 fb32::Image8880
 fb32::rotate(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     uint32_t background,
     double angle)
 {
@@ -808,7 +808,7 @@ fb32::rotate(
 
 fb32::Image8880
 fb32::rotate90(
-    const fb32::Interface8880& input)
+    const fb32::Interface8880Base& input)
 {
     const auto id = input.getDimensions();
     const Dimensions8880 od{id.height(), id.width()};
@@ -836,7 +836,7 @@ fb32::rotate90(
 
 fb32::Image8880
 fb32::rotate180(
-    const fb32::Interface8880& input)
+    const fb32::Interface8880Base& input)
 {
     const auto d = input.getDimensions();
     Image8880 output{d};
@@ -863,7 +863,7 @@ fb32::rotate180(
 
 fb32::Image8880
 fb32::rotate270(
-    const fb32::Interface8880& input)
+    const fb32::Interface8880Base& input)
 {
     const auto id = input.getDimensions();
     const Dimensions8880 od{ id.height(), id.width() };
@@ -891,7 +891,7 @@ fb32::rotate270(
 
 fb32::Image8880
 fb32::scaleUp(
-    const fb32::Interface8880& input,
+    const fb32::Interface8880Base& input,
     uint8_t scale)
 {
     const auto id = input.getDimensions();

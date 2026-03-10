@@ -36,6 +36,8 @@
 
 #include "framebuffer8880.h"
 #include "image8880Jpeg.h"
+#include "image8880Font8x16.h"
+#include "image8880FreeType.h"
 #include "joystick.h"
 #include "viewer.h"
 
@@ -84,6 +86,7 @@ printUsage(
     std::println(stream, "    --help,-h - print usage and exit");
     std::println(stream, "    --joystick,-j - joystick device");
     std::println(stream, "    --quality,-q - resize qualitylow, medium or high");
+    std::println(stream, "    --truetype,-t - use truetype font file");
     std::println(stream, "");;
 }
 
@@ -99,12 +102,13 @@ main(
     std::string device{};
     const std::string program{basename(argv[0])};
     std::string folder{};
+    FontConfig fontConfig;
     std::string joystick{defaultJoystick};
     Viewer::Quality quality{Viewer::QUALITY_MEDIUM};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "b:c:d:f:hj:q:";
+    static const char* sopts = "b:c:d:f:hj:q:t:";
     static option lopts[] =
     {
         { "background", required_argument, nullptr, 'b' },
@@ -174,6 +178,11 @@ main(
             quality = Viewer::qualityFromString(optarg);
             break;
 
+        case 't':
+
+            fontConfig = fb32::parseFontConfig(optarg, 16);
+            break;
+
         default:
 
             printUsage(std::cerr, program);
@@ -184,11 +193,43 @@ main(
 
     //---------------------------------------------------------------------
 
+
+
+    //---------------------------------------------------------------------
+
+
     if (folder.empty())
     {
         printUsage(std::cerr, program);
         ::exit(EXIT_FAILURE);
     }
+
+    //---------------------------------------------------------------------
+
+    std::unique_ptr<Interface8880Font> font;
+
+    if (not fontConfig.m_fontFile.empty())
+    {
+        try
+        {
+            font = std::make_unique<fb32::Image8880FreeType>(fontConfig);
+        }
+        catch (std::exception& error)
+        {
+            std::println(
+                std::cerr,
+                "Error: loading font {} : {}",
+                fontConfig.m_fontFile,
+                error.what());
+                ::exit(EXIT_FAILURE);
+        }
+    }
+
+    if (not font)
+    {
+        font = std::make_unique<fb32::Image8880Font8x16>();
+    }
+
 
     //---------------------------------------------------------------------
 
@@ -213,7 +254,7 @@ main(
         fb.clearBuffers(background);
 
         Joystick js{joystick, true};
-        Viewer viewer{background, fb, folder, quality};
+        Viewer viewer{background, fb, folder, quality, std::move(font)};
 
         viewer.draw(fb);
         fb.update();

@@ -35,6 +35,7 @@
 
 #include <array>
 #include <memory>
+#include <span>
 #include <string>
 
 #include "fileDescriptor.h"
@@ -159,6 +160,8 @@ drmModeSetCrtc(
     uint32_t *connectors,
     int count,
     drmModeModeInfoPtr mode) noexcept;
+
+int drmModeSetCrtc(fd::FileDescriptor& fd, drmModeCrtc_ptr& crtcPtr, std::span<uint32_t> connectors) noexcept;
 
 bool drmSetMaster(fd::FileDescriptor& fd) noexcept;
 

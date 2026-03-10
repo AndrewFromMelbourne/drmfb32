@@ -15,7 +15,7 @@ Test double buffering by displaying one red and one greem buffer.
 ## testLines
 Test line drawing at different angles.
 
-## testft and testft2
+## testFont and testFontWide
 Tests programs for truetype fonts (Requires Freetype2).
 
 ## testJoystick

@@ -30,7 +30,7 @@
 //-------------------------------------------------------------------------
 
 #include "image8880.h"
-#include "interface8880.h"
+#include "interface8880Base.h"
 #include "rgb8880.h"
 #include "point.h"
 
@@ -43,57 +43,57 @@ namespace fb32
 
 [[nodiscard]] Image8880
 boxBlur(
-    const Interface8880& input,
+    const Interface8880Base& input,
     int radius);
 
 [[nodiscard]] Image8880
 enlighten(
-    const Interface8880& input,
+    const Interface8880Base& input,
     double strength);
 
 [[nodiscard]] Image8880
 maxRGB(
-    const Interface8880& input);
+    const Interface8880Base& input);
 
 [[nodiscard]] Image8880
 resizeBilinearInterpolation(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Dimensions8880 d);
 
 [[nodiscard]] Image8880
 resizeLanczos3Interpolation(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Dimensions8880 d);
 
 [[nodiscard]] Image8880
 resizeNearestNeighbour(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Dimensions8880 d);
 
 Image8880&
 resizeToBilinearInterpolation(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Image8880& output);
 
 Image8880&
 resizeToLanczos3Interpolation(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Image8880& output);
 
 Image8880&
 resizeToNearestNeighbour(
-    const Interface8880& input,
+    const Interface8880Base& input,
     Image8880& output);
 
 [[nodiscard]] Image8880
 rotate(
-    const Interface8880& input,
+    const Interface8880Base& input,
     uint32_t background,
     double angle);
 
 [[nodiscard]] inline Image8880
 rotate(
-    const Interface8880& input,
+    const Interface8880Base& input,
     const RGB8880& background,
     double angle)
 {
@@ -102,7 +102,7 @@ rotate(
 
 [[nodiscard]] inline Image8880
 rotate(
-    const Interface8880& input,
+    const Interface8880Base& input,
     double angle)
 {
     return rotate(input, 0, angle);
@@ -110,19 +110,19 @@ rotate(
 
 [[nodiscard]] Image8880
 rotate90(
-    const Interface8880& input);
+    const Interface8880Base& input);
 
 [[nodiscard]] Image8880
 rotate180(
-    const Interface8880& input);
+    const Interface8880Base& input);
 
 [[nodiscard]] Image8880
 rotate270(
-    const Interface8880& input);
+    const Interface8880Base& input);
 
 [[nodiscard]] Image8880
 scaleUp(
-    const Interface8880& input,
+    const Interface8880Base& input,
     uint8_t scale);
 
 //-------------------------------------------------------------------------

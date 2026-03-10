@@ -71,6 +71,7 @@ Interface8880Menu::Interface8880Menu(
     RGB8880 foregroundColour,
     RGB8880 backgroundColour,
     RGB8880 selectionColour,
+    Interface8880Font& font,
     std::initializer_list<MenuItem> items)
 :
     m_foregroundColour{foregroundColour},
@@ -78,19 +79,20 @@ Interface8880Menu::Interface8880Menu(
     m_selectionColour{selectionColour},
     m_selected{0},
     m_items{items},
-    m_titleMaximum{0},
-    m_valueMaximum{0}
+    m_titleMaximumPixels{0},
+    m_valueMaximumPixels{0}
 {
     std::ranges::sort(m_items, std::less());
 
     for (const auto& item : m_items)
     {
-        const auto titleLength = item.m_title.length();
-        m_titleMaximum = std::max(titleLength, m_titleMaximum);
+        const auto titleDimensions = font.getStringDimensions(item.m_title);
+        m_titleMaximumPixels = std::max(titleDimensions.width(), m_titleMaximumPixels);
 
         for (const auto& value : item.m_values)
         {
-            m_valueMaximum = std::max(value.length(), m_valueMaximum);
+            const auto valueDimensions = font.getStringDimensions(value);
+            m_valueMaximumPixels = std::max(valueDimensions.width(), m_valueMaximumPixels);
         }
     }
 }
@@ -102,50 +104,60 @@ Interface8880Menu::draw(
     fb32::FrameBuffer8880& fb,
     Interface8880Font& font) const
 {
-    constexpr auto characterPadding{5};
-    constexpr auto padding{4};
+    constexpr auto paddingPixels{6};
+    constexpr auto padding2Pixels{paddingPixels * 2};
+    constexpr auto padding3Pixels{paddingPixels * 3};
+    constexpr auto padding4Pixels{paddingPixels * 4};
     const auto d = font.getPixelDimensions();
-    const auto characters = m_titleMaximum + m_valueMaximum + characterPadding;
-    const auto width = characters * d.width();
+    const auto width = m_titleMaximumPixels + m_valueMaximumPixels + padding3Pixels;
 
     boxFilled(
         fb,
         fb32::Point8880(0, 0),
         fb32::Point8880(
-            width + (padding * 2),
-            (m_items.size() * d.height()) + (padding * 2)),
+            width + padding2Pixels,
+            (m_items.size() * d.height()) + padding2Pixels),
             m_backgroundColour);
 
     box(
         fb,
         fb32::Point8880(0, 0),
         fb32::Point8880(
-            width + (padding * 2),
-            (m_items.size() * d.height()) + (padding * 2)),
+            width + padding2Pixels,
+            (m_items.size() * d.height()) + padding2Pixels),
             m_selectionColour);
 
     boxFilled(
         fb,
         fb32::Point8880(
-            padding,
-            (m_selected * d.height()) + padding),
+            paddingPixels,
+            (m_selected * d.height()) + paddingPixels),
         fb32::Point8880(
-            width + padding,
-            ((m_selected + 1) * d.height()) + padding),
+            width + paddingPixels,
+            ((m_selected + 1) * d.height()) + paddingPixels),
             m_selectionColour);
 
-    int yOffset = 0;
+    int yOffset = paddingPixels;
     for (const auto& item : m_items)
     {
         font.drawString(
-            fb32::Point8880(padding, yOffset + padding),
-            std::format(
-                " {0:<{1}} : {2}",
-                item.m_title,
-                m_titleMaximum,
-                item.m_values[item.m_value]),
+            fb32::Point8880(paddingPixels, yOffset),
+            std::format("{}", item.m_title),
             m_foregroundColour,
             fb);
+
+        font.drawChar(
+            fb32::Point8880{m_titleMaximumPixels + padding2Pixels, yOffset},
+            '|',
+            m_foregroundColour,
+            fb);
+
+        font.drawString(
+            fb32::Point8880(m_titleMaximumPixels + padding4Pixels, yOffset),
+            std::format("{}", item.m_values[item.m_value]),
+            m_foregroundColour,
+            fb);
+
         yOffset += d.height();
     }
 }

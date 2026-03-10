@@ -74,7 +74,7 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/image8880Graphics.cxx
                            libdrmfb32/image8880Process.cxx
                            libdrmfb32/image8880Qoi.cxx
-                           libdrmfb32/interface8880.cxx
+                           libdrmfb32/interface8880Base.cxx
                            libdrmfb32/interface8880Font.cxx
                            libdrmfb32/interface8880Menu.cxx
                            libdrmfb32/joystick.cxx
@@ -216,11 +216,12 @@ target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-if (LIBPNG_FOUND AND TURBOJPEG_FOUND)
+if (FREETYPE_FOUND AND LIBPNG_FOUND AND TURBOJPEG_FOUND)
 add_executable(slideshow slideshow/slideshow.cxx
                          slideshow/viewer.cxx)
 
 target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
+                                        ${FREETYPE_LIBRARIES}
                                         ${LIBPNG_LIBRARIES}
                                         ${TURBOJPEG_LIBRARIES}
                                         ${BS_THREAD_LIBRARIES})
@@ -249,15 +250,15 @@ target_link_libraries(testDoubleBuffer drmfb32 ${DRM_LIBRARIES})
 #--------------------------------------------------------------------------
 
 if (FREETYPE_FOUND)
-add_executable(testft test/testft.cxx)
-target_link_libraries(testft drmfb32
-                             ${DRM_LIBRARIE}
-                             ${FREETYPE_LIBRARIES})
+add_executable(testFont test/testFont.cxx)
+target_link_libraries(testFont drmfb32
+                               ${DRM_LIBRARIE}
+                               ${FREETYPE_LIBRARIES})
 
-add_executable(testft2 test/testft2.cxx)
-target_link_libraries(testft2 drmfb32
-                             ${DRM_LIBRARIE}
-                             ${FREETYPE_LIBRARIES})
+add_executable(testFontWide test/testFontWide.cxx)
+target_link_libraries(testFontWide drmfb32
+                                   ${DRM_LIBRARIE}
+                                   ${FREETYPE_LIBRARIES})
 endif()
 
 #--------------------------------------------------------------------------

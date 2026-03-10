@@ -4683,6 +4683,39 @@ Image8880Font8x16::getCharacterCode(Interface8880Font::CharacterCode code) const
 
 //-------------------------------------------------------------------------
 
+Dimensions8880
+Image8880Font8x16::getStringDimensions(
+    std::string_view s)
+{
+    if (s.size() == 0)
+    {
+        return Dimensions8880{};
+    }
+
+    Dimensions8880 d{0, sc_fontHeight};
+    auto pixelWidth{0};
+
+    for (const auto c : s)
+    {
+        if (c == '\n')
+        {
+            d.setWidth(std::max(d.width(), pixelWidth));
+            d.setHeight(d.height() + sc_fontHeight);
+            pixelWidth = 0;
+        }
+        else
+        {
+            pixelWidth += sc_fontWidth;
+        }
+    }
+
+    d.setWidth(std::max(d.width(), pixelWidth));
+
+    return d;
+}
+
+//-------------------------------------------------------------------------
+
 Point8880
 Image8880Font8x16::drawChar(
     Point8880 p,

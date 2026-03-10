@@ -382,6 +382,23 @@ drm::drmModeSetCrtc(
 
 //-------------------------------------------------------------------------
 
+int
+drm::drmModeSetCrtc(
+    fd::FileDescriptor& fd,
+    drm::drmModeCrtc_ptr& crtcPtr,
+    std::span<uint32_t> connectors) noexcept
+{
+    return ::drmModeSetCrtc(fd.fd(),
+                            crtcPtr->crtc_id,
+                            crtcPtr->buffer_id,
+                            crtcPtr->x,
+                            crtcPtr->y,
+                            connectors.data(),
+                            connectors.size(),
+                            &crtcPtr->mode);
+}
+//-------------------------------------------------------------------------
+
 bool
 drm::drmSetMaster(
     fd::FileDescriptor& fd) noexcept

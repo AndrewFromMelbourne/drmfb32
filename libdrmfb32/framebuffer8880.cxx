@@ -132,13 +132,8 @@ fb32::FrameBuffer8880::~FrameBuffer8880()
     destroyDumbBuffer(m_dbFront);
 
     drm::drmModeSetCrtc(m_fd,
-                        m_originalCrtc->crtc_id,
-                        m_originalCrtc->buffer_id,
-                        m_originalCrtc->x,
-                        m_originalCrtc->y,
-                        &m_connectorId,
-                        1,
-                        &(m_originalCrtc->mode));
+                        m_originalCrtc,
+                        std::span<u_int32_t>{&m_connectorId, 1});
 
     if (drm::drmIsMaster(m_fd))
     {

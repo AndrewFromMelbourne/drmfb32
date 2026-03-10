@@ -204,7 +204,7 @@ Puzzle::update(Joystick& js)
 //-------------------------------------------------------------------------
 
 void
-Puzzle::draw(Interface8880& fb)
+Puzzle::draw(Interface8880Base& fb)
 {
     for (int j = 0 ; j < c_puzzleHeight ; ++j)
     {

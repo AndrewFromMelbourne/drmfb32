@@ -37,6 +37,7 @@
 #include "framebuffer8880.h"
 #include "image8880.h"
 #include "interface8880.h"
+#include "interface8880Font.h"
 #include "interface8880Menu.h"
 #include "joystick.h"
 
@@ -157,7 +158,8 @@ public:
         fb32::RGB8880 background,
         fb32::Interface8880& interface,
         const std::string& folder,
-        Quality quality);
+        Quality quality,
+        std::unique_ptr<fb32::Interface8880Font>font);
 
     ~Viewer();
 
@@ -205,6 +207,7 @@ private:
     std::vector<ImageFile> m_files;
     int m_fileStep;
     bool m_fitToScreen;
+    std::unique_ptr<fb32::Interface8880Font> m_font;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
     bool m_isBlank;

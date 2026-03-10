@@ -80,15 +80,15 @@ public:
 
     void init();
     void update(fb32::Joystick& js);
-    void draw(fb32::Interface8880& fb, fb32::Interface8880Font& font);
+    void draw(fb32::Interface8880Base& fb, fb32::Interface8880Font& font);
 
 private:
 
     void findPlayer();
     void swapPieces(const Location& location1, const Location& location2);
     void isLevelSolved();
-    void drawBoard(fb32::Interface8880& fb);
-    void drawText(fb32::Interface8880& fb, fb32::Interface8880Font& font);
+    void drawBoard(fb32::Interface8880Base& fb);
+    void drawText(fb32::Interface8880Base& fb, fb32::Interface8880Font& font);
 
     //---------------------------------------------------------------------
 

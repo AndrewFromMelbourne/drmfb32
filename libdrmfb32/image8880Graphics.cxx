@@ -29,6 +29,7 @@
 #include <cmath>
 #include <cstdint>
 #include <span>
+#include <vector>
 
 #include "interface8880.h"
 #include "image8880Graphics.h"
@@ -43,7 +44,7 @@ namespace
 
 void
 trim(
-    const fb32::Interface8880& iface,
+    const fb32::Interface8880Base& iface,
     fb32::Point8880& p1,
     fb32::Point8880& p2)
 {
@@ -125,7 +126,7 @@ namespace fb32
 
 void
 box(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb)
@@ -141,7 +142,7 @@ box(
 
 void
 boxFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb)
@@ -163,7 +164,7 @@ boxFilled(
 
 void
 boxFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     const RGB8880& rgb,
@@ -193,7 +194,7 @@ boxFilled(
 
 void
 line(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p1,
     Point8880 p2,
     uint32_t rgb)
@@ -305,7 +306,7 @@ line(
 
 void
 horizontalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x1,
     int x2,
     int y,
@@ -339,7 +340,7 @@ horizontalLine(
 
 void
 verticalLine(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x,
     int y1,
     int y2,
@@ -375,7 +376,7 @@ verticalLine(
 
 void
 circleLines(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x,
     int y,
     int i,
@@ -390,7 +391,7 @@ circleLines(
 
 void
 circlePoints(
-    Interface8880& iface,
+    Interface8880Base& iface,
     int x,
     int y,
     int i,
@@ -415,7 +416,7 @@ circlePoints(
 
 void
 circle(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     uint32_t rgb)
@@ -448,7 +449,7 @@ circle(
 
 void
 circleFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     Point8880 p,
     int r,
     uint32_t rgb)
@@ -496,7 +497,7 @@ circleFilled(
 
 void
 polygon(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb)
 {
@@ -524,7 +525,7 @@ polygon(
 
 void
 polygonFilled(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb)
 {
@@ -604,7 +605,7 @@ polygonFilled(
 
 void
 polyline(
-    Interface8880& iface,
+    Interface8880Base& iface,
     std::span<const Point8880> vertices,
     uint32_t rgb)
 {
