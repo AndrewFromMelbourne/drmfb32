@@ -92,7 +92,7 @@ public:
     bool setFramePixel(Point8880 p, uint32_t rgb, uint8_t frame);
 
     bool
-    setPixelRGB(
+    setFramePixelRGB(
         Point8880 p,
         const RGB8880& rgb,
         uint8_t frame)
