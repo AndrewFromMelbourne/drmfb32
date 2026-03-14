@@ -31,13 +31,13 @@
 
 Level::Level(const LevelType& level) noexcept
 :
-    m_level(level)
+    m_level{level}
 {
 }
 
 //-------------------------------------------------------------------------
 
-const Level::LevelType
+const Level::LevelType&
 Level::level() const noexcept
 {
     return m_level;

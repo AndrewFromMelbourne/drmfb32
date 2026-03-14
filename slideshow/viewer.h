@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 
+#include "fontConfig.h"
 #include "framebuffer8880.h"
 #include "image8880.h"
 #include "interface8880.h"
@@ -159,7 +160,7 @@ public:
         fb32::Interface8880& interface,
         const std::string& folder,
         Quality quality,
-        std::unique_ptr<fb32::Interface8880Font>font);
+        const fb32::FontConfig& fontConfig);
 
     ~Viewer();
 
@@ -207,7 +208,7 @@ private:
     std::vector<ImageFile> m_files;
     int m_fileStep;
     bool m_fitToScreen;
-    std::unique_ptr<fb32::Interface8880Font> m_font;
+    std::shared_ptr<fb32::Interface8880Font> m_font;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
     bool m_isBlank;

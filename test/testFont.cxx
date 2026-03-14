@@ -34,6 +34,7 @@
 #include <system_error>
 #include <thread>
 
+#include "fontConfig.h"
 #include "framebuffer8880.h"
 #include "image8880.h"
 #include "image8880FreeType.h"

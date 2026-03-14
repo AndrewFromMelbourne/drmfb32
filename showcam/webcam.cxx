@@ -43,7 +43,7 @@ fb32::Webcam::Webcam(
     const std::string& device,
     bool fitToScreen,
     int requestedFPS,
-    Interface8880& interface)
+    const Interface8880& interface)
 :
     m_dimensions{ 0, 0 },
     m_fd{::open(device.c_str(), O_RDWR)},
@@ -134,7 +134,7 @@ fb32::Webcam::showFrame(
     }
 
     auto vbuffer = m_videoBuffers[buffer.index].buffer;
-    uint8_t* data = static_cast<uint8_t*>(vbuffer);
+    const uint8_t* data = static_cast<uint8_t*>(vbuffer);
 
     //-----------------------------------------------------------------
 
@@ -205,10 +205,10 @@ fb32::Webcam::stopStream() const noexcept
 
 bool
 fb32::Webcam::chooseBestFit(
-    Interface8880& interface)
+    const Interface8880& interface)
 {
     const auto id = interface.getDimensions();
-    std::vector<fb32::Dimensions8880> dimensions;
+    std::vector<fb32::Dimensions8880> dim;
 
     v4l2_frmsizeenum frmsize;
     frmsize.index = 0;
@@ -221,7 +221,7 @@ fb32::Webcam::chooseBestFit(
             const int width = frmsize.discrete.width;
             const int height = frmsize.discrete.height;
 
-            dimensions.emplace_back(width, height);
+            dim.emplace_back(width, height);
         }
         else
         {
@@ -234,7 +234,7 @@ fb32::Webcam::chooseBestFit(
     m_dimensions.set(0, 0);
     bool result = false;
 
-    if (dimensions.size() > 0)
+    if (dim.size() > 0)
     {
         auto reverseSort = [](const fb32::Dimensions8880& a, const fb32::Dimensions8880& b) -> bool
         {
@@ -242,26 +242,33 @@ fb32::Webcam::chooseBestFit(
                     ((a.height() == b.height()) and (a.width() > b.width()));
         };
 
-        std::ranges::sort(dimensions, reverseSort);
+        std::ranges::sort(dim, reverseSort);
 
-        for (const auto d : dimensions)
+        auto best = [this, &id](const auto& d) -> bool
         {
             if ((d.width() <= id.width()) and
                 (d.height() <= id.height()) and
                 (d.width() > m_dimensions.width()) and
                 (d.height() > m_dimensions.height()))
             {
-                m_dimensions = d;
-                result = true;
-                break;
+                return true;
             }
+
+            return false;
+        };
+
+        auto found = std::find_if(begin(dim), end(dim), best);
+
+        if (found == end(dim))
+        {
+            m_dimensions = dim.back();
+        }
+        else
+        {
+            m_dimensions = *found;
         }
 
-        if (not result)
-        {
-            m_dimensions = dimensions.back();
-            result = true;
-        }
+        result = true;
     }
     else if ((frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) or
              (frmsize.type == V4L2_FRMSIZE_TYPE_CONTINUOUS))
@@ -489,7 +496,7 @@ bool fb32::Webcam::initBuffers() noexcept
 
 void
 fb32::Webcam::initResizedImage(
-    Interface8880& interface)
+    const Interface8880& interface)
 {
     const auto id = interface.getDimensions();
 

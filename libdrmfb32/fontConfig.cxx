@@ -25,7 +25,9 @@
 //
 //-------------------------------------------------------------------------
 
-#include "interface8880Font.h"
+#include "fontConfig.h"
+#include "image8880Font8x16.h"
+#include "image8880FreeType.h"
 
 //-------------------------------------------------------------------------
 
@@ -34,15 +36,25 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-Interface8880Font::Interface8880Font()
+std::unique_ptr<fb32::Interface8880Font>
+createFont(
+    const FontConfig& fontConfig)
 {
+    if (not fontConfig.m_fontFile.empty())
+    {
+        try
+        {
+            return std::make_unique<fb32::Image8880FreeType>(fontConfig);
+        }
+        catch (const std::exception& error)
+        {
+            // ignore exception.
+        }
+    }
+
+    return std::make_unique<fb32::Image8880Font8x16>();
 }
 
-//-------------------------------------------------------------------------
-
-Interface8880Font::~Interface8880Font()
-{
-}
 
 //-------------------------------------------------------------------------
 

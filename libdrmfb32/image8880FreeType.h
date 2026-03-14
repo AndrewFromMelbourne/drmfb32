@@ -35,6 +35,7 @@
 #include <cstdint>
 #include <string>
 
+#include "fontConfig.h"
 #include "interface8880.h"
 #include "interface8880Font.h"
 #include "point.h"

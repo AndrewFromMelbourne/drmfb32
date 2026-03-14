@@ -1642,7 +1642,7 @@ Levels::Levels()
 
 //-------------------------------------------------------------------------
 
-const Level::LevelType Levels::level(int number) const
+Level::LevelType Levels::level(int number) const
 {
     return m_levels[number].level();
 }

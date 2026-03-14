@@ -36,3 +36,7 @@ build/*
 
 # VSCode directory
 .vscode/*
+
+# cppcheck directory
+cppcheck-build-dir/*
+

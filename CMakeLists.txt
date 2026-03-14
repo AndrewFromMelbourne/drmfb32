@@ -67,6 +67,7 @@ pkg_check_modules(LIBPNG libpng)
 
 add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/fileDescriptor.cxx
+                           libdrmfb32/fontConfig.cxx
                            libdrmfb32/framebuffer8880.cxx
                            libdrmfb32/image8880.cxx
                            libdrmfb32/image8880Font8x16.cxx
@@ -75,7 +76,6 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/image8880Process.cxx
                            libdrmfb32/image8880Qoi.cxx
                            libdrmfb32/interface8880Base.cxx
-                           libdrmfb32/interface8880Font.cxx
                            libdrmfb32/interface8880Menu.cxx
                            libdrmfb32/joystick.cxx
                            libdrmfb32/rgb8880.cxx)

@@ -56,7 +56,7 @@ class Interface8880Null
 {
 public:
 
-    virtual ~Interface8880Null() = default;
+    ~Interface8880Null() override = default;
 
     [[nodiscard]] Dimensions8880 getDimensions() const noexcept override
     {

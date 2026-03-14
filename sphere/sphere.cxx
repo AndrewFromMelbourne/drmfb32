@@ -39,7 +39,7 @@ using namespace fb32;
 
 //-------------------------------------------------------------------------
 
-double dot(vector3 a, vector3 b) noexcept
+double dot(const vector3& a, const vector3& b) noexcept
 {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
@@ -56,7 +56,6 @@ Sphere::Sphere(int size)
     m_threadPool()
 #else
     m_light{ -std::sqrt(1.0/3.0), std::sqrt(1.0/3.0), std::sqrt(1.0/3.0) }
-    m_image(fb32::Dimensions8880{size, size})
 #endif
 {
 }

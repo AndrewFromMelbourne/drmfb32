@@ -399,7 +399,7 @@ rowsScaleUp(
 
 void
 rowsRotate(
-    fb32::Image8880& image,
+    const fb32::Image8880& image,
     fb32::Image8880& output,
     double sinAngle,
     double cosAngle,

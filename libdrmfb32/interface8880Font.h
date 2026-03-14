@@ -47,14 +47,6 @@ class RGB8880;
 
 //-------------------------------------------------------------------------
 
-struct FontConfig
-{
-    std::string m_fontFile;
-    int m_pixelHeight{};
-};
-
-//-------------------------------------------------------------------------
-
 class Interface8880Font
 {
 public:
@@ -64,8 +56,8 @@ public:
         DEGREE_SYMBOL
     };
 
-    Interface8880Font();
-    virtual ~Interface8880Font() = 0;
+    Interface8880Font() = default;
+    virtual ~Interface8880Font() = default;
 
     Interface8880Font(const Interface8880Font&) = delete;
     Interface8880Font(Interface8880Font&&) = delete;
@@ -106,13 +98,6 @@ public:
         uint32_t rgb,
         Interface8880& image) = 0;
 };
-
-//-------------------------------------------------------------------------
-
-FontConfig
-parseFontConfig(
-    const std::string_view fontConfigStr,
-    int defaultPixelHeight) noexcept;
 
 //-------------------------------------------------------------------------
 

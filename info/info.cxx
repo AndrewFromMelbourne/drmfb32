@@ -103,7 +103,7 @@ Info::getHostname()
 void
 Info::init()
 {
-    setFontConfig();
+    m_font = createFont(m_fontConfig);
 
     m_fb = std::make_unique<fb32::FrameBuffer8880>(m_device, m_connector);
     m_fb->clearBuffers();
@@ -352,33 +352,5 @@ Info::run()
     }
 
     messageLog(LOG_INFO, "exiting");
-}
-
-//-------------------------------------------------------------------------
-
-void
-Info::setFontConfig() noexcept
-{
-    if (not m_fontConfig.m_fontFile.empty())
-    {
-        try
-        {
-            m_font = std::make_unique<fb32::Image8880FreeType>(m_fontConfig);
-        }
-        catch (std::exception& error)
-        {
-            messageLog(
-                LOG_WARNING,
-                std::format(
-                    "Error: loading font {} : {}",
-                    m_fontConfig.m_fontFile,
-                    error.what()));
-        }
-    }
-
-    if (not m_font)
-    {
-        m_font = std::make_unique<fb32::Image8880Font8x16>();
-    }
 }
 

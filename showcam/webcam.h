@@ -58,7 +58,7 @@ public:
         const std::string& device,
         bool fitToScreen,
         int requestedFPS,
-        Interface8880& image);
+        const Interface8880& image);
 
     ~Webcam();
 
@@ -73,7 +73,7 @@ public:
         return m_dimensions;
     }
 
-    [[nodiscard]] std::string formatName() const noexcept
+    [[nodiscard]] const std::string& formatName() const noexcept
     {
         return m_formatName;
     }
@@ -84,13 +84,13 @@ public:
 
 private:
 
-    bool chooseBestFit(Interface8880& image);
+    bool chooseBestFit(const Interface8880& image);
     bool chooseFormat() noexcept;
     bool convertMjpeg(const uint8_t* data, std::size_t length);
     bool convertYuyv(const uint8_t* data, std::size_t length);
     bool hasVideoCapabilities() const noexcept;
     bool initBuffers() noexcept;
-    void initResizedImage(Interface8880& interface);
+    void initResizedImage(const Interface8880& interface);
     bool initVideo() noexcept;
     bool setFPS(int fps) const noexcept;
 

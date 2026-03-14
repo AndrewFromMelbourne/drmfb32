@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <numeric>
 #include <ranges>
 
 #include "image8880Font8x16.h"
@@ -177,17 +178,17 @@ Trace::addData(
 
     if (m_autoScale)
     {
-        m_traceScale = 0;
-
-        for (const auto& trace : m_traceData)
+        auto traceDataMax = [](int max, const TraceData& td)
         {
-            m_traceScale = std::max(m_traceScale, trace.max());
-        }
+            return std::max(max, td.max());
+        };
 
-        if (m_traceScale == 0)
-        {
-            m_traceScale = 1;
-        }
+        m_traceScale = std::accumulate(begin(m_traceData),
+                                       end(m_traceData),
+                                       m_traceData[0].max(),
+                                       traceDataMax);
+
+        m_traceScale = std::max(m_traceScale, 1);
     }
 
     //-----------------------------------------------------------------

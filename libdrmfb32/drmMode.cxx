@@ -87,7 +87,7 @@ drm::DrmDevices::getDevice(int index) const
 
 uint64_t
 drm::drmGetPropertyValue(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t objectId,
     uint32_t objectType,
     const std::string& name) noexcept
@@ -111,7 +111,7 @@ drm::drmGetPropertyValue(
 
 drm::drmVersion_ptr
 drm::drmGetVersion(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return drmVersion_ptr(::drmGetVersion(fd.fd()), &drmFreeVersion);
 }
@@ -129,7 +129,7 @@ drm::drmModeAtomicAlloc() noexcept
 
 drm::drmModeConnector_ptr
 drm::drmModeGetConnector(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t connId) noexcept
 {
     return drmModeConnector_ptr(::drmModeGetConnector(fd.fd(), connId),
@@ -140,7 +140,7 @@ drm::drmModeGetConnector(
 
 drm::drmModeCrtc_ptr
 drm::drmModeGetCrtc(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t crtcId) noexcept
 {
     return drmModeCrtc_ptr(::drmModeGetCrtc(fd.fd(), crtcId),
@@ -151,7 +151,7 @@ drm::drmModeGetCrtc(
 
 drm::drmModeEncoder_ptr
 drm::drmModeGetEncoder(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t encoderId) noexcept
 {
     return drmModeEncoder_ptr(::drmModeGetEncoder(fd.fd(), encoderId),
@@ -162,7 +162,7 @@ drm::drmModeGetEncoder(
 
 drm::drmModeObjectProperties_ptr
 drm::drmModeObjectGetProperties(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t objectId,
     uint32_t objectType) noexcept
 {
@@ -176,7 +176,7 @@ drm::drmModeObjectGetProperties(
 
 drm::drmModePlane_ptr
 drm::drmModeGetPlane(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t planeId) noexcept
 {
     return drmModePlane_ptr(::drmModeGetPlane(fd.fd(), planeId),
@@ -187,7 +187,7 @@ drm::drmModeGetPlane(
 
 drm::drmModePlaneRes_ptr
 drm::drmModeGetPlaneResources(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return drmModePlaneRes_ptr(::drmModeGetPlaneResources(fd.fd()),
                                &drmModeFreePlaneResources);
@@ -197,7 +197,7 @@ drm::drmModeGetPlaneResources(
 
 drm::drmModePropertyBlobRes_ptr
 drm::drmModeGetPropertyBlob(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t blobId) noexcept
 {
     return drmModePropertyBlobRes_ptr(::drmModeGetPropertyBlob(fd.fd(), blobId),
@@ -208,7 +208,7 @@ drm::drmModeGetPropertyBlob(
 
 drm::drmModePropertyRes_ptr
 drm::drmModeGetProperty(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t propertyId) noexcept
 {
     return drmModePropertyRes_ptr(::drmModeGetProperty(fd.fd(), propertyId),
@@ -219,7 +219,7 @@ drm::drmModeGetProperty(
 
 drm::drmModeRes_ptr
 drm::drmModeGetResources(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return drmModeRes_ptr(::drmModeGetResources(fd.fd()),
                           &drmModeFreeResources);
@@ -229,7 +229,7 @@ drm::drmModeGetResources(
 
 bool
 drm::drmDropMaster(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return ::drmDropMaster(fd.fd()) == 0;
 }
@@ -238,7 +238,7 @@ drm::drmDropMaster(
 
 bool
 drm::drmHandleEvent(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     drmEventContext* ev) noexcept
 {
     return ::drmHandleEvent(fd.fd(), ev) == 0;
@@ -248,7 +248,7 @@ drm::drmHandleEvent(
 
 int
 drm::drmIoctl(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     unsigned long request,
     void *arg) noexcept
 {
@@ -259,7 +259,7 @@ drm::drmIoctl(
 
 bool
 drm::drmIsMaster(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return ::drmIsMaster(fd.fd()) != 0;
 }
@@ -268,7 +268,7 @@ drm::drmIsMaster(
 
 int
 drm::drmModeAddFB2(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t width,
     uint32_t height,
 	uint32_t pixel_format,
@@ -293,7 +293,7 @@ drm::drmModeAddFB2(
 
 int
 drm::drmModeAtomicCommit(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     drmModeAtomicReq_ptr& req,
     uint32_t flags,
     void* user_data)
@@ -305,7 +305,7 @@ drm::drmModeAtomicCommit(
 
 int
 drm::drmModeCreatePropertyBlob(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     const void *data,
     size_t size,
     uint32_t *id) noexcept
@@ -317,7 +317,7 @@ drm::drmModeCreatePropertyBlob(
 
 int
 drm::drmGetCap(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint64_t capability,
     uint64_t *value) noexcept
 {
@@ -328,7 +328,7 @@ drm::drmGetCap(
 
 int
 drm::drmModeDestroyPropertyBlob(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t id) noexcept
 {
     return ::drmModeDestroyPropertyBlob(fd.fd(), id);
@@ -338,7 +338,7 @@ drm::drmModeDestroyPropertyBlob(
 
 int
 drm::drmModePageFlip(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t crtc_id,
     uint32_t fb_id,
     uint32_t flags,
@@ -351,7 +351,7 @@ drm::drmModePageFlip(
 
 bool
 drm::drmModeRmFB(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t bufferId) noexcept
 {
     return ::drmModeRmFB(fd.fd(), bufferId) == 0;
@@ -361,7 +361,7 @@ drm::drmModeRmFB(
 
 int
 drm::drmModeSetCrtc(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t crtcId,
     uint32_t bufferId,
     uint32_t x,
@@ -384,7 +384,7 @@ drm::drmModeSetCrtc(
 
 int
 drm::drmModeSetCrtc(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     drm::drmModeCrtc_ptr& crtcPtr,
     std::span<uint32_t> connectors) noexcept
 {
@@ -401,7 +401,7 @@ drm::drmModeSetCrtc(
 
 bool
 drm::drmSetMaster(
-    fd::FileDescriptor& fd) noexcept
+    const fd::FileDescriptor& fd) noexcept
 {
     return ::drmSetMaster(fd.fd()) == 0;
 }
@@ -411,7 +411,7 @@ drm::drmSetMaster(
 bool
 drm::addDrmPropertyToAtomicRequest(
     drmModeAtomicReq_ptr& atomicReq,
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t objectId,
     uint32_t objectType,
     const std::string& propertyName,
@@ -492,9 +492,9 @@ drm::findDrmDeviceWithConnector(
         return "";
     }
 
-    for (auto i = 0 ; i < devices.getDeviceCount() ; ++i)
+    for (auto deviceIndex = 0 ; deviceIndex < devices.getDeviceCount() ; ++deviceIndex)
     {
-        const auto device = devices.getDevice(i);
+        const auto device = devices.getDevice(deviceIndex);
 
         if ((device->available_nodes & (1 << DRM_NODE_PRIMARY)) and
             drm::drmDeviceHasDumbBuffer(device->nodes[DRM_NODE_PRIMARY]))
@@ -503,9 +503,9 @@ drm::findDrmDeviceWithConnector(
             auto fd = fd::FileDescriptor{::open(card, O_RDWR)};
             const auto resources = drm::drmModeGetResources(fd);
 
-            for (int i = 0 ; i < resources->count_connectors ; ++i)
+            for (int connectorIndex = 0 ; connectorIndex < resources->count_connectors ; ++connectorIndex)
             {
-                if (connectorId == resources->connectors[i])
+                if (connectorId == resources->connectors[connectorIndex])
                 {
                     return card;
                 }
@@ -550,7 +550,7 @@ drm::findDrmDevice(
 
 uint32_t
 drm::findDrmPrimaryPlaneId(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t crtcMask) noexcept
 {
     const auto planeResources{drm::drmModeGetPlaneResources(fd)};
@@ -582,7 +582,7 @@ drm::findDrmPrimaryPlaneId(
 
 uint32_t
 drm::findDrmPropertyId(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t objectId,
     uint32_t objectType,
     const std::string& name) noexcept
@@ -616,7 +616,7 @@ drm::findDrmPropertyId(
 
 drm::FoundDrmResource
 drm::findDrmResourcesForConnector(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t connectorId,
     const drm::drmModeRes_ptr& resources) noexcept
 {
@@ -662,7 +662,7 @@ drm::findDrmResourcesForConnector(
 
 drm::FoundDrmResource
 drm::findDrmResources(
-    fd::FileDescriptor& fd,
+    const fd::FileDescriptor& fd,
     uint32_t connectorId) noexcept
 {
     if (connectorId)
@@ -720,7 +720,7 @@ drm::getModeCount(
 
 bool
 drm::setClientCap(
-    fd::FileDescriptor& m_fd,
+    const fd::FileDescriptor& m_fd,
     uint64_t capability,
     uint64_t value) noexcept
 {
@@ -731,7 +731,7 @@ drm::setClientCap(
 
 bool
 drm::setAtomicModeSetting(
-    fd::FileDescriptor& m_fd) noexcept
+    const fd::FileDescriptor& m_fd) noexcept
 {
     return setClientCap(m_fd, DRM_CLIENT_CAP_ATOMIC, 1);
 }
@@ -740,7 +740,7 @@ drm::setAtomicModeSetting(
 
 bool
 drm::setUniversalPlanes(
-    fd::FileDescriptor& m_fd) noexcept
+    const fd::FileDescriptor& m_fd) noexcept
 {
     return setClientCap(m_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
 }

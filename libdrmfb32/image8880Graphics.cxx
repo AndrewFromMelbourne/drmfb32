@@ -48,7 +48,7 @@ trim(
     fb32::Point8880& p1,
     fb32::Point8880& p2)
 {
-    const auto d = iface.getDimensions();
+    const auto dim = iface.getDimensions();
 
     if ((p1.x() == p2.x()) or (p1.y() == p2.y()))
     {
@@ -62,9 +62,9 @@ trim(
     const auto maxY = std::max(p1.y(), p2.y());
 
     if ((minX > 0) and
-        (maxX < d.width()) and
+        (maxX < dim.width()) and
         (minY > 0) and
-        (maxY < d.height()))
+        (maxY < dim.height()))
     {
         return;
     }
@@ -84,9 +84,9 @@ trim(
         p1.setX((p1.y() - c) * run / rise);
     }
 
-    if (p2.y() >= d.height())
+    if (p2.y() >= dim.height())
     {
-        p2.setY(d.height() - 1);
+        p2.setY(dim.height() - 1);
         p2.setX((p2.y() - c) * run / rise);
     }
 
@@ -106,9 +106,9 @@ trim(
         p1.setY((rise * p1.x()) / run + c);
     }
 
-    if (p2.x() >= d.width())
+    if (p2.x() >= dim.width())
     {
-        p2.setX(d.width() - 1);
+        p2.setX(dim.width() - 1);
         p2.setY((rise * p2.x()) / run + c);
     }
 }
@@ -199,14 +199,14 @@ line(
     Point8880 p2,
     uint32_t rgb)
 {
-    const auto d = iface.getDimensions();
+    const auto dim = iface.getDimensions();
 
     trim(iface, p1, p2);
 
     const auto minX = std::min(p1.x(), p2.x());
     const auto maxX = std::max(p1.x(), p2.x());
 
-    if ((maxX < 0) or (minX >= d.width()))
+    if ((maxX < 0) or (minX >= dim.width()))
     {
         return;
     }
@@ -214,7 +214,7 @@ line(
     const auto minY = std::min(p1.y(), p2.y());
     const auto maxY = std::max(p1.y(), p2.y());
 
-    if ((maxY < 0) or (minY >= d.height()))
+    if ((maxY < 0) or (minY >= dim.height()))
     {
         return;
     }
@@ -312,9 +312,9 @@ horizontalLine(
     int y,
     uint32_t rgb)
 {
-    const auto d = iface.getDimensions();
+    const auto dim = iface.getDimensions();
 
-    if ((y < 0) or (y >= d.height()))
+    if ((y < 0) or (y >= dim.height()))
     {
         return;
     }
@@ -325,9 +325,9 @@ horizontalLine(
     }
 
     x1 = std::max(x1, 0);
-    x2 = std::min(x2, d.width() - 1);
+    x2 = std::min(x2, dim.width() - 1);
 
-    if ((x1 >= d.width()) or (x2 < 0))
+    if ((x1 >= dim.width()) or (x2 < 0))
     {
         return;
     }
@@ -346,9 +346,9 @@ verticalLine(
     int y2,
     uint32_t rgb)
 {
-    const auto d = iface.getDimensions();
+    const auto dim = iface.getDimensions();
 
-    if (x < 0 or x >= d.width())
+    if (x < 0 or x >= dim.width())
     {
         return;
     }
@@ -359,9 +359,9 @@ verticalLine(
     }
 
     y1 = std::max(y1, 0);
-    y2 = std::min(y2, d.height() - 1);
+    y2 = std::min(y2, dim.height() - 1);
 
-    if ((y1 >= d.height()) or (y2 < 0))
+    if ((y1 >= dim.height()) or (y2 < 0))
     {
         return;
     }
@@ -558,14 +558,15 @@ polygonFilled(
         return p1.x() + (y - p1.y()) * xChange / yChange;
     };
 
-    auto minY = vertices[0].y();
-    auto maxY = vertices[0].y();
-
-    for (const auto& p : vertices)
+    auto compareY = [](const auto& a, const auto& b) -> bool
     {
-        minY = std::min(minY, p.y());
-        maxY = std::max(maxY, p.y());
-    }
+        return a.y() < b.y();
+    };
+
+    auto minMaxY = std::minmax_element(begin(vertices), end(vertices), compareY);
+
+    const auto minY = minMaxY.first->y();
+    const auto maxY = minMaxY.second->y();
 
     for (int y = minY; y <= maxY; ++y)
     {
@@ -585,7 +586,7 @@ polygonFilled(
 
         std::ranges::sort(intersects);
 
-        const auto d = iface.getDimensions();
+        const auto dim = iface.getDimensions();
 
 
         for (std::size_t i = 0; i + 1 < intersects.size(); i += 2)
@@ -593,7 +594,7 @@ polygonFilled(
             const auto x1 = intersects[i];
             const auto x2 = intersects[i + 1];
 
-            if (x2 >= 0 and x1 < d.width())
+            if (x2 >= 0 and x1 < dim.width())
             {
                 horizontalLine(iface, x1, x2, y, rgb);
             }

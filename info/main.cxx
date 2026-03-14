@@ -75,7 +75,7 @@ signalHandler(
 
 void
 setSignalHandler(
-    Info& info
+    const Info& info
 )
 {
     for (auto signal : { SIGINT, SIGTERM, SIGUSR1, SIGUSR2 })

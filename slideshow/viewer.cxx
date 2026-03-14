@@ -31,6 +31,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <print>
 #include <ranges>
@@ -123,12 +124,12 @@ fileStep() noexcept
 fileStepStrings() noexcept
 {
     std::vector<std::string> result;
-
-    for (const auto step : fileStep())
-    {
-        result.push_back(std::to_string(step));
-    }
-
+    const auto fs = fileStep();
+    result.reserve(fs.size());
+    std::transform(cbegin(fs),
+                   cend(fs),
+                   std::back_inserter(result),
+                   [](int i){ return std::to_string(i); });
     return result;
 }
 
@@ -149,12 +150,12 @@ panStep() noexcept
 panStepStrings() noexcept
 {
     std::vector<std::string> result;
-
-    for (const auto step : panStep())
-    {
-        result.push_back(std::to_string(step));
-    }
-
+    const auto ps = panStep();
+    result.reserve(ps.size());
+    std::transform(cbegin(ps),
+                   cend(ps),
+                   std::back_inserter(result),
+                   [](int i){ return std::to_string(i); });
     return result;
 }
 
@@ -316,7 +317,7 @@ Viewer::Viewer(
     fb32::Interface8880& interface,
     const std::string& folder,
     Viewer::Quality quality,
-    std::unique_ptr<fb32::Interface8880Font> font)
+    const fb32::FontConfig& fontConfig)
 :
     m_annotate{ANNOTATE_SHORT},
     m_background{background},
@@ -333,7 +334,7 @@ Viewer::Viewer(
     m_files{},
     m_fileStep{1},
     m_fitToScreen{true},
-    m_font{},
+    m_font{createFont(fontConfig)},
     m_image{},
     m_imageProcessed{},
     m_isBlank{false},
@@ -341,7 +342,7 @@ Viewer::Viewer(
         fb32::RGB8880{0x00FFFFFF},
         fb32::RGB8880{0x00000000},
         fb32::RGB8880{0x003F3F3F},
-        *font,
+        fontConfig,
         {
             MenuItem{MENUID_ANNOTATE, "Annotate", ANNOTATE_SHORT, annotateStrings()},
             MenuItem{MENUID_ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
@@ -359,7 +360,6 @@ Viewer::Viewer(
     m_quality{quality},
     m_zoom{0}
 {
-    m_font = std::move(font);
     readDirectory();
 
     if (m_files.size() == 0)
@@ -384,7 +384,7 @@ Viewer::draw(
 
     if (m_menuShow)
     {
-        m_menu.draw(fb, *m_font);
+        m_menu.draw(fb);
     }
 }
 

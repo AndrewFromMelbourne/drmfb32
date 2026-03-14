@@ -236,7 +236,7 @@ Image8880FreeType::drawString(
     Point8880 position{p};
     position.translateY(m_face->size->metrics.ascender >> 6);
 
-    const auto slot{m_face->glyph};
+    auto slot{m_face->glyph};
     const auto use_kerning{FT_HAS_KERNING(m_face)};
     FT_UInt previous{0};
 
@@ -265,7 +265,7 @@ Image8880FreeType::drawString(
 
             if (FT_Load_Glyph(m_face, glyph_index, FT_LOAD_RENDER) == 0)
             {
-                const auto slot{m_face->glyph};
+                slot = m_face->glyph;
 
                 drawChar(position.x() + slot->bitmap_left,
                          position.y() - slot->bitmap_top,

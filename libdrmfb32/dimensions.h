@@ -79,6 +79,22 @@ public:
         m_height = height;
     }
 
+    constexpr void incrWidth(T dx) noexcept
+    {
+        m_width += dx;
+    }
+
+    constexpr void incrHeight(T dy) noexcept
+    {
+        m_height += dy;
+    }
+
+    constexpr void incr(T dx, T dy) noexcept
+    {
+        m_width += dx;
+        m_height += dy;
+    }
+
     friend bool operator<=>(const Dimensions& lhs, const Dimensions& rhs) = default;
 
 private:

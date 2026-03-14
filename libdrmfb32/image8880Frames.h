@@ -109,9 +109,9 @@ private:
 
     [[nodiscard]] std::size_t offset(Point8880 p, uint8_t frame) const noexcept;
 
-    Dimensions8880 m_dimensions;
+    Dimensions8880 m_dimensions{0, 0};
 
-    uint8_t m_frame;
+    uint8_t m_frame{0};
     uint8_t m_numberOfFrames{};
 
     std::vector<uint32_t> m_buffer{};

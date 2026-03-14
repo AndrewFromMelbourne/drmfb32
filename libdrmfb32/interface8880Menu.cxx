@@ -68,15 +68,16 @@ Interface8880Menu::MenuItem::incrementValue() noexcept
 //-------------------------------------------------------------------------
 
 Interface8880Menu::Interface8880Menu(
-    RGB8880 foregroundColour,
-    RGB8880 backgroundColour,
-    RGB8880 selectionColour,
-    Interface8880Font& font,
+    RGB8880 colourForeground,
+    RGB8880 colourBackground,
+    RGB8880 colourSelection,
+    const FontConfig& fontConfig,
     std::initializer_list<MenuItem> items)
 :
-    m_foregroundColour{foregroundColour},
-    m_backgroundColour{backgroundColour},
-    m_selectionColour{selectionColour},
+    m_colourForeground{colourForeground},
+    m_colourBackground{colourBackground},
+    m_colourSelection{colourSelection},
+    m_font{createFont(fontConfig)},
     m_selected{0},
     m_items{items},
     m_titleMaximumPixels{0},
@@ -86,12 +87,12 @@ Interface8880Menu::Interface8880Menu(
 
     for (const auto& item : m_items)
     {
-        const auto titleDimensions = font.getStringDimensions(item.m_title);
+        const auto titleDimensions = m_font->getStringDimensions(item.m_title);
         m_titleMaximumPixels = std::max(titleDimensions.width(), m_titleMaximumPixels);
 
         for (const auto& value : item.m_values)
         {
-            const auto valueDimensions = font.getStringDimensions(value);
+            const auto valueDimensions = m_font->getStringDimensions(value);
             m_valueMaximumPixels = std::max(valueDimensions.width(), m_valueMaximumPixels);
         }
     }
@@ -101,14 +102,13 @@ Interface8880Menu::Interface8880Menu(
 
 void
 Interface8880Menu::draw(
-    fb32::FrameBuffer8880& fb,
-    Interface8880Font& font) const
+    fb32::FrameBuffer8880& fb) const
 {
     constexpr auto paddingPixels{6};
     constexpr auto padding2Pixels{paddingPixels * 2};
     constexpr auto padding3Pixels{paddingPixels * 3};
     constexpr auto padding4Pixels{paddingPixels * 4};
-    const auto d = font.getPixelDimensions();
+    const auto d = m_font->getPixelDimensions();
     const auto width = m_titleMaximumPixels + m_valueMaximumPixels + padding3Pixels;
 
     boxFilled(
@@ -117,7 +117,7 @@ Interface8880Menu::draw(
         fb32::Point8880(
             width + padding2Pixels,
             (m_items.size() * d.height()) + padding2Pixels),
-            m_backgroundColour);
+            m_colourBackground);
 
     box(
         fb,
@@ -125,7 +125,7 @@ Interface8880Menu::draw(
         fb32::Point8880(
             width + padding2Pixels,
             (m_items.size() * d.height()) + padding2Pixels),
-            m_selectionColour);
+            m_colourSelection);
 
     boxFilled(
         fb,
@@ -135,27 +135,27 @@ Interface8880Menu::draw(
         fb32::Point8880(
             width + paddingPixels,
             ((m_selected + 1) * d.height()) + paddingPixels),
-            m_selectionColour);
+            m_colourSelection);
 
     int yOffset = paddingPixels;
     for (const auto& item : m_items)
     {
-        font.drawString(
+        m_font->drawString(
             fb32::Point8880(paddingPixels, yOffset),
             std::format("{}", item.m_title),
-            m_foregroundColour,
+            m_colourForeground,
             fb);
 
-        font.drawChar(
+        m_font->drawChar(
             fb32::Point8880{m_titleMaximumPixels + padding2Pixels, yOffset},
             '|',
-            m_foregroundColour,
+            m_colourForeground,
             fb);
 
-        font.drawString(
+        m_font->drawString(
             fb32::Point8880(m_titleMaximumPixels + padding4Pixels, yOffset),
             std::format("{}", item.m_values[item.m_value]),
-            m_foregroundColour,
+            m_colourForeground,
             fb);
 
         yOffset += d.height();

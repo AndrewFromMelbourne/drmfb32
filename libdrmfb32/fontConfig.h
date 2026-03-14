@@ -2,7 +2,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2022 Andrew Duncan
+// Copyright (c) 2026 Andrew Duncan
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -29,28 +29,39 @@
 
 //-------------------------------------------------------------------------
 
-#include <array>
-#include <cstdint>
+#include <memory>
+#include <string>
+#include <string_view>
+
+#include "interface8880Font.h"
 
 //-------------------------------------------------------------------------
 
-class Level
+namespace fb32
 {
-public:
 
-    static constexpr int c_levelWidth{16};
-    static constexpr int c_levelHeight{14};
-    static constexpr int c_levelCount{100};
+//-------------------------------------------------------------------------
 
-    using LevelRow = std::array<uint8_t, c_levelWidth>;
-    using LevelType = std::array<LevelRow, c_levelHeight>;
-
-    Level(const LevelType& level) noexcept;
-
-    [[nodiscard]] const LevelType& level() const noexcept;
-
-private:
-
-    LevelType m_level;
+struct FontConfig
+{
+    std::string m_fontFile;
+    int m_pixelHeight{};
 };
+
+//-------------------------------------------------------------------------
+
+std::unique_ptr<fb32::Interface8880Font>
+createFont(
+    const FontConfig& fontConfig);
+
+FontConfig
+parseFontConfig(
+    const std::string_view fontConfigStr,
+    int defaultPixelHeight) noexcept;
+
+//-------------------------------------------------------------------------
+
+} // namespace fb32
+
+//-------------------------------------------------------------------------
 

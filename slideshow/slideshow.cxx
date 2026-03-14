@@ -34,6 +34,7 @@
 #include <iostream>
 #include <print>
 
+#include "fontConfig.h"
 #include "framebuffer8880.h"
 #include "image8880Jpeg.h"
 #include "image8880Font8x16.h"
@@ -67,33 +68,6 @@ signalHandler(
         run = false;
         break;
     };
-}
-
-//-------------------------------------------------------------------------
-
-std::unique_ptr<fb32::Interface8880Font>
-getFont(
-    const FontConfig& fontConfig)
-{
-    std::unique_ptr<Interface8880Font> font;
-
-    if (not fontConfig.m_fontFile.empty())
-    {
-        try
-        {
-            return std::make_unique<fb32::Image8880FreeType>(fontConfig);
-        }
-        catch (std::exception& error)
-        {
-            std::println(
-                std::cerr,
-                "Error: loading font {} : {}",
-                fontConfig.m_fontFile,
-                error.what());
-        }
-    }
-
-    return std::make_unique<fb32::Image8880Font8x16>();
 }
 
 //-------------------------------------------------------------------------
@@ -256,7 +230,7 @@ main(
             fb,
             folder,
             quality,
-            getFont(fontConfig)
+            fontConfig
         };
 
         viewer.draw(fb);

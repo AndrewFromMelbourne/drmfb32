@@ -58,8 +58,6 @@ public:
     [[nodiscard]] virtual std::span<uint32_t> getBuffer() noexcept = 0;
     [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const  noexcept = 0;
 
-    [[nodiscard]] virtual Dimensions8880 getDimensions() const noexcept = 0;
-
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0) override;
 

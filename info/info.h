@@ -37,6 +37,7 @@
 
 #include <bsd/libutil.h>
 
+#include "fontConfig.h"
 #include "framebuffer8880.h"
 #include "interface8880Font.h"
 #include "panel.h"
@@ -61,7 +62,6 @@ public:
     void messageLog(int priority, std::string_view message) const;
     std::optional<int> parseCommandLine(int argc, char* argv[]);
     void perrorLog(std::string_view s) const;
-    [[nodiscard]] std::string programName() const noexcept { return m_programName; }
     void run();
 
 private:
@@ -70,7 +70,6 @@ private:
     void init();
     int panelTop() const;
     void printUsage(std::ostream& stream) const;
-    void setFontConfig() noexcept;
 
     uint32_t m_connector{0};
     std::string m_device{};

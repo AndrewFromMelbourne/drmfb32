@@ -31,10 +31,12 @@
 
 #include <compare>
 #include <initializer_list>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "fontConfig.h"
 #include "framebuffer8880.h"
 #include "interface8880.h"
 #include "interface8880Font.h"
@@ -94,12 +96,12 @@ public:
 
     Interface8880Menu(
         RGB8880 forgroundColour,
-        RGB8880 backgroundColour,
-        RGB8880 selectionColour,
-        Interface8880Font& font,
+        RGB8880 colourBackground,
+        RGB8880 colourSelection,
+        const FontConfig& fontConfig,
         std::initializer_list<MenuItem> items);
 
-    void draw(fb32::FrameBuffer8880& fb, Interface8880Font& font) const;
+    void draw(fb32::FrameBuffer8880& fb) const;
     std::size_t getValue(std::size_t id) const;
     Update update(fb32::Joystick& js);
     bool setValue(std::size_t id, std::size_t value);
@@ -109,9 +111,10 @@ private:
     void decrementSelected() noexcept;
     void incrementSelected() noexcept;
 
-    RGB8880 m_foregroundColour;
-    RGB8880 m_backgroundColour;
-    RGB8880 m_selectionColour;
+    RGB8880 m_colourForeground;
+    RGB8880 m_colourBackground;
+    RGB8880 m_colourSelection;
+    std::unique_ptr<Interface8880Font> m_font;
     std::size_t m_selected;
     std::vector<MenuItem> m_items;
     int m_titleMaximumPixels;

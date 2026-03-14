@@ -121,23 +121,30 @@ fb32::FrameBuffer8880::FrameBuffer8880(
 
 fb32::FrameBuffer8880::~FrameBuffer8880()
 {
-    clearBuffers();
-
-    if (useAtomic())
+    try
     {
-        drm::drmModeDestroyPropertyBlob(m_fd, m_blobId);
+        clearBuffers();
+
+        if (useAtomic())
+        {
+            drm::drmModeDestroyPropertyBlob(m_fd, m_blobId);
+        }
+
+        destroyDumbBuffer(m_dbBack);
+        destroyDumbBuffer(m_dbFront);
+
+        drm::drmModeSetCrtc(m_fd,
+                            m_originalCrtc,
+                            std::span<u_int32_t>{&m_connectorId, 1});
+
+        if (drm::drmIsMaster(m_fd))
+        {
+            drm::drmDropMaster(m_fd);
+        }
     }
-
-    destroyDumbBuffer(m_dbBack);
-    destroyDumbBuffer(m_dbFront);
-
-    drm::drmModeSetCrtc(m_fd,
-                        m_originalCrtc,
-                        std::span<u_int32_t>{&m_connectorId, 1});
-
-    if (drm::drmIsMaster(m_fd))
+    catch (...)
     {
-        drm::drmDropMaster(m_fd);
+        // ignore exceptions
     }
 }
 
@@ -175,7 +182,7 @@ std::size_t
 fb32::FrameBuffer8880::getBufferSize() const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
-    return dbb.m_lineLengthPixels * m_dimensions.height();
+    return static_cast<std::size_t>(dbb.m_lineLengthPixels) * m_dimensions.height();
 }
 
 //-------------------------------------------------------------------------

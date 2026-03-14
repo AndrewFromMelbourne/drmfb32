@@ -25,10 +25,17 @@ It uses pkg-config to find these libraries.
 
 This project uses CMake. To build
 
-     mkdir build
-     cd build
-     cmake ..
-     make
+    mkdir build
+    cd build
+    cmake ..
+    make
+
+For a debug build with sanitizers
+
+    mkdir debug
+    cd debug
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    make
 
 You can speed up the build on mulit-core systems by using
 

@@ -66,8 +66,8 @@ NetworkStats::NetworkStats()
 
             if ((family == AF_PACKET) and (std::string(ifa->ifa_name) != "lo"))
             {
-                rtnl_link_stats* stats =
-                    static_cast<rtnl_link_stats*>(ifa->ifa_data);
+                const auto stats =
+                    static_cast<const rtnl_link_stats*>(ifa->ifa_data);
 
                 m_tx += stats->tx_bytes;
                 m_rx += stats->rx_bytes;

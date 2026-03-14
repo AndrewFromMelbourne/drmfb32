@@ -113,41 +113,42 @@ main(
 
     //---------------------------------------------------------------------
 
-    std::array<std::string, fb32::Joystick::BUTTON_COUNT> descriptions{
-        "X",
-        "A",
-        "B",
-        "Y",
-        "left shoulder",
-        "right shoulder",
-        "",
-        "",
-        "select",
-        "start",
-        "",
-        "",
-    };
-
-    std::array<std::string, fb32::Joystick::BUTTON_COUNT> tokens =
-    {
-        "BUTTON_X",
-        "BUTTON_A",
-        "BUTTON_B",
-        "BUTTON_Y",
-        "BUTTON_LEFT_SHOULDER",
-        "BUTTON_RIGHT_SHOULDER",
-        "",
-        "",
-        "BUTTON_SELECT",
-        "BUTTON_START",
-        "",
-        "",
-    };
-
-    //---------------------------------------------------------------------
-
     try
     {
+        std::array<std::string, fb32::Joystick::BUTTON_COUNT> descriptions{
+            "X",
+            "A",
+            "B",
+            "Y",
+            "left shoulder",
+            "right shoulder",
+            "",
+            "",
+            "select",
+            "start",
+            "",
+            "",
+        };
+
+        std::array<std::string, fb32::Joystick::BUTTON_COUNT> tokens =
+        {
+            "BUTTON_X",
+            "BUTTON_A",
+            "BUTTON_B",
+            "BUTTON_Y",
+            "BUTTON_LEFT_SHOULDER",
+            "BUTTON_RIGHT_SHOULDER",
+            "",
+            "",
+            "BUTTON_SELECT",
+            "BUTTON_START",
+            "",
+            "",
+        };
+
+        //-----------------------------------------------------------------
+
+
         Joystick js(joystick, true);
         std::vector<std::string> configuration;
 
