@@ -77,6 +77,7 @@ public:
         MENUID_ENLIGHTEN,
         MENUID_FILE_STEP,
         MENUID_FIT_TO_SCREEN,
+        MENUID_GREYSCALE,
         MENUID_PAN_STEP,
         MENUID_QUALITY,
         MENUID_ZOOM
@@ -209,6 +210,7 @@ private:
     int m_fileStep;
     bool m_fitToScreen;
     std::shared_ptr<fb32::Interface8880Font> m_font;
+    bool m_greyscale;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageProcessed;
     bool m_isBlank;

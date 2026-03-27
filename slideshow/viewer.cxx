@@ -335,6 +335,7 @@ Viewer::Viewer(
     m_fileStep{1},
     m_fitToScreen{true},
     m_font{createFont(fontConfig)},
+    m_greyscale{false},
     m_image{},
     m_imageProcessed{},
     m_isBlank{false},
@@ -348,6 +349,7 @@ Viewer::Viewer(
             MenuItem{MENUID_ENLIGHTEN, "Enlighten", 0, percentageStrings(10)},
             MenuItem{MENUID_FILE_STEP, "File step", 1, fileStepStrings()},
             MenuItem{MENUID_FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
+            MenuItem{MENUID_GREYSCALE, "Greyscale", 0, boolStrings()},
             MenuItem{MENUID_PAN_STEP, "Pan step", 3, panStepStrings()},
             MenuItem{MENUID_QUALITY, "Quality", quality, qualityStrings()},
             MenuItem{MENUID_ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
@@ -720,13 +722,18 @@ Viewer::processImage()
         return;
     }
 
-    if (m_enlighten)
+    if (m_greyscale)
     {
-        m_imageProcessed = enlighten(m_image, m_enlighten / 10.0);
+        m_imageProcessed = fb32::toGrey(m_image);
     }
     else
     {
         m_imageProcessed = m_image;
+    }
+
+    if (m_enlighten)
+    {
+        m_imageProcessed = enlighten(m_imageProcessed, m_enlighten / 10.0);
     }
 
     if (((m_zoom == SCALE_OVERSIZED) and
@@ -841,6 +848,7 @@ Viewer::readValuesFromMenu()
     m_annotate = static_cast<Annotate>(m_menu.getValue(MENUID_ANNOTATE));
     m_enlighten = m_menu.getValue(MENUID_ENLIGHTEN);
     m_fitToScreen = m_menu.getValue(MENUID_FIT_TO_SCREEN);
+    m_greyscale = m_menu.getValue(MENUID_GREYSCALE);
     m_quality = static_cast<Quality>(m_menu.getValue(MENUID_QUALITY));
     m_zoom = m_menu.getValue(MENUID_ZOOM);
 
@@ -861,6 +869,7 @@ Viewer::setMenuValues()
     m_menu.setValue(MENUID_ANNOTATE, m_annotate);
     m_menu.setValue(MENUID_ENLIGHTEN, m_enlighten);
     m_menu.setValue(MENUID_FIT_TO_SCREEN, m_fitToScreen);
+    m_menu.setValue(MENUID_GREYSCALE, m_greyscale);
     m_menu.setValue(MENUID_QUALITY, m_quality);
     m_menu.setValue(MENUID_ZOOM, m_zoom);
 

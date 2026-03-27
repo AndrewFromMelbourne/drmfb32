@@ -466,6 +466,28 @@ rowsRotate(
     }
 }
 
+//-------------------------------------------------------------------------
+
+void
+rowsToGrey(
+    const fb32::Interface8880Base& input,
+    fb32::Image8880& output,
+    int jStart,
+    int jEnd)
+{
+    const auto id = input.getDimensions();
+    auto inputi = input.getBuffer().data() + (jStart * id.width());
+
+    for (auto j = jStart ; j < jEnd ; ++j)
+    {
+        for (int i = 0 ; i < id.width() ; ++i)
+        {
+            auto pixel = *(inputi++);
+            Point p{i, j};
+            output.setPixel(p,fb32::RGB8880(pixel).toGrey().get8880());
+        }
+    }
+}
 
 //-------------------------------------------------------------------------
 
@@ -914,3 +936,27 @@ fb32::scaleUp(
     return output;
 }
 
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::toGrey(
+    const Interface8880Base& input)
+{
+    const auto id = input.getDimensions();
+    Image8880 output{id};
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output](int start, int end)
+    {
+        rowsToGrey(input, output, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, id.height(), iterateRows);
+    tPool.wait();
+#else
+    rowsToGrey(input, output, 0, id.height());
+#endif
+
+    return output;
+}

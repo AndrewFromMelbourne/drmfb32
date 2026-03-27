@@ -103,6 +103,16 @@ public:
         return (getRed() == getGreen()) and (getGreen() == getBlue());
     }
 
+    [[nodiscard]] constexpr RGB8880 toGrey() const noexcept
+    {
+        const auto grey = static_cast<uint8_t>(((getRed() * 299) +
+                                                (getGreen() * 587) +
+                                                (getBlue() * 114)) / 1000);
+        return {grey, grey, grey};
+    }
+
+
+
     //---------------------------------------------------------------------
 
     constexpr void
