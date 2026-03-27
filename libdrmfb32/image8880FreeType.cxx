@@ -133,6 +133,7 @@ Image8880FreeType::getStringDimensions(
     return Dimensions8880{p.x(), p.y() + d.height()};
 }
 
+//-------------------------------------------------------------------------
 
 fb32::Dimensions8880
 Image8880FreeType::getWideCharDimensions(
