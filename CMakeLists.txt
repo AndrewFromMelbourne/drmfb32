@@ -78,7 +78,8 @@ add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/interface8880Base.cxx
                            libdrmfb32/interface8880Menu.cxx
                            libdrmfb32/joystick.cxx
-                           libdrmfb32/rgb8880.cxx)
+                           libdrmfb32/rgb8880.cxx
+                           libdrmfb32/tokenize.cxx)
 
 if (FREETYPE_FOUND)
 target_include_directories(drmfb32 PUBLIC ${FREETYPE_INCLUDE_DIRS})
@@ -144,6 +145,12 @@ add_executable(boxworld boxworld/main.cxx
                         boxworld/boxworld.cxx)
 
 target_link_libraries(boxworld drmfb32 ${DRM_LIBRARIES})
+
+#--------------------------------------------------------------------------
+
+add_executable(joyControl joyControl/joyControl.cxx)
+
+target_link_libraries(joyControl drmfb32)
 
 #--------------------------------------------------------------------------
 

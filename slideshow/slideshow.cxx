@@ -229,7 +229,7 @@ main(
         FrameBuffer8880 fb(device, connector);
         fb.clearBuffers(background);
 
-        Joystick js{joystick, true};
+        Joystick js{joystick, Joystick::ReadType::BLOCKING};
         Viewer viewer
         {
             background,

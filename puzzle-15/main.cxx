@@ -141,8 +141,7 @@ main(
     try
     {
         Image8880Font8x16 font;
-        constexpr bool block{true};
-        Joystick js(joystick, block);
+        Joystick js(joystick, Joystick::ReadType::BLOCKING);
         FrameBuffer8880 fb{device, connector};
 
         Puzzle puzzle{fitToScreen};
