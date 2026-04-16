@@ -187,7 +187,8 @@ main(
             std::vector<std::string> args{argsv.begin(), argsv.end()};
 
             std::vector<char*> argcs;
-            std::transform(cbegin(args),
+            std::transform(
+                   cbegin(args),
                    cend(args),
                    std::back_inserter(argcs),
                    [](const std::string& s){ return const_cast<char*>(s.c_str()); });
