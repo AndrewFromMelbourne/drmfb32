@@ -49,7 +49,6 @@ public:
         m_image{d}
     { }
 
-
     virtual ~Panel() = default;
 
     [[nodiscard]] int getBottom() const noexcept;

@@ -93,7 +93,6 @@ public:
     [[nodiscard]] constexpr uint8_t getGreen() const noexcept { return (m_rgb >> 8) & 0xFF; }
     [[nodiscard]] constexpr uint8_t getBlue() const noexcept { return m_rgb & 0xFF; }
 
-
     [[nodiscard]] RGB8 getRGB8() const noexcept;
 
     [[nodiscard]] constexpr uint32_t get8880() const noexcept { return m_rgb; }
@@ -105,10 +104,15 @@ public:
 
     [[nodiscard]] constexpr RGB8880 toGrey() const noexcept
     {
-        const auto grey = static_cast<uint8_t>(((getRed() * 299) +
-                                                (getGreen() * 587) +
-                                                (getBlue() * 114)) / 1000);
+        const auto grey = toIntensity();
         return {grey, grey, grey};
+    }
+
+    [[nodiscard]] constexpr uint8_t toIntensity() const noexcept
+    {
+        return static_cast<uint8_t>(((getRed() * 299) +
+                                     (getGreen() * 587) +
+                                     (getBlue() * 114)) / 1000);
     }
 
     //---------------------------------------------------------------------
@@ -134,8 +138,6 @@ public:
     {
         return (red << 16) | (green << 8) | blue;
     }
-
-
 
 private:
 

@@ -148,7 +148,6 @@ main(
 
         //-----------------------------------------------------------------
 
-
         Joystick js(joystick, Joystick::ReadType::BLOCKING);
         std::vector<std::string> configuration;
 
@@ -196,7 +195,6 @@ main(
 
         std::string configDirectory{std::getenv("HOME") +
                                     std::string{"/.config/drmfb32"}};
-
 
         if (std::filesystem::exists(configDirectory) or
             std::filesystem::create_directories(configDirectory))

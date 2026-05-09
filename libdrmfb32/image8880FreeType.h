@@ -81,7 +81,6 @@ public:
     [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) override;
     [[nodiscard]] Dimensions8880 getWideCharDimensions(uint32_t c);
 
-
     [[nodiscard]] int getPixelSize() const noexcept
     {
         return m_pixelSize;

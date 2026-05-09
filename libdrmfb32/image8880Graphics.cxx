@@ -588,7 +588,6 @@ polygonFilled(
 
         const auto dim = iface.getDimensions();
 
-
         for (std::size_t i = 0; i + 1 < intersects.size(); i += 2)
         {
             const auto x1 = intersects[i];

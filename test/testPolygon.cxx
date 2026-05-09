@@ -155,7 +155,6 @@ main(
         const int iIncrement = fbd.width() / 4;
         const int jIncrement = fbd.height() / 4;
 
-
         for (int j = 0; j <= fbd.height(); j += jIncrement)
         {
             const int index = j / jIncrement;
