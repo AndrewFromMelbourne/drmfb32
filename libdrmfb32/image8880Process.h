@@ -52,6 +52,14 @@ enlighten(
     double strength);
 
 [[nodiscard]] Image8880
+histogramIntensity(
+    const Interface8880Base& input);
+
+[[nodiscard]] Image8880
+histogramRGB(
+    const Interface8880Base& input);
+
+[[nodiscard]] Image8880
 maxRGB(
     const Interface8880Base& input);
 

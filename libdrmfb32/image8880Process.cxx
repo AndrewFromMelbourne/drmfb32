@@ -85,6 +85,116 @@ private:
 
 //-------------------------------------------------------------------------
 
+class CountIntensity
+{
+public:
+
+    void add(const fb32::RGB8880& rgb) noexcept
+    {
+        const auto intensity = rgb.toIntensity();
+        m_intensity[intensity]++;
+    }
+
+    void add(const CountIntensity& other) noexcept
+    {
+        for (int i = 0 ; i < 256 ; ++i)
+        {
+            m_intensity[i] += other.m_intensity[i];
+        }
+    }
+
+    [[nodiscard]] fb32::Image8880 histogram() const noexcept
+    {
+        fb32::Image8880 image({256, 256});
+        int max = maximum();
+
+        if (max == 0)
+        {
+            return {};
+        }
+
+        for (int i = 0 ; i < 256 ; ++i)
+        {
+            const auto value = static_cast<uint8_t>((m_intensity[i] * 255) / max);
+            image.setPixelRGB(Point{i, 0}, fb32::RGB8880(value, value, value));
+        }
+
+        return image;
+    }
+
+    [[nodiscard]] int maximum() const noexcept
+    {
+        return *std::max_element(m_intensity.begin(), m_intensity.end());
+    }
+
+private:
+
+    std::array<int, 256> m_intensity{};
+};
+
+//-------------------------------------------------------------------------
+
+class CountRGB
+{
+public:
+
+    void add(const fb32::RGB8880& rgb) noexcept
+    {
+        const auto rgb8 = rgb.getRGB8();
+        m_red[rgb8.red]++;
+        m_green[rgb8.green]++;
+        m_blue[rgb8.blue]++;
+    }
+
+    void add(const CountRGB& other) noexcept
+    {
+        for (int i = 0 ; i < 256 ; ++i)
+        {
+            m_red[i] += other.m_red[i];
+            m_green[i] += other.m_green[i];
+            m_blue[i] += other.m_blue[i];
+        }
+    }
+
+    [[nodiscard]] fb32::Image8880 histogram() const noexcept
+    {
+        fb32::Image8880 image({256, 256});
+        int max = maximum();
+
+        if (max == 0)
+        {
+            return {};
+        }
+
+        for (int i = 0 ; i < 256 ; ++i)
+        {
+            const auto red = static_cast<uint8_t>((m_red[i] * 255) / max);
+            const auto green = static_cast<uint8_t>((m_green[i] * 255) / max);
+            const auto blue = static_cast<uint8_t>((m_blue[i] * 255) / max);
+            image.setPixelRGB(Point{i, 0}, fb32::RGB8880(red, green, blue));
+        }
+
+        return image;
+    }
+
+    [[nodiscard]] int maximum() const noexcept
+    {
+        auto maxRed = std::max_element(m_red.begin(), m_red.end());
+        auto maxGreen = std::max_element(m_green.begin(), m_green.end());
+        auto maxBlue = std::max_element(m_blue.begin(), m_blue.end());
+
+        return std::max({*maxRed, *maxGreen, *maxBlue});
+    }
+
+private:
+
+    std::array<int, 256> m_red{};
+    std::array<int, 256> m_green{};
+    std::array<int, 256> m_blue{};
+};
+
+//-------------------------------------------------------------------------
+
 #ifdef WITH_BS_THREAD_POOL
 
 BS::thread_pool& threadPool()
@@ -183,6 +293,50 @@ boxBlurColumns(
 
             p = Point(i, j);
             *(outputi + output.offset(p)) = argb.average(diameter).get8880();
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void rowsCountIntensity(
+    const fb32::Interface8880Base& input,
+    CountIntensity& count,
+    int jStart,
+    int jEnd)
+{
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        for (int i = 0 ; i < input.getDimensions().width() ; ++i)
+        {
+            auto pixel = input.getPixel(Point{i, j});
+
+            if (pixel.has_value())
+            {
+                count.add(fb32::RGB8880(pixel.value()));
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void rowsCountRGB(
+    const fb32::Interface8880Base& input,
+    CountRGB& count,
+    int jStart,
+    int jEnd)
+{
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        for (int i = 0 ; i < input.getDimensions().width() ; ++i)
+        {
+            auto pixel = input.getPixel(Point{i, j});
+
+            if (pixel.has_value())
+            {
+                count.add(fb32::RGB8880(pixel.value()));
+            }
         }
     }
 }
@@ -495,7 +649,6 @@ rowsToGrey(
 
 //=========================================================================
 
-
 fb32::Image8880
 fb32::boxBlur(
     const fb32::Interface8880Base& input,
@@ -585,6 +738,64 @@ fb32::enlighten(
     }
 
     return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::histogramIntensity(
+    const Interface8880Base& input)
+{
+    CountIntensity count;
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &count](int start, int end)
+    {
+        CountIntensity localCount;
+        rowsCountIntensity(input, localCount, start, end);
+        count.add(localCount);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    CountIntensity localCount;
+    rowsCountIntensity(input, localCount, 0, d.height());
+    count.add(localCount);
+#endif
+
+    return count.histogram();
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::histogramRGB(
+    const Interface8880Base& input)
+{
+    CountRGB count;
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &count](int start, int end)
+    {
+        CountRGB localCount;
+        rowsCountRGB(input, localCount, start, end);
+        count.add(localCount);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    CountRGB localCount;
+    rowsCountRGB(input, localCount, 0, d.height());
+    count.add(localCount);
+#endif
+
+    return count.histogram();
 }
 
 //-------------------------------------------------------------------------

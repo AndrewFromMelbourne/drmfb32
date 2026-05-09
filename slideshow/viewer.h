@@ -57,6 +57,13 @@ public:
         ANNOTATE_LONG
     };
 
+    enum Histogram
+    {
+        HISTOGRAM_OFF,
+        HISTOGRAM_RGB,
+        HISTOGRAM_INTENSITY
+    };
+
     enum Quality
     {
         QUALITY_LOW,
@@ -78,6 +85,7 @@ public:
         MENUID_FILE_STEP,
         MENUID_FIT_TO_SCREEN,
         MENUID_GREYSCALE,
+        MENUID_HISTOGRAM,
         MENUID_PAN_STEP,
         MENUID_QUALITY,
         MENUID_ZOOM
@@ -96,11 +104,13 @@ public:
         }
     };
 
-
     //---------------------------------------------------------------------
 
     [[nodiscard]] static Annotate annotateFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string annotateToString(Annotate annotate) noexcept;
+
+    [[nodiscard]] static Histogram histogramFromString(std::string_view string) noexcept;
+    [[nodiscard]] static std::string histogramToString(Histogram histogram) noexcept;
 
     [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
@@ -188,11 +198,13 @@ private:
     void paint();
     void pan(int dx, int dy) noexcept;
     [[nodiscard]] fb32::Point8880 placeImage(const fb32::Image8880& image) const noexcept;
+    void processHistogram();
     void processImage();
     void processResize(fb32::Dimensions8880 d);
     void readDirectory();
     void readValuesFromMenu();
     void setMenuValues();
+    void showHistogram();
     [[nodiscard]] fb32::Dimensions8880 zoomedDimensions() const noexcept;
 
     static const std::size_t INVALID_INDEX{std::numeric_limits<std::size_t>::max()};
@@ -211,7 +223,9 @@ private:
     bool m_fitToScreen;
     std::shared_ptr<fb32::Interface8880Font> m_font;
     bool m_greyscale;
+    Histogram m_histogram;
     fb32::Image8880 m_image;
+    fb32::Image8880 m_imageHistogram;
     fb32::Image8880 m_imageProcessed;
     bool m_isBlank;
     fb32::Interface8880Menu m_menu;

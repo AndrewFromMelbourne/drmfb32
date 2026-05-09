@@ -70,7 +70,136 @@ annotateStrings()
 
     return result;
 }
+//-------------------------------------------------------------------------
 
+[[nodiscard]] std::vector<std::string>
+boolStrings()
+{
+    return std::vector<std::string>{ "no", "yes" };
+}
+
+//-------------------------------------------------------------------------
+
+[[nodiscard]] fb32::Image8880
+histogramRGB(
+    const fb32::Image8880& image)
+{
+    std::array<std::size_t, 256> red{};
+    std::array<std::size_t, 256> green{};
+    std::array<std::size_t, 256> blue{};
+
+    for (const auto pixel : image.getBuffer())
+    {
+        const auto rgb = fb32::RGB8880(pixel);
+        red[rgb.getRed()]++;
+        green[rgb.getGreen()]++;
+        blue[rgb.getBlue()]++;
+    }
+
+    std::size_t maximum{};
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        maximum = std::max(maximum, red[i]);
+        maximum = std::max(maximum, green[i]);
+        maximum = std::max(maximum, blue[i]);
+    }
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        red[i] = (red[i] * 255) / maximum;
+        green[i] = (green[i] * 255) / maximum;
+        blue[i] = (blue[i] * 255) / maximum;
+    }
+
+    fb32::Image8880 histogram({256, 256});
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        const auto r = static_cast<int>(red[i]);
+        const auto g = static_cast<int>(green[i]);
+        const auto b = static_cast<int>(blue[i]);
+
+        for (int j = 0 ; j < 256 ; ++j)
+        {
+            constexpr std::uint8_t low{0};
+            constexpr std::uint8_t high{255};
+            fb32::RGB8880 rgb
+            {
+                (r >= j) ? high : low,
+                (g >= j) ? high : low,
+                (b >= j) ? high : low
+            };
+
+            const auto x = static_cast<int>(i);
+            const auto y = static_cast<int>(255 - j);
+            histogram.setPixelRGB({x, y}, rgb);
+        }
+    }
+
+    return histogram;
+}
+
+//-------------------------------------------------------------------------
+
+[[nodiscard]] fb32::Image8880
+histogramIntensity(
+    const fb32::Image8880& image)
+{
+    std::array<std::size_t, 256> intensity{};
+
+    for (const auto pixel : image.getBuffer())
+    {
+        const auto grey =  fb32::RGB8880(pixel).toIntensity();
+        intensity[grey]++;
+    }
+
+    std::size_t maximum{};
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        maximum = std::max(maximum, intensity[i]);
+    }
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        intensity[i] = (intensity[i] * 255) / maximum;
+    }
+
+    fb32::Image8880 histogram({256, 256});
+
+    for (int i = 0 ; i < 256 ; ++i)
+    {
+        const auto grey = static_cast<int>(intensity[i]);
+
+        for (int j = 0 ; j < 256 ; ++j)
+        {
+            const std::uint8_t value = (grey >= j) ? 255 : 0;
+            fb32::RGB8880 rgb{value, value, value};
+
+            const auto x = static_cast<int>(i);
+            const auto y = static_cast<int>(255 - j);
+            histogram.setPixelRGB({x, y}, rgb);
+        }
+    }
+
+    return histogram;
+}
+
+//-------------------------------------------------------------------------
+
+[[nodiscard]] std::vector<std::string>
+histogramStrings()
+{
+    std::vector<std::string> result;
+
+    for (const auto histogram : { Viewer::HISTOGRAM_OFF, Viewer::HISTOGRAM_RGB, Viewer::HISTOGRAM_INTENSITY })
+    {
+        result.push_back(Viewer::histogramToString(histogram));
+    }
+
+    return result;
+}
 
 //-------------------------------------------------------------------------
 
@@ -101,14 +230,6 @@ isImageFile(
 
 //-------------------------------------------------------------------------
 
-[[nodiscard]] std::vector<std::string>
-boolStrings()
-{
-    return std::vector<std::string>{ "no", "yes" };
-}
-
-//-------------------------------------------------------------------------
-
 [[nodiscard]] std::span<const int>
 fileStep() noexcept
 {
@@ -116,7 +237,6 @@ fileStep() noexcept
 
     return steps;
 }
-
 
 //-------------------------------------------------------------------------
 
@@ -142,7 +262,6 @@ panStep() noexcept
 
     return steps;
 }
-
 
 //-------------------------------------------------------------------------
 
@@ -262,6 +381,56 @@ Viewer::annotateToString(
 
 //-------------------------------------------------------------------------
 
+Viewer::Histogram
+Viewer::histogramFromString(
+    std::string_view string) noexcept
+{
+    auto s = tolower(string);
+
+    if (s == "off")
+    {
+        return HISTOGRAM_OFF;
+    }
+
+    if (s == "rgb")
+    {
+        return HISTOGRAM_RGB;
+    }
+
+    if (s == "intensity")
+    {
+        return HISTOGRAM_INTENSITY;
+    }
+
+    return HISTOGRAM_OFF;
+}
+
+//-------------------------------------------------------------------------
+
+std::string
+Viewer::histogramToString(
+    Viewer::Histogram histogram) noexcept
+{
+    switch (histogram)
+    {
+    case HISTOGRAM_OFF:
+
+        return "off";
+
+    case HISTOGRAM_RGB:
+
+        return "rgb";
+
+    case HISTOGRAM_INTENSITY:
+
+        return "intensity";
+    }
+
+    return "";
+}
+
+//-------------------------------------------------------------------------
+
 Viewer::Quality
 Viewer::qualityFromString(
     std::string_view string) noexcept
@@ -336,7 +505,9 @@ Viewer::Viewer(
     m_fitToScreen{true},
     m_font{createFont(fontConfig)},
     m_greyscale{false},
+    m_histogram{HISTOGRAM_OFF},
     m_image{},
+    m_imageHistogram{},
     m_imageProcessed{},
     m_isBlank{false},
     m_menu{
@@ -350,6 +521,7 @@ Viewer::Viewer(
             MenuItem{MENUID_FILE_STEP, "File step", 1, fileStepStrings()},
             MenuItem{MENUID_FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
             MenuItem{MENUID_GREYSCALE, "Greyscale", 0, boolStrings()},
+            MenuItem{MENUID_HISTOGRAM, "Histogram", HISTOGRAM_OFF, histogramStrings()},
             MenuItem{MENUID_PAN_STEP, "Pan step", 3, panStepStrings()},
             MenuItem{MENUID_QUALITY, "Quality", quality, qualityStrings()},
             MenuItem{MENUID_ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
@@ -441,6 +613,7 @@ Viewer::update(
         case fb32::Interface8880Menu::VALUE_UPDATE:
 
             readValuesFromMenu();
+            processHistogram();
             processImage();
             paint();
             return true;
@@ -640,9 +813,9 @@ Viewer::openImage()
     }
 
     m_enlighten = 0;
-
     m_offset.center();
 
+    processHistogram();
     processImage();
     paint();
 }
@@ -684,6 +857,7 @@ Viewer::paint()
 
     m_buffer.putImage(placeImage(m_imageProcessed), m_imageProcessed);
     annotate();
+    showHistogram();
 }
 
 //-------------------------------------------------------------------------
@@ -707,6 +881,31 @@ Viewer::placeImage(
     p.translate(m_offset.x(), m_offset.y());
 
     return p;
+}
+
+//-------------------------------------------------------------------------
+
+void
+Viewer::processHistogram()
+{
+    switch (m_histogram)
+    {
+    case HISTOGRAM_OFF:
+
+        m_imageHistogram = fb32::Image8880();
+        break;
+
+    case HISTOGRAM_RGB:
+
+        m_imageHistogram = histogramRGB(m_image);
+        break;
+
+    case HISTOGRAM_INTENSITY:
+
+        m_imageHistogram = histogramIntensity(m_image);
+        break;
+
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -741,7 +940,7 @@ Viewer::processImage()
          not m_fitToScreen) or (m_zoom == 1))
     {
         m_percent = 100;
-    }
+    }//-------------------------------------------------------------------------
     else
     {
         if (m_zoom == SCALE_OVERSIZED)
@@ -849,6 +1048,7 @@ Viewer::readValuesFromMenu()
     m_enlighten = m_menu.getValue(MENUID_ENLIGHTEN);
     m_fitToScreen = m_menu.getValue(MENUID_FIT_TO_SCREEN);
     m_greyscale = m_menu.getValue(MENUID_GREYSCALE);
+    m_histogram =  static_cast<Histogram>(m_menu.getValue(MENUID_HISTOGRAM));
     m_quality = static_cast<Quality>(m_menu.getValue(MENUID_QUALITY));
     m_zoom = m_menu.getValue(MENUID_ZOOM);
 
@@ -870,6 +1070,7 @@ Viewer::setMenuValues()
     m_menu.setValue(MENUID_ENLIGHTEN, m_enlighten);
     m_menu.setValue(MENUID_FIT_TO_SCREEN, m_fitToScreen);
     m_menu.setValue(MENUID_GREYSCALE, m_greyscale);
+    m_menu.setValue(MENUID_HISTOGRAM, m_histogram);
     m_menu.setValue(MENUID_QUALITY, m_quality);
     m_menu.setValue(MENUID_ZOOM, m_zoom);
 
@@ -894,6 +1095,26 @@ Viewer::setMenuValues()
         }
         ++index;
     }
+}
+
+//-------------------------------------------------------------------------
+
+void
+Viewer::showHistogram()
+{
+    if (m_histogram == HISTOGRAM_OFF)
+    {
+        return;
+    }
+
+    constexpr int padding{4};
+    fb32::Point8880 p
+    {
+        m_buffer.getDimensions().width() - m_imageHistogram.getDimensions().width() - padding,
+        m_buffer.getDimensions().height() - m_imageHistogram.getDimensions().height() - padding
+    };
+
+    m_buffer.putImage(p, m_imageHistogram);
 }
 
 //-------------------------------------------------------------------------
