@@ -187,32 +187,19 @@ PngDecode::pngStartRead()
         png_set_gray_to_rgb(m_readPtr);
     }
 
-    png_color_16 *imageBackgroundColor{};
+    png_color_16 background = {
+        .index = 0,
+        .red = m_background.getRed(),
+        .green = m_background.getGreen(),
+        .blue = m_background.getBlue(),
+        .gray = 0
+    };
 
-    if (png_get_bKGD(m_readPtr, m_infoPtr, &imageBackgroundColor))
-    {
-        png_set_background(m_readPtr,
-                           imageBackgroundColor,
-                           PNG_BACKGROUND_GAMMA_FILE,
-                           1,
-                           1.0);
-    }
-    else
-    {
-        png_color_16 background = {
-            .index = 0,
-            .red = m_background.getRed(),
-            .green = m_background.getGreen(),
-            .blue = m_background.getBlue(),
-            .gray = 0
-        };
-
-        png_set_background(m_readPtr,
-                           &background,
-                           PNG_BACKGROUND_GAMMA_SCREEN,
-                           0,
-                           1.0);
-    }
+    png_set_background(m_readPtr,
+                        &background,
+                        PNG_BACKGROUND_GAMMA_SCREEN,
+                        0,
+                        1.0);
 
     png_set_filler(m_readPtr, 0xFF, PNG_FILLER_AFTER);
     png_set_bgr(m_readPtr);
