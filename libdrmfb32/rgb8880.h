@@ -40,6 +40,12 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
+[[nodiscard]] constexpr uint8_t getRed(uint32_t rgb) noexcept { return (rgb >> 16) & 0xFF; }
+[[nodiscard]] constexpr uint8_t getGreen(uint32_t rgb) noexcept { return (rgb >> 8) & 0xFF; }
+[[nodiscard]] constexpr uint8_t getBlue(uint32_t rgb) noexcept { return rgb & 0xFF; }
+
+//-------------------------------------------------------------------------
+
 struct RGB8
 {
     constexpr RGB8(uint8_t r, uint8_t g, uint8_t b)
@@ -51,9 +57,9 @@ struct RGB8
 
     explicit constexpr RGB8(uint32_t rgb)
     :
-        red{static_cast<uint8_t>((rgb >> 16) & 0xFF)},
-        green{static_cast<uint8_t>((rgb >> 8) & 0xFF)},
-        blue{static_cast<uint8_t>(rgb & 0xFF)}
+        red{getRed(rgb)},
+        green{getGreen(rgb)},
+        blue{getBlue(rgb)}
     {}
 
     uint8_t red{};
