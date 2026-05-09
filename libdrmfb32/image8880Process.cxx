@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <mutex>
 #include <numbers>
 #include <stdexcept>
 
@@ -307,14 +308,12 @@ void rowsCountIntensity(
 {
     for (int j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < input.getDimensions().width() ; ++i)
-        {
-            auto pixel = input.getPixel(Point{i, j});
+        const auto row = input.getRow(j);
 
-            if (pixel.has_value())
-            {
-                count.add(fb32::RGB8880(pixel.value()));
-            }
+        for (const auto value : row)
+        {
+            auto pixel = fb32::RGB8880(value);
+            count.add(pixel);
         }
     }
 }
@@ -329,14 +328,11 @@ void rowsCountRGB(
 {
     for (int j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < input.getDimensions().width() ; ++i)
+        const auto row = input.getRow(j);
+        for (const auto value : row)
         {
-            auto pixel = input.getPixel(Point{i, j});
-
-            if (pixel.has_value())
-            {
-                count.add(fb32::RGB8880(pixel.value()));
-            }
+            auto pixel = fb32::RGB8880(value);
+            count.add(pixel);
         }
     }
 }
@@ -747,14 +743,16 @@ fb32::histogramIntensity(
     const Interface8880Base& input)
 {
     CountIntensity count;
+    std::mutex countMutex;
     const auto d = input.getDimensions();
 
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
-    auto iterateRows = [&input, &count](int start, int end)
+    auto iterateRows = [&input, &count, &countMutex](int start, int end)
     {
         CountIntensity localCount;
         rowsCountIntensity(input, localCount, start, end);
+        std::lock_guard<std::mutex> lock(countMutex);
         count.add(localCount);
     };
 
@@ -776,14 +774,16 @@ fb32::histogramRGB(
     const Interface8880Base& input)
 {
     CountRGB count;
+    std::mutex countMutex;
     const auto d = input.getDimensions();
 
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
-    auto iterateRows = [&input, &count](int start, int end)
+    auto iterateRows = [&input, &count, &countMutex](int start, int end)
     {
         CountRGB localCount;
         rowsCountRGB(input, localCount, start, end);
+        std::lock_guard<std::mutex> lock(countMutex);
         count.add(localCount);
     };
 
