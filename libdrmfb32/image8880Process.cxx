@@ -104,6 +104,10 @@ public:
         }
     }
 
+    static void count(
+        const fb32::Interface8880Base& input,
+        CountIntensity& count);
+
     [[nodiscard]] fb32::Image8880 histogram() const noexcept
     {
         fb32::Image8880 image({256, 256});
@@ -157,6 +161,10 @@ public:
         }
     }
 
+    static void count(
+        const fb32::Interface8880Base& input,
+        CountRGB& count);
+
     [[nodiscard]] fb32::Image8880 histogram() const noexcept
     {
         fb32::Image8880 image({256, 256});
@@ -192,6 +200,160 @@ private:
     std::array<int, 256> m_red{};
     std::array<int, 256> m_green{};
     std::array<int, 256> m_blue{};
+};
+
+//-------------------------------------------------------------------------
+
+struct ChannelMinMax
+{
+    uint8_t min{};
+    uint8_t max{};
+};
+
+//-------------------------------------------------------------------------
+
+class ChannelMap
+{
+public:
+
+    explicit ChannelMap(ChannelMinMax minMax) noexcept
+    :
+        m_minMax{minMax}
+    {
+        const auto range = m_minMax.max - m_minMax.min;
+
+        for (int i = 0 ; i < 256 ; ++i)
+        {
+            if (i < m_minMax.min)
+            {
+                m_map[i] = 0;
+            }
+            else if (i >= m_minMax.max)
+            {
+                m_map[i] = 255;
+            }
+            else
+            {
+                m_map[i] = static_cast<int>(((i - m_minMax.min) * 255) / range);
+            }
+        }
+    }
+
+    [[nodiscard]] int map(int value) const noexcept
+    {
+        return m_map[value];
+    }
+
+private:
+
+    ChannelMinMax m_minMax{};
+    std::array<int, 256> m_map{};
+};
+
+//-------------------------------------------------------------------------
+
+class MinMaxRGB
+{
+public:
+
+    struct RangeRGB
+    {
+        ChannelMinMax red{ .min = 255, .max = 0 };
+        ChannelMinMax green{ .min = 255, .max = 0 };
+        ChannelMinMax blue{ .min = 255, .max = 0 };
+    };
+
+    void add(const fb32::RGB8880& rgb) noexcept
+    {
+        const auto rgb8 = rgb.getRGB8();
+        m_range.red.min = std::min(m_range.red.min, rgb8.red);
+        m_range.red.max = std::max(m_range.red.max, rgb8.red);
+        m_range.green.min = std::min(m_range.green.min, rgb8.green);
+        m_range.green.max = std::max(m_range.green.max, rgb8.green);
+        m_range.blue.min = std::min(m_range.blue.min, rgb8.blue);
+        m_range.blue.max = std::max(m_range.blue.max, rgb8.blue);
+    }
+
+    void add(
+        int min,
+        int max,
+        const fb32::RGB8880& rgb) noexcept
+    {
+        const auto rgb8 = rgb.getRGB8();
+
+        if (rgb8.red >= min and rgb8.red < max)
+        {
+            m_range.red.min = std::min(m_range.red.min, rgb8.red);
+            m_range.red.max = std::max(m_range.red.max, rgb8.red);
+        }
+
+        if (rgb8.green >= min and rgb8.green < max)
+        {
+            m_range.green.min = std::min(m_range.green.min, rgb8.green);
+            m_range.green.max = std::max(m_range.green.max, rgb8.green);
+        }
+
+        if (rgb8.blue >= min and rgb8.blue < max)
+        {
+            m_range.blue.min = std::min(m_range.blue.min, rgb8.blue);
+            m_range.blue.max = std::max(m_range.blue.max, rgb8.blue);
+        }
+    }
+
+    void merge(const MinMaxRGB& other) noexcept
+    {
+        m_range.red.min = std::min(m_range.red.min, other.m_range.red.min);
+        m_range.red.max = std::max(m_range.red.max, other.m_range.red.max);
+        m_range.green.min = std::min(m_range.green.min, other.m_range.green.min);
+        m_range.green.max = std::max(m_range.green.max, other.m_range.green.max);
+        m_range.blue.min = std::min(m_range.blue.min, other.m_range.blue.min);
+        m_range.blue.max = std::max(m_range.blue.max, other.m_range.blue.max);
+    }
+
+    [[nodiscard]] const RangeRGB& getRange() const noexcept { return m_range; }
+
+    static void calculate(
+        const fb32::Interface8880Base& input,
+        MinMaxRGB& minMax);
+
+    static void calculate(
+        int low,
+        int high,
+        const fb32::Interface8880Base& input,
+        MinMaxRGB& minMax);
+
+private:
+
+    RangeRGB m_range{};
+};
+
+//-------------------------------------------------------------------------
+
+class ChannelMapRGB
+{
+public:
+
+    explicit ChannelMapRGB(const MinMaxRGB::RangeRGB& range) noexcept
+    :
+        red(range.red),
+        green(range.green),
+        blue(range.blue)
+    {
+    }
+
+    [[nodiscard]] fb32::RGB8880 map(const fb32::RGB8880& rgb) const noexcept
+    {
+        const auto rgb8 = rgb.getRGB8();
+        return fb32::RGB8880{static_cast<uint8_t>(red.map(rgb8.red)),
+                             static_cast<uint8_t>(green.map(rgb8.green)),
+                             static_cast<uint8_t>(blue.map(rgb8.blue))};
+    }
+
+private:
+
+    ChannelMap red;
+    ChannelMap green;
+    ChannelMap blue;
 };
 
 //-------------------------------------------------------------------------
@@ -300,7 +462,8 @@ boxBlurColumns(
 
 //-------------------------------------------------------------------------
 
-void rowsCountIntensity(
+void
+rowsCountIntensity(
     const fb32::Interface8880Base& input,
     CountIntensity& count,
     int jStart,
@@ -320,7 +483,8 @@ void rowsCountIntensity(
 
 //-------------------------------------------------------------------------
 
-void rowsCountRGB(
+void
+rowsCountRGB(
     const fb32::Interface8880Base& input,
     CountRGB& count,
     int jStart,
@@ -420,6 +584,29 @@ lanczosKernel(float x, int a)
 //-------------------------------------------------------------------------
 
 void
+rowHistogramStretch(
+    const fb32::Interface8880Base& input,
+    fb32::Image8880& output,
+    const ChannelMapRGB& channelMap,
+    int jStart,
+    int jEnd)
+{
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        const auto irow = input.getRow(j);
+        auto orowIter = output.getRow(j).begin();
+
+        for (const auto value : irow)
+        {
+            auto pixel = fb32::RGB8880(value);
+            *(orowIter++) = channelMap.map(pixel).get8880();
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
 rowsLanczos3Interpolation(
     const fb32::Interface8880Base& input,
     fb32::Image8880& output,
@@ -481,6 +668,50 @@ rowsLanczos3Interpolation(
                                 static_cast<uint8_t>(blue)};
 
             output.setPixelRGB(Point{i, j}, rgb);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+rowsMinMax(
+    const fb32::Interface8880Base& input,
+    MinMaxRGB& minMax,
+    int jStart,
+    int jEnd)
+{
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        const auto row = input.getRow(j);
+
+        for (const auto value : row)
+        {
+            auto pixel = fb32::RGB8880(value);
+            minMax.add(pixel);
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+rowsMinMax(
+    int low,
+    int high,
+    const fb32::Interface8880Base& input,
+    MinMaxRGB& minMax,
+    int jStart,
+    int jEnd)
+{
+    for (int j = jStart ; j < jEnd ; ++j)
+    {
+        const auto row = input.getRow(j);
+
+        for (const auto value : row)
+        {
+            auto pixel = fb32::RGB8880(value);
+            minMax.add(low, high, pixel);
         }
     }
 }
@@ -641,7 +872,125 @@ rowsToGrey(
 
 //-------------------------------------------------------------------------
 
+void
+CountIntensity::count(
+    const fb32::Interface8880Base& input,
+    CountIntensity& count)
+{
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    std::mutex countMutex;
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &count, &countMutex](int start, int end)
+    {
+        CountIntensity localCount;
+        rowsCountIntensity(input, localCount, start, end);
+        std::lock_guard<std::mutex> lock(countMutex);
+        count.add(localCount);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    CountIntensity localCount;
+    rowsCountIntensity(input, localCount, 0, d.height());
+    count.add(localCount);
+#endif
 }
+
+//-------------------------------------------------------------------------
+
+void
+CountRGB::count(
+    const fb32::Interface8880Base& input,
+    CountRGB& count)
+{
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    std::mutex countMutex;
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &count, &countMutex](int start, int end)
+    {
+        CountRGB localCount;
+        rowsCountRGB(input, localCount, start, end);
+        std::lock_guard<std::mutex> lock(countMutex);
+        count.add(localCount);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    CountRGB localCount;
+    rowsCountRGB(input, localCount, 0, d.height());
+    count.add(localCount);
+#endif
+}
+
+//-------------------------------------------------------------------------
+
+void
+MinMaxRGB::calculate(
+    const fb32::Interface8880Base& input,
+    MinMaxRGB& minMax)
+{
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    std::mutex minMaxMutex;
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &minMax, &minMaxMutex](int start, int end)
+    {
+        MinMaxRGB localMinMax;
+        rowsMinMax(input, localMinMax, start, end);
+        std::lock_guard<std::mutex> lock(minMaxMutex);
+        minMax.merge(localMinMax);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    MinMaxRGB localMinMax;
+    rowsMinMax(input, localMinMax, 0, d.height());
+    minMax.merge(localMinMax);
+#endif
+}
+
+//-------------------------------------------------------------------------
+
+void
+MinMaxRGB::calculate(
+    int low,
+    int high,
+    const fb32::Interface8880Base& input,
+    MinMaxRGB& minMax)
+{
+    const auto d = input.getDimensions();
+
+#ifdef WITH_BS_THREAD_POOL
+    std::mutex minMaxMutex;
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, low, high, &minMax, &minMaxMutex](int start, int end)
+    {
+        MinMaxRGB localMinMax;
+        rowsMinMax(low, high, input, localMinMax, start, end);
+        std::lock_guard<std::mutex> lock(minMaxMutex);
+        minMax.merge(localMinMax);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    MinMaxRGB localMinMax;
+    rowsMinMax(low, high, input, localMinMax, 0, d.height());
+    minMax.merge(localMinMax);
+#endif
+}
+
+//-------------------------------------------------------------------------
+
+};
 
 //=========================================================================
 
@@ -743,26 +1092,8 @@ fb32::histogramIntensity(
     const Interface8880Base& input)
 {
     CountIntensity count;
-    std::mutex countMutex;
-    const auto d = input.getDimensions();
 
-#ifdef WITH_BS_THREAD_POOL
-    auto& tPool = threadPool();
-    auto iterateRows = [&input, &count, &countMutex](int start, int end)
-    {
-        CountIntensity localCount;
-        rowsCountIntensity(input, localCount, start, end);
-        std::lock_guard<std::mutex> lock(countMutex);
-        count.add(localCount);
-    };
-
-    tPool.detach_blocks<int>(0, d.height(), iterateRows);
-    tPool.wait();
-#else
-    CountIntensity localCount;
-    rowsCountIntensity(input, localCount, 0, d.height());
-    count.add(localCount);
-#endif
+    CountIntensity::count(input, count);
 
     return count.histogram();
 }
@@ -774,28 +1105,70 @@ fb32::histogramRGB(
     const Interface8880Base& input)
 {
     CountRGB count;
-    std::mutex countMutex;
+
+    CountRGB::count(input, count);
+
+    return count.histogram();
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::histogramStretch(
+    const Interface8880Base& input)
+{
     const auto d = input.getDimensions();
+    Image8880 output{d};
+    MinMaxRGB minMax;
+
+    MinMaxRGB::calculate(input, minMax);
+    ChannelMapRGB channelMap{minMax.getRange()};
 
 #ifdef WITH_BS_THREAD_POOL
     auto& tPool = threadPool();
-    auto iterateRows = [&input, &count, &countMutex](int start, int end)
+    auto iterateRows = [&input, &output, &channelMap](int start, int end)
     {
-        CountRGB localCount;
-        rowsCountRGB(input, localCount, start, end);
-        std::lock_guard<std::mutex> lock(countMutex);
-        count.add(localCount);
+        rowHistogramStretch(input, output, channelMap, start, end);
     };
 
     tPool.detach_blocks<int>(0, d.height(), iterateRows);
     tPool.wait();
 #else
-    CountRGB localCount;
-    rowsCountRGB(input, localCount, 0, d.height());
-    count.add(localCount);
+    rowHistogramStretch(input, output, channelMap, 0, d.height());
 #endif
 
-    return count.histogram();
+    return output;
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::histogramStretch(
+    int low,
+    int high,
+    const Interface8880Base& input)
+{
+    const auto d = input.getDimensions();
+    Image8880 output{d};
+    MinMaxRGB minMax;
+
+    MinMaxRGB::calculate(low, high, input, minMax);
+    ChannelMapRGB channelMap{minMax.getRange()};
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output, &channelMap](int start, int end)
+    {
+        rowHistogramStretch(input, output, channelMap, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.wait();
+#else
+    rowHistogramStretch(input, output, channelMap, 0, d.height());
+#endif
+
+    return output;
 }
 
 //-------------------------------------------------------------------------
