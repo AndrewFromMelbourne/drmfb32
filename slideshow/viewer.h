@@ -64,13 +64,6 @@ public:
         HISTOGRAM_INTENSITY
     };
 
-    enum HisttogramStretch
-    {
-        HISTOGRAM_STRETCH_OFF,
-        HISTOGRAM_STRETCH_0_255,
-        HISTOGRAM_STRETCH_5_250
-    };
-
     enum Quality
     {
         QUALITY_LOW,
@@ -119,9 +112,6 @@ public:
 
     [[nodiscard]] static Histogram histogramFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string histogramToString(Histogram histogram) noexcept;
-
-    [[nodiscard]] static HisttogramStretch histogramStretchFromString(std::string_view string) noexcept;
-    [[nodiscard]] static std::string histogramStretchToString(HisttogramStretch histogramStretch) noexcept;
 
     [[nodiscard]] static Quality qualityFromString(std::string_view string) noexcept;
     [[nodiscard]] static std::string qualityToString(Quality quality) noexcept;
@@ -236,7 +226,7 @@ private:
     std::shared_ptr<fb32::Interface8880Font> m_font;
     bool m_greyscale;
     Histogram m_histogram;
-    HisttogramStretch m_histogramStretch;
+    bool m_histogramStretch;
     fb32::Image8880 m_image;
     fb32::Image8880 m_imageHistogram;
     fb32::Image8880 m_imageProcessed;

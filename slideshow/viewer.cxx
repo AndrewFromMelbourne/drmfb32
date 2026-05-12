@@ -80,114 +80,6 @@ boolStrings()
 
 //-------------------------------------------------------------------------
 
-[[nodiscard]] fb32::Image8880
-histogramRGB(
-    const fb32::Image8880& image)
-{
-    std::array<std::size_t, 256> red{};
-    std::array<std::size_t, 256> green{};
-    std::array<std::size_t, 256> blue{};
-
-    for (const auto pixel : image.getBuffer())
-    {
-        const auto rgb = fb32::RGB8880(pixel);
-        red[rgb.getRed()]++;
-        green[rgb.getGreen()]++;
-        blue[rgb.getBlue()]++;
-    }
-
-    std::size_t maximum{};
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        maximum = std::max(maximum, red[i]);
-        maximum = std::max(maximum, green[i]);
-        maximum = std::max(maximum, blue[i]);
-    }
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        red[i] = (red[i] * 255) / maximum;
-        green[i] = (green[i] * 255) / maximum;
-        blue[i] = (blue[i] * 255) / maximum;
-    }
-
-    fb32::Image8880 histogram({256, 256});
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        const auto r = static_cast<int>(red[i]);
-        const auto g = static_cast<int>(green[i]);
-        const auto b = static_cast<int>(blue[i]);
-
-        for (int j = 0 ; j < 256 ; ++j)
-        {
-            constexpr std::uint8_t low{0};
-            constexpr std::uint8_t high{255};
-            fb32::RGB8880 rgb
-            {
-                (r >= j) ? high : low,
-                (g >= j) ? high : low,
-                (b >= j) ? high : low
-            };
-
-            const auto x = static_cast<int>(i);
-            const auto y = static_cast<int>(255 - j);
-            histogram.setPixelRGB({x, y}, rgb);
-        }
-    }
-
-    return histogram;
-}
-
-//-------------------------------------------------------------------------
-
-[[nodiscard]] fb32::Image8880
-histogramIntensity(
-    const fb32::Image8880& image)
-{
-    std::array<std::size_t, 256> intensity{};
-
-    for (const auto pixel : image.getBuffer())
-    {
-        const auto grey =  fb32::RGB8880(pixel).toIntensity();
-        intensity[grey]++;
-    }
-
-    std::size_t maximum{};
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        maximum = std::max(maximum, intensity[i]);
-    }
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        intensity[i] = (intensity[i] * 255) / maximum;
-    }
-
-    fb32::Image8880 histogram({256, 256});
-
-    for (int i = 0 ; i < 256 ; ++i)
-    {
-        const auto grey = static_cast<int>(intensity[i]);
-
-        for (int j = 0 ; j < 256 ; ++j)
-        {
-            const std::uint8_t value = (grey >= j) ? 255 : 0;
-            fb32::RGB8880 rgb{value, value, value};
-
-            const auto x = static_cast<int>(i);
-            const auto y = static_cast<int>(255 - j);
-            histogram.setPixelRGB({x, y}, rgb);
-        }
-    }
-
-    return histogram;
-}
-
-//-------------------------------------------------------------------------
-
 [[nodiscard]] std::vector<std::string>
 histogramStrings()
 {
@@ -196,21 +88,6 @@ histogramStrings()
     for (const auto histogram : { Viewer::HISTOGRAM_OFF, Viewer::HISTOGRAM_RGB, Viewer::HISTOGRAM_INTENSITY })
     {
         result.push_back(Viewer::histogramToString(histogram));
-    }
-
-    return result;
-}
-
-//-------------------------------------------------------------------------
-
-[[nodiscard]] std::vector<std::string>
-histogramStretchStrings()
-{
-    std::vector<std::string> result;
-
-    for (const auto histogramStretch : { Viewer::HISTOGRAM_STRETCH_OFF, Viewer::HISTOGRAM_STRETCH_0_255, Viewer::HISTOGRAM_STRETCH_5_250 })
-    {
-        result.push_back(Viewer::histogramStretchToString(histogramStretch));
     }
 
     return result;
@@ -446,56 +323,6 @@ Viewer::histogramToString(
 
 //-------------------------------------------------------------------------
 
-Viewer::HisttogramStretch
-Viewer::histogramStretchFromString(
-    std::string_view string) noexcept
-{
-    auto s = tolower(string);
-
-    if (s == "off")
-    {
-        return HISTOGRAM_STRETCH_OFF;
-    }
-
-    if (s == "stretch_0_255")
-    {
-        return HISTOGRAM_STRETCH_0_255;
-    }
-
-    if (s == "stretch_5_250")
-    {
-        return HISTOGRAM_STRETCH_5_250;
-    }
-
-    return HISTOGRAM_STRETCH_OFF;
-}
-
-//-------------------------------------------------------------------------
-
-std::string
-Viewer::histogramStretchToString(
-    Viewer::HisttogramStretch histogramStretch) noexcept
-{
-    switch (histogramStretch)
-    {
-    case HISTOGRAM_STRETCH_OFF:
-
-        return "off";
-
-    case HISTOGRAM_STRETCH_0_255:
-
-        return "stretch_0_255";
-
-    case HISTOGRAM_STRETCH_5_250:
-
-        return "stretch_5_250";
-    }
-
-    return "";
-}
-
-//-------------------------------------------------------------------------
-
 Viewer::Quality
 Viewer::qualityFromString(
     std::string_view string) noexcept
@@ -571,7 +398,7 @@ Viewer::Viewer(
     m_font{createFont(fontConfig)},
     m_greyscale{false},
     m_histogram{HISTOGRAM_OFF},
-    m_histogramStretch{HISTOGRAM_STRETCH_OFF},
+    m_histogramStretch{false},
     m_image{},
     m_imageHistogram{},
     m_imageProcessed{},
@@ -588,7 +415,7 @@ Viewer::Viewer(
             MenuItem{MENUID_FIT_TO_SCREEN, "Fit to screen", 1, boolStrings()},
             MenuItem{MENUID_GREYSCALE, "Greyscale", 0, boolStrings()},
             MenuItem{MENUID_HISTOGRAM, "Histogram", HISTOGRAM_OFF, histogramStrings()},
-            MenuItem{MENUID_HISTOGRAM_STRETCH, "Histogram Stretch", HISTOGRAM_STRETCH_OFF, histogramStretchStrings()},
+            MenuItem{MENUID_HISTOGRAM_STRETCH, "Histogram Stretch", 0, boolStrings()},
             MenuItem{MENUID_PAN_STEP, "Pan step", 3, panStepStrings()},
             MenuItem{MENUID_QUALITY, "Quality", quality, qualityStrings()},
             MenuItem{MENUID_ZOOM, "Zoom", 0, zoomStrings(MAX_ZOOM)}
@@ -978,21 +805,9 @@ Viewer::processHistogram()
 void
 Viewer::processHistogramStretch()
 {
-    switch (m_histogramStretch)
+    if (m_histogramStretch)
     {
-    case HISTOGRAM_STRETCH_OFF:
-
-        break;
-
-    case HISTOGRAM_STRETCH_0_255:
-
-        m_imageProcessed = histogramStretch(m_imageProcessed);
-        break;
-
-    case HISTOGRAM_STRETCH_5_250:
-
-        m_imageProcessed = histogramStretch(5, 250, m_imageProcessed);
-        break;
+        m_imageProcessed = histogramStretch(10, m_imageProcessed);
     }
 }
 
@@ -1140,7 +955,7 @@ Viewer::readValuesFromMenu()
     m_fitToScreen = m_menu.getValue(MENUID_FIT_TO_SCREEN);
     m_greyscale = m_menu.getValue(MENUID_GREYSCALE);
     m_histogram =  static_cast<Histogram>(m_menu.getValue(MENUID_HISTOGRAM));
-    m_histogramStretch = static_cast<HisttogramStretch>(m_menu.getValue(MENUID_HISTOGRAM_STRETCH));
+    m_histogramStretch = m_menu.getValue(MENUID_HISTOGRAM_STRETCH);
     m_quality = static_cast<Quality>(m_menu.getValue(MENUID_QUALITY));
     m_zoom = m_menu.getValue(MENUID_ZOOM);
 

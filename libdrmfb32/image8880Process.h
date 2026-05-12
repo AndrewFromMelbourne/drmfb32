@@ -61,12 +61,7 @@ histogramRGB(
 
 [[nodiscard]] Image8880
 histogramStretch(
-    const Interface8880Base& input);
-
-[[nodiscard]] Image8880
-histogramStretch(
-    int low,
-    int high,
+    int percent,
     const Interface8880Base& input);
 
 [[nodiscard]] Image8880
