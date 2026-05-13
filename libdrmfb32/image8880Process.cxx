@@ -919,7 +919,6 @@ fb32::histogramStretch(
 
     const auto d = input.getDimensions();
     const auto totalPixels = d.width() * d.height();
-
     const auto threshold = (totalPixels * percent) / (100 * 256);
 
     int low{};
@@ -941,6 +940,11 @@ fb32::histogramStretch(
             high = i;
             break;
         }
+    }
+
+    if ((low = 0) and (high == 255))
+    {
+        return fb32::Image8880{input};
     }
 
     Image8880 output{d};
