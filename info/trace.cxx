@@ -52,6 +52,7 @@ Trace::Trace(
     std::initializer_list<TraceConfiguration> traces)
 :
     Panel(fb32::Dimensions8880{width, traceHeight + fontHeight + 4}, yPosition),
+    m_width{width},
     m_traceHeight{traceHeight},
     m_fontHeight{fontHeight},
     m_traceScale{traceScale},
@@ -166,7 +167,9 @@ Trace::addData(
             return;
         }
 
-        for (auto t{then} ; t < now ; ++t)
+        const auto start = std::max(then, now - m_width);
+
+        for (auto t{start} ; t < now ; ++t)
         {
             emptyDataPoint(t);
         }
