@@ -942,7 +942,7 @@ fb32::histogramStretch(
         }
     }
 
-    if ((low = 0) and (high == 255))
+    if ((low == 0) and (high == 255))
     {
         return fb32::Image8880{input};
     }
