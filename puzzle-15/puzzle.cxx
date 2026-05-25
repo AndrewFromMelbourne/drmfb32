@@ -165,7 +165,7 @@ Puzzle::update(Joystick& js)
         return true;
     }
 
-    auto value = js.getAxes(0);
+    auto value = js.getDpad();
 
     if (not value.x and not value.y)
     {

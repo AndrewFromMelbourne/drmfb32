@@ -149,6 +149,9 @@ main(
         //-----------------------------------------------------------------
 
         Joystick js(joystick, Joystick::ReadType::BLOCKING);
+
+        std::println("Joystick: {}", js.name());
+
         std::vector<std::string> configuration;
 
         for (auto i = 0U ; i < descriptions.size() ; ++i)
@@ -183,6 +186,31 @@ main(
 
         //-----------------------------------------------------------------
 
+        std::print("Press and release D-pad arrow");
+        std::cout.flush();
+
+        bool found{false};
+
+        while (not found)
+        {
+            js.read();
+
+            for (int j = 0 ; j < js.numberOfAxes() ; ++j)
+            {
+                const auto axes = js.getAxes(j);
+
+                if (axes.x != 0 or axes.y != 0)
+                {
+                    configuration.emplace_back("AXES_DPAD = " + std::to_string(j));
+                    std::println(" is {}", j);
+                    found = true;
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------
+
+
         std::print("Write conifiguration file? [y/N] ");
 
         std::string reply;
@@ -193,15 +221,12 @@ main(
             return 0;
         }
 
-        std::string configDirectory{std::getenv("HOME") +
-                                    std::string{"/.config/drmfb32"}};
+        std::string configDirectory{fb32::Joystick::configurationDirectory()};
 
         if (std::filesystem::exists(configDirectory) or
             std::filesystem::create_directories(configDirectory))
         {
-            std::string configFile{configDirectory + "/joystickButtons"};
-
-            std::ofstream ofs{configFile.c_str()};
+            std::ofstream ofs{js.configurationFile().c_str()};
 
             if (ofs)
             {

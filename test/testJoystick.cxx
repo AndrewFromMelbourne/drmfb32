@@ -113,6 +113,10 @@ main(
     {
         Joystick js(joystick, Joystick::ReadType::BLOCKING);
 
+        std::println("Joystick: {}", js.name());
+        std::println("Dpad axes: {}", js.dpadAxes());
+        std::println("");
+
         while (1)
         {
             js.read();

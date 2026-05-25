@@ -221,7 +221,7 @@ Interface8880Menu::update(
         return MENU_UPDATE;
     }
 
-    const auto value = js.getAxes(0);
+    const auto value = js.getDpad();
 
     if (not value.x and not value.y)
     {
