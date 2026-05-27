@@ -116,7 +116,6 @@ public:
         return m_intensity[i];
     }
 
-
     [[nodiscard]] fb32::Image8880 histogram() const noexcept
     {
         constexpr fb32::RGB8880 grey{15, 15, 15};
