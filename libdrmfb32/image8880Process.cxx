@@ -942,11 +942,23 @@ fb32::histogramStretch(
         }
     }
 
+    return histogramStretch(low, high, input);
+}
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::histogramStretch(
+    int low,
+    int high,
+    const Interface8880Base& input)
+{
     if (((low == 0) and (high == 255)) or (low >= high))
     {
         return fb32::Image8880{input};
     }
 
+    const auto d = input.getDimensions();
     Image8880 output{d};
 
 #if WITH_BS_THREAD_POOL

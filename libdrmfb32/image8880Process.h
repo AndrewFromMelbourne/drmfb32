@@ -65,6 +65,12 @@ histogramStretch(
     const Interface8880Base& input);
 
 [[nodiscard]] Image8880
+histogramStretch(
+    int low,
+    int high,
+    const Interface8880Base& input);
+
+[[nodiscard]] Image8880
 maxRGB(
     const Interface8880Base& input);
 
