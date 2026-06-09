@@ -55,7 +55,7 @@ class Image8880;
 
 //-------------------------------------------------------------------------
 
-class FrameBuffer8880
+class FrameBuffer8880 final
 :
     public Interface8880Base
 {

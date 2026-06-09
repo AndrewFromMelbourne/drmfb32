@@ -46,7 +46,7 @@ namespace fb32
 
 //-------------------------------------------------------------------------
 
-class Image8880
+class Image8880 final
 :
     public Interface8880Base
 {

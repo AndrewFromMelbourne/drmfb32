@@ -45,7 +45,7 @@ class FrameBuffer8880;
 
 //-------------------------------------------------------------------------
 
-class DynamicInfo
+class DynamicInfo final
 :
     public Panel
 {

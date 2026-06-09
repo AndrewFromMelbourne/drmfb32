@@ -50,7 +50,7 @@ using Point8880 = Point<int>;
 
 //-------------------------------------------------------------------------
 
-class Interface8880Null
+class Interface8880Null final
 :
     public Interface8880
 {

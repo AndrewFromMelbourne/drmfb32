@@ -44,7 +44,7 @@ class FrameBuffer8880;
 
 //-------------------------------------------------------------------------
 
-class TemperatureTrace
+class TemperatureTrace final
 :
     public TraceGraph
 {
