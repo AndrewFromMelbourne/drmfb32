@@ -723,8 +723,36 @@ rowsToGrey(
         for (int i = 0 ; i < id.width() ; ++i)
         {
             auto pixel = *(inputi++);
-            Point p{i, j};
-            output.setPixel(p,fb32::RGB8880(pixel).toGrey().get8880());
+            const Point p{i, j};
+
+            output.setPixel(p, fb32::RGB8880(pixel).toGrey().get8880());
+        }
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void
+rowsToGreen(
+    const fb32::Interface8880Base& input,
+    fb32::Image8880& output,
+    int jStart,
+    int jEnd)
+{
+    const auto id = input.getDimensions();
+    auto inputi = input.getBuffer().data() + (jStart * id.width());
+
+    for (auto j = jStart ; j < jEnd ; ++j)
+    {
+        for (int i = 0 ; i < id.width() ; ++i)
+        {
+            auto pixel = *(inputi++);
+            const Point p{i, j};
+            const fb32::RGB8880 rgb{pixel};
+            const auto intensity = rgb.toIntensity();
+            const fb32::RGB8880 green{0, intensity, 0};
+
+            output.setPixel(p, green.get8880());
         }
     }
 }
@@ -1349,3 +1377,29 @@ fb32::toGrey(
 
     return output;
 }
+
+//-------------------------------------------------------------------------
+
+fb32::Image8880
+fb32::toGreen(
+    const Interface8880Base& input)
+{
+    const auto id = input.getDimensions();
+    Image8880 output{id};
+
+#ifdef WITH_BS_THREAD_POOL
+    auto& tPool = threadPool();
+    auto iterateRows = [&input, &output](int start, int end)
+    {
+        rowsToGreen(input, output, start, end);
+    };
+
+    tPool.detach_blocks<int>(0, id.height(), iterateRows);
+    tPool.wait();
+#else
+    rowsToGreen(input, output, 0, id.height());
+#endif
+
+    return output;
+}
+

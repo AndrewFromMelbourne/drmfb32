@@ -148,6 +148,10 @@ scaleUp(
 toGrey(
     const Interface8880Base& input);
 
+[[nodiscard]] Image8880
+toGreen(
+    const Interface8880Base& input);
+
 //-------------------------------------------------------------------------
 
 } // namespace fb32
