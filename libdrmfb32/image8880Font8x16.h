@@ -51,53 +51,53 @@ class RGB8880;
 
 //-------------------------------------------------------------------------
 
-class Image8880Font8x16
+class Image8880Font8x16 final
 :
     public Interface8880Font
 {
 public:
 
     Image8880Font8x16() = default;
-    ~Image8880Font8x16() override = default;
+    ~Image8880Font8x16() final = default;
 
     Image8880Font8x16(const Image8880Font8x16&) = delete;
     Image8880Font8x16(Image8880Font8x16&&) = delete;
     Image8880Font8x16& operator=(const Image8880Font8x16&) = delete;
     Image8880Font8x16& operator=(Image8880Font8x16&&) = delete;
 
-    [[nodiscard]] Dimensions8880 getPixelDimensions() const noexcept override;
+    [[nodiscard]] Dimensions8880 getPixelDimensions() const noexcept final;
 
-    [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
+    [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept final;
 
-    [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) override;
+    [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) final;
 
     Point8880
     drawChar(
         Point8880 p,
         uint8_t c,
         const RGB8880& rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawChar(
         Point8880 p,
         uint8_t c,
         uint32_t rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawString(
         Point8880 p,
         std::string_view cv,
         const RGB8880& rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawString(
         Point8880 p,
         std::string_view sv,
         uint32_t rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 };
 
 //-------------------------------------------------------------------------

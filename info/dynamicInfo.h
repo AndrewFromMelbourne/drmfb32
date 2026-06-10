@@ -55,8 +55,8 @@ public:
                 int fontHeight,
                 int yPosition);
 
-    void init(fb32::Interface8880Font& font) override;
-    void update(time_t now, fb32::Interface8880Font& font) override;
+    void init(fb32::Interface8880Font& font) final;
+    void update(time_t now, fb32::Interface8880Font& font) final;
 
 private:
 

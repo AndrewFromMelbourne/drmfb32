@@ -56,17 +56,17 @@ class Interface8880Null final
 {
 public:
 
-    ~Interface8880Null() override = default;
+    ~Interface8880Null() final = default;
 
-    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept final
     {
         return m_dimensions;
     }
 
-    virtual void clear(const RGB8880&) override {};
-    virtual void clear([[maybe_unused]] uint32_t rgb = 0) override {};
+    virtual void clear(const RGB8880&) final {};
+    virtual void clear([[maybe_unused]] uint32_t rgb = 0) final {};
 
-    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Point8880 p) const override
+    [[nodiscard]] virtual std::optional<RGB8880> getPixelRGB(Point8880 p) const final
     {
         if (validPixel(p))
         {
@@ -76,7 +76,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] std::optional<RGB8> getPixelRGB8(Point8880 p) const override
+    [[nodiscard]] std::optional<RGB8> getPixelRGB8(Point8880 p) const final
     {
         if (validPixel(p))
         {
@@ -86,7 +86,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] std::optional<uint32_t> getPixel(Point8880 p) const override
+    [[nodiscard]] std::optional<uint32_t> getPixel(Point8880 p) const final
     {
         if (validPixel(p))
         {
@@ -96,11 +96,11 @@ public:
         return std::nullopt;
     }
 
-    bool setPixelRGB(Point8880 p, const RGB8880&) override { return validPixel(p); }
-    bool setPixelRGB8(Point8880 p, RGB8)  override { return validPixel(p); }
-    bool setPixel(Point8880 p, uint32_t)  override { return validPixel(p); }
+    bool setPixelRGB(Point8880 p, const RGB8880&) final { return validPixel(p); }
+    bool setPixelRGB8(Point8880 p, RGB8)  final { return validPixel(p); }
+    bool setPixel(Point8880 p, uint32_t)  final { return validPixel(p); }
 
-    bool validPixel(Point8880 p) const noexcept override
+    bool validPixel(Point8880 p) const noexcept final
     {
         const auto d = getDimensions();
 

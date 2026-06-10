@@ -89,7 +89,7 @@ public:
         const std::string& device = "",
         uint32_t connectorId = 0);
 
-    ~FrameBuffer8880() override;
+    ~FrameBuffer8880() final;
 
     FrameBuffer8880(const FrameBuffer8880& fb) = delete;
     FrameBuffer8880& operator=(const FrameBuffer8880& fb) = delete;
@@ -100,14 +100,14 @@ public:
     void clearBuffers(const RGB8880& rgb) { clearBuffers(rgb.get8880()); }
     void clearBuffers(uint32_t rgb = 0);
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override;
-    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override;
+    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept final;
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept final;
 
     [[nodiscard]] std::size_t getBufferSize() const noexcept;
 
     [[nodiscard]] drm::drmVersion_ptr getDrmVersion() noexcept { return drm::drmGetVersion(m_fd); }
 
-    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept final { return m_dimensions; }
 
     [[nodiscard]] bool hasAtomic() const noexcept { return m_hasAtomic; }
     [[nodiscard]] bool hasUniversalPlanes() const noexcept { return m_hasUniversalPlanes; }
@@ -116,7 +116,7 @@ public:
     void masterSet() noexcept;
     void masterDrop() noexcept;
 
-    [[nodiscard]] std::size_t offset(Point8880 p) const noexcept override;
+    [[nodiscard]] std::size_t offset(Point8880 p) const noexcept final;
 
     void update();
 

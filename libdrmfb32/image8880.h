@@ -60,7 +60,7 @@ public:
     Image8880(Dimensions8880 d, std::initializer_list<uint32_t> buffer);
     Image8880(Dimensions8880 d, std::span<const uint32_t> buffer);
 
-    ~Image8880() override = default;
+    ~Image8880() final = default;
 
     Image8880(const Image8880&) = default;
     Image8880& operator=(const Image8880&) = default;
@@ -74,12 +74,12 @@ public:
     //---------------------------------------------------------------------
     // getters and setters
 
-    [[nodiscard]] Dimensions8880 getDimensions() const noexcept override { return m_dimensions; }
+    [[nodiscard]] Dimensions8880 getDimensions() const noexcept final { return m_dimensions; }
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept override { return m_buffer; };
-    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept override { return m_buffer; }
+    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept final { return m_buffer; };
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept final { return m_buffer; }
 
-    std::size_t offset(Point8880 p) const noexcept override;
+    std::size_t offset(Point8880 p) const noexcept final;
 
 private:
 

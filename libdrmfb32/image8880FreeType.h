@@ -55,7 +55,7 @@ class RGB8880;
 
 //-------------------------------------------------------------------------
 
-class Image8880FreeType
+class Image8880FreeType final
 :
     public Interface8880Font
 {
@@ -64,7 +64,7 @@ public:
     Image8880FreeType() = default;
     Image8880FreeType(const std::string& fontFile, int pixelSize);
     explicit Image8880FreeType(const FontConfig& fontConfig);
-    ~Image8880FreeType() override;
+    ~Image8880FreeType() final;
 
     Image8880FreeType(const Image8880FreeType&) = delete;
     Image8880FreeType(Image8880FreeType&&) = delete;
@@ -74,11 +74,11 @@ public:
     [[nodiscard]] std::string getFontFamilyName() const noexcept;
     [[nodiscard]] std::string getFontStyleName() const noexcept;
 
-    [[nodiscard]] Dimensions8880 getPixelDimensions() const noexcept override;
+    [[nodiscard]] Dimensions8880 getPixelDimensions() const noexcept final;
 
-    [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept override;
+    [[nodiscard]] std::optional<char> getCharacterCode(CharacterCode code) const noexcept final;
 
-    [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) override;
+    [[nodiscard]] Dimensions8880 getStringDimensions(std::string_view s) final;
     [[nodiscard]] Dimensions8880 getWideCharDimensions(uint32_t c);
 
     [[nodiscard]] int getPixelSize() const noexcept
@@ -93,14 +93,14 @@ public:
         Point8880 p,
         uint8_t c,
         const RGB8880& rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawChar(
         Point8880 p,
         uint8_t c,
         uint32_t rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawWideChar(
@@ -114,14 +114,14 @@ public:
         Point8880 p,
         std::string_view sv,
         const RGB8880& rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
     Point8880
     drawString(
         Point8880 p,
         std::string_view sv,
         uint32_t rgb,
-        Interface8880& image) override;
+        Interface8880& image) final;
 
 private:
 
