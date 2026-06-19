@@ -161,7 +161,7 @@ fb32::FrameBuffer8880::clearBuffers(uint32_t rgb)
 //-------------------------------------------------------------------------
 
 std::span<uint32_t>
-fb32::FrameBuffer8880::getBuffer() noexcept
+fb32::FrameBuffer8880::getBuffer() & noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
     return {dbb.m_fbp, getBufferSize()};
@@ -170,7 +170,7 @@ fb32::FrameBuffer8880::getBuffer() noexcept
 //-------------------------------------------------------------------------
 
 std::span<const uint32_t>
-fb32::FrameBuffer8880::getBuffer() const noexcept
+fb32::FrameBuffer8880::getBuffer() const &noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
     return {dbb.m_fbp, getBufferSize()};

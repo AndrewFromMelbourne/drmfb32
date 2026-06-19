@@ -100,8 +100,8 @@ public:
     void clearBuffers(const RGB8880& rgb) { clearBuffers(rgb.get8880()); }
     void clearBuffers(uint32_t rgb = 0);
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept final;
-    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept final;
+    [[nodiscard]] std::span<uint32_t> getBuffer() & noexcept final;
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const & noexcept final;
 
     [[nodiscard]] std::size_t getBufferSize() const noexcept;
 

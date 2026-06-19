@@ -81,8 +81,8 @@ public:
     [[nodiscard]] uint8_t getFrame() const { return m_frame; }
     [[nodiscard]] uint8_t getNumberOfFrames() const { return m_numberOfFrames; }
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() noexcept final { return m_buffer; };
-    [[nodiscard]] std::span<const uint32_t> getBuffer() const noexcept final { return m_buffer; }
+    [[nodiscard]] std::span<uint32_t> getBuffer() & noexcept final { return m_buffer; };
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const & noexcept final { return m_buffer; }
 
     std::optional<RGB8880> getFramePixelRGB(Point8880 p, uint8_t frame) const;
     std::optional<uint32_t> getFramePixel(Point8880 p, uint8_t frame) const;
