@@ -94,7 +94,7 @@ fb32::Interface8880Base::getPixel(
 
 std::span<uint32_t>
 fb32::Interface8880Base::getRow(
-    int y)
+    int y) &
 {
     const Point8880 p{0, y};
 
@@ -113,7 +113,7 @@ fb32::Interface8880Base::getRow(
 
 std::span<const uint32_t>
 fb32::Interface8880Base::getRow(
-    int y) const
+    int y) const &
 {
     const Point8880 p{0, y};
 

@@ -103,6 +103,9 @@ public:
     [[nodiscard]] std::span<uint32_t> getBuffer() & noexcept final;
     [[nodiscard]] std::span<const uint32_t> getBuffer() const & noexcept final;
 
+    [[nodiscard]] std::span<uint32_t> getBuffer() && noexcept = delete;
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const && noexcept = delete;
+
     [[nodiscard]] std::size_t getBufferSize() const noexcept;
 
     [[nodiscard]] drm::drmVersion_ptr getDrmVersion() noexcept { return drm::drmGetVersion(m_fd); }

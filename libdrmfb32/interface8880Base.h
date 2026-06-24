@@ -58,6 +58,9 @@ public:
     [[nodiscard]] virtual std::span<uint32_t> getBuffer() & noexcept = 0;
     [[nodiscard]] virtual std::span<const uint32_t> getBuffer() const & noexcept = 0;
 
+    [[nodiscard]] std::span<uint32_t> getBuffer() && noexcept = delete;
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const && noexcept = delete;
+
     void clear(const RGB8880& rgb) override { clear(rgb.get8880()); }
     void clear(uint32_t rgb = 0) override;
 
@@ -65,8 +68,11 @@ public:
     [[nodiscard]] std::optional<RGB8> getPixelRGB8(Point8880 p) const override;
     [[nodiscard]] std::optional<uint32_t> getPixel(Point8880 p) const override;
 
-    [[nodiscard]] std::span<uint32_t> getRow(int y);
-    [[nodiscard]] std::span<const uint32_t> getRow(int y) const;
+    [[nodiscard]] std::span<uint32_t> getRow(int y) &;
+    [[nodiscard]] std::span<const uint32_t> getRow(int y) const &;
+
+    [[nodiscard]] std::span<uint32_t> getRow(int y) && = delete;
+    [[nodiscard]] std::span<const uint32_t> getRow(int y) const && = delete;
 
     [[nodiscard]] virtual std::size_t offset(Point8880 p) const noexcept = 0;
 

@@ -76,8 +76,11 @@ public:
 
     [[nodiscard]] Dimensions8880 getDimensions() const noexcept final { return m_dimensions; }
 
-    [[nodiscard]] std::span<uint32_t> getBuffer() & noexcept final { return m_buffer; };
+    [[nodiscard]] std::span<uint32_t> getBuffer() & noexcept final { return m_buffer; }
     [[nodiscard]] std::span<const uint32_t> getBuffer() const & noexcept final { return m_buffer; }
+
+    [[nodiscard]] std::span<uint32_t> getBuffer() && noexcept = delete;
+    [[nodiscard]] std::span<const uint32_t> getBuffer() const && = delete;
 
     std::size_t offset(Point8880 p) const noexcept final;
 
