@@ -68,6 +68,7 @@ public:
     TurboJpegDecode& operator=(TurboJpegDecode&& fb) = delete;
 
     void decode(fb32::Image8880& image);
+    void decodeToGrey(fb32::Image8880& image);
     JpegDetails details() const noexcept { return m_details; }
     tjhandle instance() const noexcept { return m_instance; }
 
@@ -134,6 +135,35 @@ TurboJpegDecode::decode(
         throw std::invalid_argument("Unable to decode JPEG");
     }
 }
+//-------------------------------------------------------------------------
+
+void
+TurboJpegDecode::decodeToGrey(
+    fb32::Image8880& image)
+{
+    std::vector<uint8_t> greyBuffer(image.getDimensions().area());
+    int result = tjDecompress2(m_instance,
+                               m_data.data(),
+                               m_data.size(),
+                               reinterpret_cast<unsigned char*>(greyBuffer.data()),
+                               m_details.m_width,
+                               m_details.m_width,
+                               m_details.m_height,
+                               TJPF_GRAY,
+                               TJFLAG_ACCURATEDCT);
+
+    if (result < 0)
+    {
+        throw std::invalid_argument("Unable to decode JPEG");
+    }
+
+    auto buffer = begin(image.getBuffer());
+    for (const auto& grey : greyBuffer)
+    {
+        const fb32::RGB8880 rgb{grey, grey, grey};
+        *(buffer++) = rgb.get8880();
+    }
+}
 
 //-------------------------------------------------------------------------
 
@@ -157,6 +187,17 @@ decodeJpeg(
 
 //-------------------------------------------------------------------------
 
+void
+decodeJpegToGrey(
+    Image8880& image,
+    std::span<const uint8_t> data)
+{
+    TurboJpegDecode tjd{data};
+    tjd.decodeToGrey(image);
+}
+
+//-------------------------------------------------------------------------
+
 Image8880
 readJpeg(
     const std::string& name)
@@ -173,6 +214,28 @@ readJpeg(
     fb32::Image8880 image{d};
 
     tjd.decode(image);
+
+    return image;
+}
+
+//-------------------------------------------------------------------------
+
+Image8880
+readJpegToGrey(
+    const std::string& name)
+{
+    const auto length{std::filesystem::file_size(std::filesystem::path(name))};
+
+    std::ifstream ifs{name, std::ios_base::binary};
+    std::vector<uint8_t> buffer(length);
+    ifs.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+
+    TurboJpegDecode tjd{buffer};
+    auto details{tjd.details()};
+    const fb32::Dimensions8880 d{details.m_width, details.m_height};
+    fb32::Image8880 image{d};
+
+    tjd.decodeToGrey(image);
 
     return image;
 }

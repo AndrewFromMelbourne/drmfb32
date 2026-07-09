@@ -56,6 +56,7 @@ public:
     explicit Webcam(
         const std::string& device,
         bool fitToScreen,
+        bool greyscale,
         int requestedFPS,
         const Interface8880& image);
 
@@ -85,8 +86,10 @@ private:
 
     bool chooseBestFit(const Interface8880& image);
     bool chooseFormat() noexcept;
-    bool convertMjpeg(const uint8_t* data, std::size_t length);
-    bool convertYuyv(const uint8_t* data, std::size_t length);
+    bool convertMjpegToGrey(const uint8_t* data, std::size_t length);
+    bool convertYuyvToGrey(const uint8_t* data, std::size_t length);
+    bool convertMjpegToRGB(const uint8_t* data, std::size_t length);
+    bool convertYuyvToRGB(const uint8_t* data, std::size_t length);
     bool hasVideoCapabilities() const noexcept;
     bool initBuffers() noexcept;
     void initResizedImage(const Interface8880& interface);
@@ -98,6 +101,7 @@ private:
     bool m_fitToScreen;
     uint32_t m_format;
     std::string m_formatName;
+    bool m_greyscale;
     Image8880 m_image;
     Image8880 m_resizedImage;
     std::vector<VideoBuffer> m_videoBuffers;

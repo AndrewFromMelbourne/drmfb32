@@ -42,6 +42,7 @@
 fb32::Webcam::Webcam(
     const std::string& device,
     bool fitToScreen,
+    bool greyscale,
     int requestedFPS,
     const Interface8880& interface)
 :
@@ -50,6 +51,7 @@ fb32::Webcam::Webcam(
     m_fitToScreen{fitToScreen},
     m_format{0},
     m_formatName{},
+    m_greyscale{greyscale},
     m_image{},
     m_resizedImage{},
     m_videoBuffers{}
@@ -144,12 +146,26 @@ fb32::Webcam::showFrame(
     {
         case V4L2_PIX_FMT_YUYV:
 
-            result = convertYuyv(data, buffer.length);
+            if (m_greyscale)
+            {
+                result = convertYuyvToGrey(data, buffer.length);
+            }
+            else
+            {
+                result = convertYuyvToRGB(data, buffer.length);
+            }
             break;
 
         case V4L2_PIX_FMT_MJPEG:
 
-            result = convertMjpeg(data, buffer.length);
+            if (m_greyscale)
+            {
+                result = convertMjpegToGrey(data, buffer.length);
+            }
+            else
+            {
+                result = convertMjpegToRGB(data, buffer.length);
+            }
             break;
     }
 
@@ -332,7 +348,56 @@ fb32::Webcam::chooseFormat() noexcept
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::convertMjpeg(
+fb32::Webcam::convertMjpegToGrey(
+    const uint8_t* data,
+    std::size_t length)
+{
+    bool result = false;
+
+    try
+    {
+        decodeJpegToGrey(m_image, std::span<const uint8_t>{data, length});
+        result = true;
+    }
+    catch(const std::exception& e)
+    {
+        // do nothing
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Webcam::convertYuyvToGrey(
+    const uint8_t* data,
+    std::size_t length)
+{
+    auto buffer = begin(m_image.getBuffer());
+    constexpr std::size_t BytesPerYuyv{4};
+
+    for (auto i = 0U ; i < length ; i += BytesPerYuyv)
+    {
+        const uint8_t y1 = data[0];
+        const uint8_t y2 = data[2];
+
+        const RGB8880 rgb1{ y1, y1, y1 };
+        const RGB8880 rgb2{ y2, y2, y2 };
+
+        *(buffer++) = rgb1.get8880();
+        *(buffer++) = rgb2.get8880();
+
+        data += BytesPerYuyv;
+    }
+
+    return true;
+}
+
+//-------------------------------------------------------------------------
+
+bool
+fb32::Webcam::convertMjpegToRGB(
     const uint8_t* data,
     std::size_t length)
 {
@@ -363,7 +428,7 @@ fb32::Webcam::convertMjpeg(
 //
 
 bool
-fb32::Webcam::convertYuyv(
+fb32::Webcam::convertYuyvToRGB(
     const uint8_t* data,
     std::size_t length)
 {
