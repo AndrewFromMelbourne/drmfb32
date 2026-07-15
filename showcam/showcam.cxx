@@ -81,7 +81,7 @@ printUsage(
     std::println(stream,"    --device,-d - dri device to use");
     std::println(stream,"    --fit,-f - fit image to screen");
     std::println(stream,"    --FPS,-F - request frames per second");
-    std::println(stream,"     --greyscale,-g - convert to greyscale");
+    std::println(stream,"    --greyscale,-g - convert to greyscale");
     std::println(stream,"    --help,-h - print usage and exit");
     std::println(stream,"    --videodevice,-v - video device to use");
     std::println(stream, "");
