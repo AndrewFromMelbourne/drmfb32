@@ -83,6 +83,7 @@ printUsage(
     std::println(stream,"    --FPS,-F - request frames per second");
     std::println(stream,"    --greyscale,-g - convert to greyscale");
     std::println(stream,"    --help,-h - print usage and exit");
+    std::println(stream,"    --pixelFormat,-p - pixel format to use (YUYV, MJPEG or H264)");
     std::println(stream,"    --videodevice,-v - video device to use");
     std::println(stream, "");
 }
@@ -99,12 +100,13 @@ main(
     const std::string program{basename(argv[0])};
     bool fitToScreen{false};
     bool greyscale{false};
+    std::string pixelFormat{""};
     int requestedFPS{0};
     std::string videoDevice{"/dev/video0"};
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "F:c:d:fhv:g";
+    static const char* sopts = "F:c:d:fhv:g:p:";
     static option lopts[] =
     {
         { "FPS", no_argument, NULL, 'F' },
@@ -114,6 +116,7 @@ main(
         { "fit", no_argument, nullptr, 'f' },
         { "videodevice", required_argument, NULL, 'v' },
         { "greyscale", no_argument, NULL, 'g' },
+        { "pixelFormat", required_argument, NULL, 'p' },
         { nullptr, no_argument, nullptr, 0 }
     };
 
@@ -154,6 +157,11 @@ main(
             ::exit(EXIT_SUCCESS);
             break;
 
+        case 'p':
+
+            pixelFormat = optarg;
+            break;
+
         case 'v':
 
             videoDevice = optarg;
@@ -191,7 +199,7 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-        Webcam wc(videoDevice, fitToScreen, greyscale, requestedFPS, fb);
+        Webcam wc(videoDevice, fitToScreen, greyscale, requestedFPS, fb, pixelFormat);
 
         //-----------------------------------------------------------------
 

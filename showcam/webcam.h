@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include "decodeH264.h"
 #include "fileDescriptor.h"
 #include "image8880.h"
 #include "interface8880.h"
@@ -58,7 +59,8 @@ public:
         bool fitToScreen,
         bool greyscale,
         int requestedFPS,
-        const Interface8880& image);
+        const Interface8880& image,
+        const std::string& pixelFormat);
 
     ~Webcam();
 
@@ -85,7 +87,7 @@ public:
 private:
 
     bool chooseBestFit(const Interface8880& image);
-    bool chooseFormat() noexcept;
+    bool chooseFormat(const std::string& pixelFormat) noexcept;
     bool convertMjpegToGrey(const uint8_t* data, std::size_t length);
     bool convertYuyvToGrey(const uint8_t* data, std::size_t length);
     bool convertMjpegToRGB(const uint8_t* data, std::size_t length);
@@ -96,6 +98,7 @@ private:
     bool initVideo() noexcept;
     bool setFPS(int fps) const noexcept;
 
+    std::unique_ptr<DecodeH264> m_decodeH264;
     fb32::Dimensions8880 m_dimensions;
     fd::FileDescriptor m_fd;
     bool m_fitToScreen;

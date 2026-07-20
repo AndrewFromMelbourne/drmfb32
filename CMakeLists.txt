@@ -62,6 +62,9 @@ endif()
 find_package(Freetype)
 pkg_check_modules(TURBOJPEG libturbojpeg)
 pkg_check_modules(LIBPNG libpng)
+pkg_check_modules(LIBAVCODEC libavcodec)
+pkg_check_modules(LIBAVFORMAT libavformat)
+pkg_check_modules(LIBAVUTIL libavutil)
 
 #--------------------------------------------------------------------------
 
@@ -181,11 +184,15 @@ target_link_libraries(puzzle-15 drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-if (TURBOJPEG_FOUND)
-add_executable(showcam showcam/showcam.cxx
+if (TURBOJPEG_FOUND AND LIBAVCODEC_FOUND AND LIBAVFORMAT_FOUND AND LIBAVUTIL_FOUND)
+add_executable(showcam showcam/decodeH264.cxx
+                       showcam/showcam.cxx
                        showcam/webcam.cxx)
 target_link_libraries(showcam drmfb32 ${DRM_LIBRARIES}
                                       ${TURBOJPEG_LIBRARIES}
+                                      ${LIBAVCODEC_LIBRARIES}
+                                      ${LIBAVFORMAT_LIBRARIES}
+                                      ${LIBAVUTIL_LIBRARIES}
                                       ${BS_THREAD_LIBRARIES})
 endif()
 

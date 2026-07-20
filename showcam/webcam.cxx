@@ -31,8 +31,10 @@
 #include <sys/mman.h>
 
 #include <algorithm>
+#include <map>
 #include <system_error>
 
+#include "decodeH264.h"
 #include "image8880Jpeg.h"
 #include "image8880Process.h"
 #include "webcam.h"
@@ -44,8 +46,10 @@ fb32::Webcam::Webcam(
     bool fitToScreen,
     bool greyscale,
     int requestedFPS,
-    const Interface8880& interface)
+    const Interface8880& interface,
+    const std::string& pixelFormat)
 :
+    m_decodeH264{nullptr},
     m_dimensions{ 0, 0 },
     m_fd{::open(device.c_str(), O_RDWR)},
     m_fitToScreen{fitToScreen},
@@ -70,11 +74,11 @@ fb32::Webcam::Webcam(
                                     " does not have video capabilities");
     }
 
-    if (not chooseFormat())
+    if (not chooseFormat(pixelFormat))
     {
         throw std::invalid_argument("Device " +
                                     device +
-                                    " does not support YUYV or MJPEG");
+                                    " does not support YUYV, MJPEG or H264 formats");
     }
 
     if (not chooseBestFit(interface))
@@ -144,15 +148,14 @@ fb32::Webcam::showFrame(
 
     switch (m_format)
     {
-        case V4L2_PIX_FMT_YUYV:
+        case V4L2_PIX_FMT_H264:
 
-            if (m_greyscale)
+            if (m_decodeH264)
             {
-                result = convertYuyvToGrey(data, buffer.length);
-            }
-            else
-            {
-                result = convertYuyvToRGB(data, buffer.length);
+                result = m_decodeH264->decode(data,
+                                              buffer.length,
+                                              m_image,
+                                              m_greyscale);
             }
             break;
 
@@ -165,6 +168,18 @@ fb32::Webcam::showFrame(
             else
             {
                 result = convertMjpegToRGB(data, buffer.length);
+            }
+            break;
+
+        case V4L2_PIX_FMT_YUYV:
+
+            if (m_greyscale)
+            {
+                result = convertYuyvToGrey(data, buffer.length);
+            }
+            else
+            {
+                result = convertYuyvToRGB(data, buffer.length);
             }
             break;
     }
@@ -317,32 +332,64 @@ fb32::Webcam::chooseBestFit(
 //-------------------------------------------------------------------------
 
 bool
-fb32::Webcam::chooseFormat() noexcept
+fb32::Webcam::chooseFormat(
+    const std::string& pixelFormat) noexcept
 {
-    bool result = false;
     v4l2_fmtdesc fmtdesc;
     fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    std::map<uint32_t, std::string> formats;
 
     for (fmtdesc.index = 0 ;
          ::ioctl(m_fd.fd(), VIDIOC_ENUM_FMT, &fmtdesc) == 0 ;
          ++fmtdesc.index)
     {
-        if (fmtdesc.pixelformat == V4L2_PIX_FMT_MJPEG)
+        formats[fmtdesc.pixelformat] = reinterpret_cast<char*>(fmtdesc.description);
+    }
+
+    if (pixelFormat.length() == 4)
+    {
+        const uint32_t fourcc = v4l2_fourcc(pixelFormat[0],
+                                            pixelFormat[1],
+                                            pixelFormat[2],
+                                            pixelFormat[3]);
+
+        if (formats.find(fourcc) != formats.end())
         {
-            m_format = fmtdesc.pixelformat;
-            m_formatName = reinterpret_cast<char*>(fmtdesc.description);
-            result = true;
-            break;
-        }
-        if (fmtdesc.pixelformat == V4L2_PIX_FMT_YUYV)
-        {
-            m_format = fmtdesc.pixelformat;
-            m_formatName = reinterpret_cast<char*>(fmtdesc.description);
-            result = true;
+            m_format = fourcc;
+            m_formatName = formats[fourcc];
+
+            if (m_format == V4L2_PIX_FMT_H264)
+            {
+                m_decodeH264 = DecodeH264::create();
+            }
+
+            return true;
         }
     }
 
-    return result;
+    if (formats.find(V4L2_PIX_FMT_H264) != formats.end())
+    {
+        m_format = V4L2_PIX_FMT_H264;
+        m_formatName = formats[V4L2_PIX_FMT_H264];
+        m_decodeH264 = DecodeH264::create();
+        return true;
+    }
+
+    if (formats.find(V4L2_PIX_FMT_MJPEG) != formats.end())
+    {
+        m_format = V4L2_PIX_FMT_MJPEG;
+        m_formatName = formats[V4L2_PIX_FMT_MJPEG];
+        return true;
+    }
+
+    if (formats.find(V4L2_PIX_FMT_YUYV) != formats.end())
+    {
+        m_format = V4L2_PIX_FMT_YUYV;
+        m_formatName = formats[V4L2_PIX_FMT_YUYV];
+        return true;
+    }
+
+    return false;
 }
 
 //-------------------------------------------------------------------------
@@ -564,6 +611,12 @@ fb32::Webcam::initResizedImage(
     const Interface8880& interface)
 {
     const auto id = interface.getDimensions();
+
+    if ((m_dimensions.width() == id.width()) and (m_dimensions.height() == id.height()))
+    {
+        m_fitToScreen = false;
+        return;
+    }
 
     auto width = (m_dimensions.width() * id.height()) /
                   m_dimensions.height();

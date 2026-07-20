@@ -13,6 +13,8 @@ This project uses [BS::thread_pool](https://github.com/bshoshany/thread-pool) by
 
 This project uses the following libraries. You will need to install the developer packages to compile all the programs.
 
+* libavcodec
+* libavformat
 * libdrm
 * libfreetype2
 * libpng
