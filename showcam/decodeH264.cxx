@@ -25,8 +25,6 @@
 //
 //-------------------------------------------------------------------------
 
-#include <print>
-
 #include "decodeH264.h"
 
 //-------------------------------------------------------------------------
@@ -115,13 +113,6 @@ fb32::DecodeH264::decode(
         return false;
     }
 
-    static bool firstTime{true};
-    if (firstTime)
-    {
-        firstTime = false;
-        std::println("Decoded frame: {} x {}", m_frame->width, m_frame->height);
-        std::println("Linesize: {} {} {}", m_frame->linesize[0], m_frame->linesize[1], m_frame->linesize[2]);
-    }
     std::span<const uint8_t> yData{m_frame->data[0], static_cast<std::size_t>(m_frame->linesize[0] * m_frame->height)};
 
     if (greyscale)
