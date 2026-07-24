@@ -83,7 +83,7 @@ printUsage(
     std::println(stream,"    --FPS,-F - request frames per second");
     std::println(stream,"    --greyscale,-g - convert to greyscale");
     std::println(stream,"    --help,-h - print usage and exit");
-    std::println(stream,"    --pixelFormat,-p - pixel format to use (YUYV, MJPEG or H264)");
+    std::println(stream,"    --pixelFormat,-p - pixel format to use (YUYV, MJPG or H264)");
     std::println(stream,"    --videodevice,-v - video device to use");
     std::println(stream, "");
 }
