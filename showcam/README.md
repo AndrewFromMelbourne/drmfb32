@@ -3,12 +3,14 @@
 Display a Webcam stream
 
 ## usage
-        showcam <options>
+    showcam <options>
 
-        --FPS,-F - set the desired frames per second
-        --connector,-c - dri connector to use
-        --device,-d - dri device to use
-        --fit,-f - fit image to screen
-        --help,-h - print usage and exit
-        --videodevice,-v - video device to use
+    --connector,-c - dri connector to use
+    --device,-d - dri device to use
+    --fit,-f - fit image to screen
+    --FPS,-F - request frames per second
+    --greyscale,-g - convert to greyscale
+    --help,-h - print usage and exit
+    --pixelFormat,-p - pixel format to use (YUYV, MJPEG or H264)
+    --videodevice,-v - video device to use
 
