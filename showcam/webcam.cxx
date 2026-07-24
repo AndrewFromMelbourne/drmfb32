@@ -39,7 +39,108 @@
 #include "image8880Process.h"
 #include "webcam.h"
 
+#ifdef WITH_BS_THREAD_POOL
+#include "BS_thread_pool.hpp"
+#endif
+
+//=========================================================================
+
+namespace {
+
 //-------------------------------------------------------------------------
+
+#ifdef WITH_BS_THREAD_POOL
+
+BS::thread_pool& threadPool()
+{
+    static BS::thread_pool s_threadPool;
+
+    return s_threadPool;
+}
+
+#endif
+
+//-------------------------------------------------------------------------
+
+void
+rowsYuvyToGrey(
+    const uint8_t* data,
+    fb32::Image8880& image,
+    std::size_t start,
+    std::size_t end)
+{
+    constexpr std::size_t BytesPerY{2};
+    auto buffer = begin(image.getBuffer()) + (start / BytesPerY);
+    data += start;
+
+    for (std::size_t i = start; i < end; i += BytesPerY)
+    {
+        const auto y = *data;
+        const fb32::RGB8880 rgb{y, y, y};
+        *(buffer++) = rgb.get8880();
+        data += BytesPerY;
+    }
+}
+
+//-------------------------------------------------------------------------
+//
+// R = 1.164 (Y - 16) + 1.596 (V - 128)
+// G = 1.164 (Y - 16) - 0.813 (V - 128) - 0.391 (U - 128)
+// B = 1.164 (Y - 16) + 2.018 (U - 128)
+//
+// R = (1192 (Y - 16) + 1634 (V - 128)) / 1024
+// G = (1192 (Y - 16) -  832 (V - 128) -  400 (U - 128)) / 1024
+// B = (1992 (Y - 16) + 2066 (U - 128)) / 1024
+//
+
+void
+rowsYuvyToRGB(
+    const uint8_t* data,
+    fb32::Image8880& image,
+    std::size_t start,
+    std::size_t end)
+{
+    constexpr std::size_t BytesPerYuyv{4};
+    auto buffer = begin(image.getBuffer()) + (start / (BytesPerYuyv / 2));
+    data += start;
+
+    for (std::size_t i = start; i < end; i += BytesPerYuyv)
+    {
+        const int y1 = data[0] - 16;
+        const int u = data[1] - 128;
+        const int y2 = data[2] - 16;
+        const int v = data[3] - 128;
+
+        const int y1Part = 1192 * y1;
+        const int y2Part = 1192 * y2;
+
+        const int rPart = 1634 * v;
+        const int gPart = -832 * v - 400 * u;
+        const int bPart = 2066 * u;
+
+        const fb32::RGB8880 rgb1{
+            static_cast<uint8_t>(std::clamp((y1Part + rPart) / 1024, 0, 255)),
+            static_cast<uint8_t>(std::clamp((y1Part + gPart) / 1024, 0, 255)),
+            static_cast<uint8_t>(std::clamp((y1Part + bPart) / 1024, 0, 255))};
+
+        const fb32::RGB8880 rgb2{
+            static_cast<uint8_t>(std::clamp((y2Part + rPart) / 1024, 0, 255)),
+            static_cast<uint8_t>(std::clamp((y2Part + gPart) / 1024, 0, 255)),
+            static_cast<uint8_t>(std::clamp((y2Part + bPart) / 1024, 0, 255))};
+
+        *(buffer++) = rgb1.get8880();
+        *(buffer++) = rgb2.get8880();
+
+        data += BytesPerYuyv;
+    }
+}
+
+//-------------------------------------------------------------------------
+
+};
+
+//=========================================================================
+
 
 fb32::Webcam::Webcam(
     const std::string& device,
@@ -421,22 +522,22 @@ fb32::Webcam::convertYuyvToGrey(
     const uint8_t* data,
     std::size_t length)
 {
-    auto buffer = begin(m_image.getBuffer());
-    constexpr std::size_t BytesPerYuyv{4};
+#if WITH_BS_THREAD_POOL
 
-    for (auto i = 0U ; i < length ; i += BytesPerYuyv)
+    auto& tPool = threadPool();
+    auto iterateRows = [data, this](int start, int end)
     {
-        const uint8_t y1 = data[0];
-        const uint8_t y2 = data[2];
+        rowsYuvyToGrey(data, m_image, start, end);
+    };
 
-        const RGB8880 rgb1{ y1, y1, y1 };
-        const RGB8880 rgb2{ y2, y2, y2 };
+    tPool.detach_blocks<int>(0, length, iterateRows);
+    tPool.wait();
 
-        *(buffer++) = rgb1.get8880();
-        *(buffer++) = rgb2.get8880();
+#else
 
-        data += BytesPerYuyv;
-    }
+    rowsYuvyToGrey(data, m_image, 0, length);
+
+#endif
 
     return true;
 }
@@ -464,53 +565,28 @@ fb32::Webcam::convertMjpegToRGB(
 }
 
 //-------------------------------------------------------------------------
-//
-// R = 1.164 (Y - 16) + 1.596 (V - 128)
-// G = 1.164 (Y - 16) - 0.813 (V - 128) - 0.391 (U - 128)
-// B = 1.164 (Y - 16) + 2.018 (U - 128)
-//
-// R = (1192 (Y - 16) + 1634 (V - 128)) / 1024
-// G = (1192 (Y - 16) -  832 (V - 128) -  400 (U - 128)) / 1024
-// B = (1992 (Y - 16) + 2066 (U - 128)) / 1024
-//
 
 bool
 fb32::Webcam::convertYuyvToRGB(
     const uint8_t* data,
     std::size_t length)
 {
-    auto buffer = begin(m_image.getBuffer());
-    constexpr std::size_t BytesPerYuyv{4};
+#if WITH_BS_THREAD_POOL
 
-    for (auto i = 0U ; i < length ; i += BytesPerYuyv)
+    auto& tPool = threadPool();
+    auto iterateRows = [data, this](int start, int end)
     {
-        const int y1 = data[0] - 16;
-        const int u = data[1] - 128;
-        const int y2 = data[2] - 16;
-        const int v = data[3] - 128;
+        rowsYuvyToRGB(data, m_image, start, end);
+    };
 
-        const int y1Part = 1192 * y1;
-        const int y2Part = 1192 * y2;
+    tPool.detach_blocks<int>(0, length, iterateRows);
+    tPool.wait();
 
-        const int rPart = 1634 * v;
-        const int gPart = -832 * v - 400 * u;
-        const int bPart = 2066 * u;
+#else
 
-        const RGB8880 rgb1{
-            static_cast<uint8_t>(std::clamp((y1Part + rPart) / 1024, 0, 255)),
-            static_cast<uint8_t>(std::clamp((y1Part + gPart) / 1024, 0, 255)),
-            static_cast<uint8_t>(std::clamp((y1Part + bPart) / 1024, 0, 255))};
+    rowsYuvyToRGB(data, m_image, 0, length);
 
-        const RGB8880 rgb2{
-            static_cast<uint8_t>(std::clamp((y2Part + rPart) / 1024, 0, 255)),
-            static_cast<uint8_t>(std::clamp((y2Part + gPart) / 1024, 0, 255)),
-            static_cast<uint8_t>(std::clamp((y2Part + bPart) / 1024, 0, 255))};
-
-        *(buffer++) = rgb1.get8880();
-        *(buffer++) = rgb2.get8880();
-
-        data += BytesPerYuyv;
-    }
+#endif
 
     return true;
 }

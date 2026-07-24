@@ -106,7 +106,7 @@ main(
 
     //---------------------------------------------------------------------
 
-    static const char* sopts = "F:c:d:fhv:g:p:";
+    static const char* sopts = "F:c:d:fhv:gp:";
     static option lopts[] =
     {
         { "FPS", no_argument, NULL, 'F' },
