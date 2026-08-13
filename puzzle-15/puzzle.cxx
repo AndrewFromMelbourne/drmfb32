@@ -83,13 +83,8 @@ Puzzle::getInversionCount() const
 
     for (auto i = 0 ; i < c_boardSize - 1 ; ++i)
     {
-        for (auto j = i + 1 ; j < c_boardSize ; ++j)
-        {
-            if (m_board[i] and m_board[j] and (m_board[i] > m_board[j]))
-            {
-                ++inversions;
-            }
-        }
+        auto count = [&](uint8_t value) { return (value != 0 and m_board[i] > value); };
+        inversions += std::count_if(m_board.begin() + i + 1, m_board.end(), count);
     }
 
     return inversions;
