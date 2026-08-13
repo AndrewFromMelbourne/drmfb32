@@ -115,9 +115,9 @@ public:
     [[nodiscard]] bool hasAtomic() const noexcept { return m_hasAtomic; }
     [[nodiscard]] bool hasUniversalPlanes() const noexcept { return m_hasUniversalPlanes; }
 
-    [[nodiscard]] bool isMaster() noexcept;
-    void masterSet() noexcept;
-    void masterDrop() noexcept;
+    [[nodiscard]] bool isMaster() const noexcept;
+    void masterSet() const noexcept;
+    void masterDrop() const noexcept;
 
     [[nodiscard]] std::size_t offset(Point8880 p) const noexcept final;
 

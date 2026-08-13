@@ -56,9 +56,9 @@ std::string
 // ========================================================================
 
 fb32::RGB8880::RGB8880(
-    RGB8 rgb) noexcept
+    RGB8 rgb8) noexcept
 :
-    m_rgb{rgbTo8880(rgb.red, rgb.green, rgb.blue)}
+    m_rgb{rgbTo8880(rgb8.red, rgb8.green, rgb8.blue)}
 {
 }
 

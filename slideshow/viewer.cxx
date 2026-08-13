@@ -755,11 +755,11 @@ Viewer::paint()
 //-------------------------------------------------------------------------
 
 void
-Viewer::pan(int x, int y) noexcept
+Viewer::pan(int dx, int dy) noexcept
 {
     if (oversize() and (m_zoom != SCALE_OVERSIZED))
     {
-        m_offset.pan(x, y, m_zoom);
+        m_offset.pan(dx, dy, m_zoom);
     }
 }
 

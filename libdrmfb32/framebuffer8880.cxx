@@ -188,7 +188,7 @@ fb32::FrameBuffer8880::getBufferSize() const noexcept
 //-------------------------------------------------------------------------
 
 bool
-fb32::FrameBuffer8880::isMaster() noexcept
+fb32::FrameBuffer8880::isMaster() const noexcept
 {
     return drm::drmIsMaster(m_fd);
 }
@@ -196,7 +196,7 @@ fb32::FrameBuffer8880::isMaster() noexcept
 //-------------------------------------------------------------------------
 
 void
-fb32::FrameBuffer8880::masterSet() noexcept
+fb32::FrameBuffer8880::masterSet() const noexcept
 {
     drm::drmSetMaster(m_fd);
 }
@@ -204,7 +204,7 @@ fb32::FrameBuffer8880::masterSet() noexcept
 //-------------------------------------------------------------------------
 
 void
-fb32::FrameBuffer8880::masterDrop() noexcept
+fb32::FrameBuffer8880::masterDrop() const noexcept
 {
     drm::drmDropMaster(m_fd);
 }

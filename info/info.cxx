@@ -84,7 +84,7 @@ Info::Info(
 //-------------------------------------------------------------------------
 
 std::string
-Info::getHostname()
+Info::getHostname() const noexcept
 {
     char hostname[256];
     if (::gethostname(hostname, sizeof(hostname)) == 0)

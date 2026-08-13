@@ -81,7 +81,7 @@ public:
 
     //---------------------------------------------------------------------
 
-    explicit RGB8880(RGB8 rbg) noexcept;
+    explicit RGB8880(RGB8 rgb8) noexcept;
 
     //---------------------------------------------------------------------
 
@@ -134,7 +134,7 @@ public:
 
     //---------------------------------------------------------------------
 
-    void setRGB8(RGB8 rgb) noexcept;
+    void setRGB8(RGB8 rgb8) noexcept;
 
     constexpr void set8880(uint32_t rgb) noexcept { m_rgb = rgb; }
     void setGrey(uint8_t grey) noexcept { setRGB(grey, grey, grey); }

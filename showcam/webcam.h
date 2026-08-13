@@ -59,7 +59,7 @@ public:
         bool fitToScreen,
         bool greyscale,
         int requestedFPS,
-        const Interface8880& image,
+        const Interface8880& interface,
         const std::string& pixelFormat);
 
     ~Webcam();
@@ -80,13 +80,13 @@ public:
         return m_formatName;
     }
 
-    bool showFrame(Interface8880Base& image);
+    bool showFrame(Interface8880Base& interface);
     bool startStream() const noexcept;
     bool stopStream() const noexcept;
 
 private:
 
-    bool chooseBestFit(const Interface8880& image);
+    bool chooseBestFit(const Interface8880& interface);
     bool chooseFormat(const std::string& pixelFormat) noexcept;
     bool convertMjpegToGrey(const uint8_t* data, std::size_t length);
     bool convertYuyvToGrey(const uint8_t* data, std::size_t length);

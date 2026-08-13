@@ -68,6 +68,29 @@ pkg_check_modules(LIBAVUTIL libavutil)
 
 #--------------------------------------------------------------------------
 
+find_program(CPPCHECK_EXECUTABLE NAMES cppcheck REQUIRED)
+
+if (CPPCHECK_EXECUTABLE)
+    message(STATUS "cppcheck found. Static analysis will be performed at compile time.")
+    set(CMAKE_CXX_CPPCHECK
+        "${CPPCHECK_EXECUTABLE}"
+        "--check-level=exhaustive"
+        "--enable=all"
+        "--force"
+        "--inconclusive"
+        "--std=c++23"
+        "--quiet"
+        "--suppress=*:${CMAKE_SOURCE_DIR}/thread-pool/*"
+        "--suppress=checkersReport"
+        "--suppress=functionStatic"
+        "--suppress=missingIncludeSystem"
+        "--suppress=syntaxError"
+        "--suppress=unmatchedSuppression"
+        "--suppress=unusedFunction")
+endif()
+
+#--------------------------------------------------------------------------
+
 add_library(drmfb32 STATIC libdrmfb32/drmMode.cxx
                            libdrmfb32/fileDescriptor.cxx
                            libdrmfb32/fontConfig.cxx

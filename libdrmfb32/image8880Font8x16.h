@@ -88,7 +88,7 @@ public:
     Point8880
     drawString(
         Point8880 p,
-        std::string_view cv,
+        std::string_view sv,
         const RGB8880& rgb,
         Interface8880& image) final;
 

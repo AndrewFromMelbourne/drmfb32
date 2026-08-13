@@ -150,7 +150,7 @@ Sphere::setLight(
 
 void
 Sphere::draw(
-    fb32::FrameBuffer8880& fb)
+    fb32::FrameBuffer8880& fb) const
 {
     fb.putImage(center(fb, m_image), m_image);
 }

@@ -56,7 +56,7 @@ public:
     void update();
     void setAmbient(double ambient) noexcept { m_ambient = ambient; }
     void setLight(double inclination, double bearing) noexcept;
-    void draw(fb32::FrameBuffer8880& fb);
+    void draw(fb32::FrameBuffer8880& fb) const;
 
 private:
 

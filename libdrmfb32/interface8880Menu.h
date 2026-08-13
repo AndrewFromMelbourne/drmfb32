@@ -95,7 +95,7 @@ public:
     //---------------------------------------------------------------------
 
     Interface8880Menu(
-        RGB8880 forgroundColour,
+        RGB8880 colourForeground,
         RGB8880 colourBackground,
         RGB8880 colourSelection,
         const FontConfig& fontConfig,

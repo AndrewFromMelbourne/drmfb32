@@ -66,7 +66,7 @@ public:
 
 private:
 
-    std::string getHostname();
+    std::string getHostname() const noexcept;
     void init();
     int panelTop() const;
     void printUsage(std::ostream& stream) const;

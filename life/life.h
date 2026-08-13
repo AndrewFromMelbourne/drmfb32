@@ -60,7 +60,7 @@ public:
 
     void init();
     void update(fb32::Joystick& js);
-    void draw(fb32::FrameBuffer8880& fb);
+    void draw(fb32::FrameBuffer8880& fb) const;
 
 private:
 
