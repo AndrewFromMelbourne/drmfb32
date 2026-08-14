@@ -136,15 +136,10 @@ Puzzle::init()
     {
         std::ranges::shuffle(m_board, generator);
 
-        for (auto i = 0 ; i < c_boardSize ; ++i)
-        {
-            if (m_board[i] == 0)
-            {
-                m_blankLocation.x = i % c_puzzleWidth;
-                m_blankLocation.y = i / c_puzzleWidth;
-                break;
-            }
-        }
+        auto zero = std::find(m_board.begin(), m_board.end(), 0);
+        auto i = std::distance(m_board.begin(), zero);
+        m_blankLocation.x = i % c_puzzleWidth;
+        m_blankLocation.y = i / c_puzzleWidth;
     }
     while (not isSolvable() or isSolved());
 }
