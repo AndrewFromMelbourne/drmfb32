@@ -96,8 +96,8 @@ histogramStrings()
 //-------------------------------------------------------------------------
 
 std::string
-    tolower(
-        std::string_view s)
+tolower(
+    std::string_view s)
 {
     std::string result;
     std::ranges::copy(std::views::transform(s, ::tolower), std::back_inserter(result));
