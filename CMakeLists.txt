@@ -8,7 +8,7 @@ project(drmfb32 VERSION 1.0.0
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 set(CMAKE_CXX_STANDARD 23)
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-psabi")
-set(CMAKE_COMPILE_WARNING_AS_ERROR ON)#--------------------------------------------------------------------------
+set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 
 #--------------------------------------------------------------------------
 
@@ -218,6 +218,12 @@ target_link_libraries(showcam drmfb32 ${DRM_LIBRARIES}
                                       ${LIBAVUTIL_LIBRARIES}
                                       ${BS_THREAD_LIBRARIES})
 endif()
+
+#--------------------------------------------------------------------------
+
+add_executable(show3d show3d/main.cxx
+                      show3d/scene.cxx)
+target_link_libraries(show3d drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
