@@ -221,12 +221,6 @@ endif()
 
 #--------------------------------------------------------------------------
 
-add_executable(show3d show3d/main.cxx
-                      show3d/scene.cxx)
-target_link_libraries(show3d drmfb32 ${DRM_LIBRARIES})
-
-#--------------------------------------------------------------------------
-
 if (TURBOJPEG_FOUND)
 add_executable(showjpeg showjpeg/showjpeg.cxx)
 target_link_libraries(showjpeg drmfb32 ${DRM_LIBRARIES}
