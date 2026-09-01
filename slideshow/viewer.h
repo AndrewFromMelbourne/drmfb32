@@ -75,7 +75,8 @@ public:
     {
         JPEG,
         PNG,
-        QOI
+        QOI,
+        WEBP
     };
 
     enum MenuIds

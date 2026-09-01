@@ -20,6 +20,7 @@ This project uses the following libraries. You will need to install the develope
 * libpng
 * libsystemd
 * libturbojpeg
+* libwebp
 
 It uses pkg-config to find these libraries.
 
@@ -90,6 +91,10 @@ Display a webcam stream.
 Display a jpeg image.
 
 ### [Showqoi](showqoi/README.md)
+
+### [Showwebp](showwebp/README.md)
+
+Display a webp image.
 
 Display a Quite OK Image format (QOI) File.
 

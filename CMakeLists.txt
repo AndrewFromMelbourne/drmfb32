@@ -65,6 +65,7 @@ pkg_check_modules(LIBPNG libpng)
 pkg_check_modules(LIBAVCODEC libavcodec)
 pkg_check_modules(LIBAVFORMAT libavformat)
 pkg_check_modules(LIBAVUTIL libavutil)
+pkg_check_modules(LIBWEBP libwebp)
 
 #--------------------------------------------------------------------------
 
@@ -120,6 +121,11 @@ endif()
 if (LIBPNG_FOUND)
 target_include_directories(drmfb32 PUBLIC ${LIBPNG_INCLUDE_DIRS})
 target_sources(drmfb32 PRIVATE libdrmfb32/image8880Png.cxx)
+endif()
+
+if (LIBWEBP_FOUND)
+target_include_directories(drmfb32 PUBLIC ${LIBWEBP_INCLUDE_DIRS})
+target_sources(drmfb32 PRIVATE libdrmfb32/image8880Webp.cxx)
 endif()
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include/BS_thread_pool.hpp)
@@ -246,6 +252,15 @@ target_link_libraries(showqoi drmfb32 ${DRM_LIBRARIES}
 
 #--------------------------------------------------------------------------
 
+if (LIBWEBP_FOUND)
+add_executable(showwebp showwebp/showwebp.cxx)
+target_link_libraries(showwebp drmfb32 ${DRM_LIBRARIES}
+                                       ${LIBWEBP_LIBRARIES}
+                                       ${BS_THREAD_LIBRARIES})
+endif()
+
+#--------------------------------------------------------------------------
+
 add_executable(sphere sphere/main.cxx
                       sphere/sphere.cxx)
 
@@ -253,7 +268,7 @@ target_link_libraries(sphere drmfb32 ${DRM_LIBRARIES})
 
 #--------------------------------------------------------------------------
 
-if (FREETYPE_FOUND AND LIBPNG_FOUND AND TURBOJPEG_FOUND)
+if (FREETYPE_FOUND AND LIBPNG_FOUND AND TURBOJPEG_FOUND AND LIBWEBP_FOUND)
 add_executable(slideshow slideshow/slideshow.cxx
                          slideshow/viewer.cxx)
 
@@ -261,6 +276,7 @@ target_link_libraries(slideshow drmfb32 ${DRM_LIBRARIES}
                                         ${FREETYPE_LIBRARIES}
                                         ${LIBPNG_LIBRARIES}
                                         ${TURBOJPEG_LIBRARIES}
+                                        ${LIBWEBP_LIBRARIES}
                                         ${BS_THREAD_LIBRARIES})
 endif()
 

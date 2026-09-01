@@ -135,6 +135,7 @@ TurboJpegDecode::decode(
         throw std::invalid_argument("Unable to decode JPEG");
     }
 }
+
 //-------------------------------------------------------------------------
 
 void

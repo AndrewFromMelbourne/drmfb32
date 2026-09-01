@@ -43,6 +43,7 @@
 #include "image8880Jpeg.h"
 #include "image8880Png.h"
 #include "image8880Qoi.h"
+#include "image8880Webp.h"
 #include "viewer.h"
 
 //-------------------------------------------------------------------------
@@ -390,7 +391,8 @@ Viewer::Viewer(
         {".jpg", Type::JPEG},
         {".jpeg", Type::JPEG},
         {".png", Type::PNG},
-        {".qoi", Type::QOI}
+        {".qoi", Type::QOI},
+        {".webp", Type::WEBP}
     },
     m_files{},
     m_fileStep{1},
@@ -697,6 +699,9 @@ Viewer::openImage()
             break;
         case Type::QOI:
             m_image = fb32::readQoi(name, m_background);
+            break;
+        case Type::WEBP:
+            m_image = fb32::readWebp(name);
             break;
         }
     }
