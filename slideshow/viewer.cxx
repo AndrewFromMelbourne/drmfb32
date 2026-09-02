@@ -115,7 +115,8 @@ isImageFile(
         ".jpg",
         ".jpeg",
         ".png",
-        ".qoi"
+        ".qoi",
+        ".webp"
     };
 
     return std::ranges::find(extensions, ext) != std::end(extensions);
