@@ -92,11 +92,11 @@ Display a jpeg image.
 
 ### [Showqoi](showqoi/README.md)
 
+Display a Quite OK Image format (QOI) File.
+
 ### [Showwebp](showwebp/README.md)
 
 Display a webp image.
-
-Display a Quite OK Image format (QOI) File.
 
 ### [Slideshow](slideshow/README.md) [J]
 
