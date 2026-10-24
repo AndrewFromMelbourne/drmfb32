@@ -4699,8 +4699,8 @@ Image8880Font8x16::getStringDimensions(
     {
         if (c == '\n')
         {
-            d.setWidth(std::max(d.width(), pixelWidth));
-            d.setHeight(d.height() + sc_fontHeight);
+            d.setWidth(std::max(d.getWidth(), pixelWidth));
+            d.setHeight(d.getHeight() + sc_fontHeight);
             pixelWidth = 0;
         }
         else
@@ -4709,7 +4709,7 @@ Image8880Font8x16::getStringDimensions(
         }
     }
 
-    d.setWidth(std::max(d.width(), pixelWidth));
+    d.setWidth(std::max(d.getWidth(), pixelWidth));
 
     return d;
 }
@@ -4737,25 +4737,25 @@ Image8880Font8x16::drawChar(
 {
     const auto d = getPixelDimensions();
 
-    for (auto j = 0 ; j < d.height() ; ++j)
+    for (auto j = 0 ; j < d.getHeight() ; ++j)
     {
         const auto byte = font[c][j];
 
         if (byte)
         {
-            for (auto i = 0 ; i < d.width() ; ++i)
+            for (auto i = 0 ; i < d.getWidth() ; ++i)
             {
-                if ((byte >> (d.width() - i - 1)) & 1)
+                if ((byte >> (d.getWidth() - i - 1)) & 1)
                 {
                     image.setPixel(
-                        Point8880(p.x() + i, p.y() + j),
+                        Point8880(p.getX() + i, p.getY() + j),
                         rgb);
                 }
             }
         }
     }
 
-    return Point8880(p.x() + d.width(), p.y());
+    return Point8880(p.getX() + d.getWidth(), p.getY());
 }
 
 //-------------------------------------------------------------------------
@@ -4788,16 +4788,16 @@ Image8880Font8x16::drawString(
         if (c == '\n')
         {
             position.set(
-                start.x(),
-                position.y() + d.height());
+                start.getX(),
+                position.getY() + d.getHeight());
         }
         else
         {
             drawChar(position, c, rgb, image);
 
             position.set(
-                position.x() + d.width(),
-                position.y());
+                position.getX() + d.getWidth(),
+                position.getY());
         }
     }
 

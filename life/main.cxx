@@ -168,9 +168,9 @@ main(
         fb.clearBuffers(grey);
 
         const auto fbd = fb.getDimensions();
-        std::println("width = {} height = {}", fbd.width(), fbd.height());
+        std::println("width = {} height = {}", fbd.getWidth(), fbd.getHeight());
 
-        Life life(fbd.height());
+        Life life(fbd.getHeight());
         life.init();
         life.draw(fb);
 

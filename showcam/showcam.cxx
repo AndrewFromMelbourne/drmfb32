@@ -204,7 +204,7 @@ main(
         //-----------------------------------------------------------------
 
         const auto d = wc.dimensions();
-        std::println("{} [{} x {}]", wc.formatName(), d.width(), d.height());
+        std::println("{} [{} x {}]", wc.formatName(), d.getWidth(), d.getHeight());
 
         //-----------------------------------------------------------------
 

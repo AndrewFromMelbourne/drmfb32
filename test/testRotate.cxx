@@ -210,8 +210,8 @@ main(
             const auto rd = rotated.getDimensions();
             const Point8880 p
             {
-                (fbd.width() - rd.width()) / 2,
-                (fbd.height() - rd.height()) / 2
+                (fbd.getWidth() - rd.getWidth()) / 2,
+                (fbd.getHeight() - rd.getHeight()) / 2
             };
 
             fb.putImage(p, rotated);

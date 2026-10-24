@@ -77,10 +77,10 @@ public:
             return m_id <=> rhs.m_id;
         }
 
-        std::size_t m_id;
-        std::string m_title;
-        std::size_t m_value;
-        std::vector<std::string> m_values;
+        std::size_t m_id{};
+        std::string m_title{};
+        std::size_t m_value{};
+        std::vector<std::string> m_values{};
     };
 
     //---------------------------------------------------------------------

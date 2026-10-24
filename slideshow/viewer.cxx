@@ -534,7 +534,7 @@ Viewer::annotate()
     auto annotation = fs::path(name).filename().string();
     const auto d = m_image.getDimensions();
 
-    annotation += std::format(" ({}x{})", d.width(), d.height());
+    annotation += std::format(" ({}x{})", d.getWidth(), d.getHeight());
     annotation += std::format(" [{}/{}]", m_current + 1, m_files.size());
 
     if (m_annotate == ANNOTATE_LONG)
@@ -566,7 +566,7 @@ Viewer::annotate()
     const auto dimensions = m_font->getStringDimensions(annotation);
 
     Point p1{0, 0};
-    Point p2{dimensions.width() + padding2, dimensions.height() + padding2};
+    Point p2{dimensions.getWidth() + padding2, dimensions.getHeight() + padding2};
 
     constexpr fb32::RGB8880 black{0};
     constexpr fb32::RGB8880 green{0, 255, 0};
@@ -726,7 +726,7 @@ Viewer::oversize() const noexcept
     const auto d = m_buffer.getDimensions();
     const auto zd = zoomedDimensions();
 
-    if ((zd.width() > d.width()) or (zd.height() > d.height()))
+    if ((zd.getWidth() > d.getWidth()) or (zd.getHeight() > d.getHeight()))
     {
         return true;
     }
@@ -776,7 +776,7 @@ Viewer::placeImage(
     const fb32::Image8880& image) const noexcept
 {
     auto p = center(m_buffer, image);
-    p.translate(m_offset.x(), m_offset.y());
+    p.translate(m_offset.getX(), m_offset.getY());
 
     return p;
 }
@@ -824,7 +824,7 @@ Viewer::processImage()
 {
     const auto id = m_image.getDimensions();
 
-    if (id.width() == 0 or id.height() == 0)
+    if (id.getWidth() == 0 or id.getHeight() == 0)
     {
         m_imageProcessed = m_image;
         return;
@@ -860,20 +860,20 @@ Viewer::processImage()
             const auto bd = m_buffer.getDimensions();
             fb32::Dimensions8880 d
             {
-                (bd.height() * id.width()) / id.height(),
-                bd.height()
+                (bd.getHeight() * id.getWidth()) / id.getHeight(),
+                bd.getHeight()
             };
 
-            if (d.width() > bd.width())
+            if (d.getWidth() > bd.getWidth())
             {
                 d.set(
-                    bd.width(),
-                    (bd.width() * id.height()) / id.width());
+                    bd.getWidth(),
+                    (bd.getWidth() * id.getHeight()) / id.getWidth());
             }
 
             processResize(d);
 
-            auto percent = (100.0 * m_imageProcessed.getDimensions().width()) / id.width();
+            auto percent = (100.0 * m_imageProcessed.getDimensions().getWidth()) / id.getWidth();
             m_percent = static_cast<int>(0.5 + percent);
         }
         else
@@ -1024,8 +1024,8 @@ Viewer::showHistogram()
     constexpr int padding{4};
     fb32::Point8880 p
     {
-        m_buffer.getDimensions().width() - m_imageHistogram.getDimensions().width() - padding,
-        m_buffer.getDimensions().height() - m_imageHistogram.getDimensions().height() - padding
+        m_buffer.getDimensions().getWidth() - m_imageHistogram.getDimensions().getWidth() - padding,
+        m_buffer.getDimensions().getHeight() - m_imageHistogram.getDimensions().getHeight() - padding
     };
 
     m_buffer.putImage(p, m_imageHistogram);
@@ -1039,6 +1039,6 @@ Viewer::zoomedDimensions() const noexcept
     const auto d = m_image.getDimensions();
     const auto zoom = (m_zoom == 0) ? 1 : m_zoom;
 
-    return {d.width() * zoom, d.height() * zoom};
+    return {d.getWidth() * zoom, d.getHeight() * zoom};
 }
 

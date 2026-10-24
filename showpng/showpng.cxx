@@ -219,15 +219,15 @@ main(
         {
             fb32::Dimensions8880 d
             {
-                (fbd.height() * id.width()) / id.height(),
-                fbd.height()
+                (fbd.getHeight() * id.getWidth()) / id.getHeight(),
+                fbd.getHeight()
             };
 
-            if (d.width() > fbd.width())
+            if (d.getWidth() > fbd.getWidth())
             {
                 d.set(
-                    fbd.width(),
-                    (fbd.width() * id.height()) / id.width());
+                    fbd.getWidth(),
+                    (fbd.getWidth() * id.getHeight()) / id.getWidth());
             }
 
             image = resizeBilinearInterpolation(image, d);

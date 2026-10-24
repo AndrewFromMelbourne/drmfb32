@@ -70,14 +70,14 @@ TraceGraph::draw()
     boxFilled(
         getImage(),
         fb32::Point8880(0, 0),
-        fb32::Point8880(id.width() - 1, m_traceHeight),
+        fb32::Point8880(id.getWidth() - 1, m_traceHeight),
         sc_background);
 
     //---------------------------------------------------------------------
 
     for (auto j = 0 ; j < m_traceHeight + 1 ; j+= m_gridHeight)
     {
-        horizontalLine(getImage(), 0, id.width() - 1, j, sc_gridColour);
+        horizontalLine(getImage(), 0, id.getWidth() - 1, j, sc_gridColour);
     }
 
     for (auto i = 0 ; i < m_columns ; ++i)
@@ -96,8 +96,8 @@ TraceGraph::draw()
         {
             auto i1 = i2 - 1;
 
-            int y1 = (trace.value(i1) * m_traceHeight) / m_traceScale;
-            int y2 = (trace.value(i2) * m_traceHeight) / m_traceScale;
+            int y1 = (trace.getValue(i1) * m_traceHeight) / m_traceScale;
+            int y2 = (trace.getValue(i2) * m_traceHeight) / m_traceScale;
 
             line(
                 getImage(),

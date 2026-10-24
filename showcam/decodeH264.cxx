@@ -74,7 +74,7 @@ rowsYuvyToGrey(
 
 void
 rowsYuvyToRGB(
-    AVFrame* frame,
+    const AVFrame* frame,
     std::span<const uint8_t> yData,
     std::span<const uint8_t> uData,
     std::span<const uint8_t> vData,

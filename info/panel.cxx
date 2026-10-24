@@ -33,7 +33,7 @@ int
 Panel::getBottom() const noexcept
 {
     const auto d = m_image.getDimensions();
-    return m_yPosition + d.height();
+    return m_yPosition + d.getHeight();
 }
 
 //-------------------------------------------------------------------------

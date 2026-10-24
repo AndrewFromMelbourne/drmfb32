@@ -130,7 +130,7 @@ Image8880FreeType::getStringDimensions(
 
     const auto d = getPixelDimensions();
 
-    return Dimensions8880{p.x(), p.y() + d.height()};
+    return Dimensions8880{p.getX(), p.getY() + d.getHeight()};
 }
 
 //-------------------------------------------------------------------------
@@ -146,7 +146,7 @@ Image8880FreeType::getWideCharDimensions(
 
     const auto d = getPixelDimensions();
 
-    return Dimensions8880{p.x(), p.y() + d.height()};
+    return Dimensions8880{p.getX(), p.getY() + d.getHeight()};
 }
 
 //-------------------------------------------------------------------------
@@ -211,8 +211,8 @@ Image8880FreeType::drawWideChar(
     {
         const auto slot{m_face->glyph};
 
-        drawChar(position.x() + slot->bitmap_left,
-                 position.y() - slot->bitmap_top,
+        drawChar(position.getX() + slot->bitmap_left,
+                 position.getY() - slot->bitmap_top,
                  slot->bitmap,
                  rgb,
                  image);
@@ -245,7 +245,7 @@ Image8880FreeType::drawString(
     {
         if (c == '\n')
         {
-            position.set(p.x(), position.y() + d.height());
+            position.set(p.getX(), position.getY() + d.getHeight());
         }
         else
         {
@@ -268,8 +268,8 @@ Image8880FreeType::drawString(
             {
                 slot = m_face->glyph;
 
-                drawChar(position.x() + slot->bitmap_left,
-                         position.y() - slot->bitmap_top,
+                drawChar(position.getX() + slot->bitmap_left,
+                         position.getY() - slot->bitmap_top,
                          slot->bitmap,
                          rgb,
                          image);

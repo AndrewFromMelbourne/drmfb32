@@ -142,9 +142,9 @@ main(
         //-----------------------------------------------------------------
 
         constexpr int scale{3};
-        constexpr fb32::Dimensions8880 sd{d.width() * scale, d.height() * scale};
+        constexpr fb32::Dimensions8880 sd{d.getWidth() * scale, d.getHeight() * scale};
         constexpr int imageOffset{200};
-        constexpr int yStep{sd.height() + 8};
+        constexpr int yStep{sd.getHeight() + 8};
 
         const auto imageSu = scaleUp(image, scale);
         const auto imageNn = resizeNearestNeighbour(image, sd);

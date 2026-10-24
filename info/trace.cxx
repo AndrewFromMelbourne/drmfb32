@@ -116,22 +116,22 @@ Trace::init(
         // draw small box
 
         const auto d = font.getPixelDimensions();
-        const fb32::Dimensions8880 quaterd{ d.width() / 4, d.height() / 4};
+        const fb32::Dimensions8880 quaterd{ d.getWidth() / 4, d.getHeight() / 4};
 
         const fb32::Point8880 p1
         {
-            position.x() + quaterd.width(),
-            position.y() + quaterd.height()
+            position.getX() + quaterd.getWidth(),
+            position.getY() + quaterd.getHeight()
         };
 
         const fb32::Point8880 p2
         {
-            position.x() + 3 * quaterd.width(),
-            position.y() + 3 * quaterd.height()
+            position.getX() + 3 * quaterd.getWidth(),
+            position.getY() + 3 * quaterd.getHeight()
         };
 
         boxFilled(getImage(), p1, p2, trace.traceColour());
-        position.translateX(d.width());
+        position.translateX(d.getWidth());
     }
 
     position = font.drawString(position,
@@ -145,7 +145,7 @@ Trace::init(
     {
         horizontalLine(getImage(),
                        0,
-                       id.width() - 1,
+                       id.getWidth() - 1,
                        j,
                        sc_gridColour);
     }
@@ -237,7 +237,7 @@ Trace::storeTime(
 {
     const auto d = getImage().getDimensions();
 
-    if (m_columns < d.width())
+    if (m_columns < d.getWidth())
     {
         ++m_columns;
         m_time.push_back(now);

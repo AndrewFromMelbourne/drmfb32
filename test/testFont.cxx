@@ -151,28 +151,28 @@ main(
         p = ft.drawString(p, "0123456789", white, image);
 
         p.setX(0);
-        p.translateY(ftd.height());
+        p.translateY(ftd.getHeight());
 
         p = ft.drawString(p, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", white, image);
 
         p.setX(0);
-        p.translateY(ftd.height());
+        p.translateY(ftd.getHeight());
 
         p = ft.drawChar(p, '@', white, image);
 
         p.setX(0);
-        p.translateY(ftd.height());
+        p.translateY(ftd.getHeight());
 
         for (int j = 0 ; j < 16 ; ++j)
         {
             for (int i = 0 ; i < 16 ; ++i)
             {
                 const uint8_t c = static_cast<uint8_t>(i + (j * 16));
-                p.setX(i * ftd.width());
+                p.setX(i * ftd.getWidth());
                 ft.drawChar(p, c, white, image);
             }
 
-            p.translateY(ftd.height());
+            p.translateY(ftd.getHeight());
         }
 
         //-----------------------------------------------------------------

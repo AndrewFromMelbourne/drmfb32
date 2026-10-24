@@ -97,8 +97,8 @@ public:
 
     struct ImageFile
     {
-        std::string m_filename;
-        Type m_type;
+        std::string m_filename{};
+        Type m_type{};
 
         auto operator<(const ImageFile& other) const
         {
@@ -147,8 +147,8 @@ public:
             zoomed(zoom);
         }
 
-        [[nodiscard]] int x() const noexcept { return m_zoomedX; }
-        [[nodiscard]] int y() const noexcept { return m_zoomedY; }
+        [[nodiscard]] int getX() const noexcept { return m_zoomedX; }
+        [[nodiscard]] int getY() const noexcept { return m_zoomedY; }
 
         void zoomed(int zoom) noexcept
         {

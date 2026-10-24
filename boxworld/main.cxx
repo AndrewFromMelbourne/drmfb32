@@ -182,7 +182,7 @@ main(
         Joystick js{joystick};
         FrameBuffer8880 fb{device, connector};
 
-        if (fb.getDimensions().height() < 480)
+        if (fb.getDimensions().getHeight() < 480)
         {
             std::println(std::cerr, "Display too small, must be at least 480 pixels high");
             exit(EXIT_FAILURE);

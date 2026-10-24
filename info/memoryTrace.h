@@ -78,7 +78,7 @@ public:
         int yPosition,
         int gridHeight = 20);
 
-    void update(time_t now, fb32::Interface8880Font& font) final;
+    void update(time_t now, fb32::Interface8880Font&) final;
 };
 
 //-------------------------------------------------------------------------

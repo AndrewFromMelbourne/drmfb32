@@ -268,7 +268,7 @@ boxBlurRows(
     const auto d = input.getDimensions();
 
     const auto diameter = 2 * radius + 1;
-    const auto width = d.width();
+    const auto width = d.getWidth();
     auto inputi = input.getBuffer().data();
     auto rbi = rb.getBuffer().data();
 
@@ -313,7 +313,7 @@ boxBlurColumns(
 
     const auto d = rb.getDimensions();
     const auto diameter = 2 * radius + 1;
-    const auto height = d.height();
+    const auto height = d.getHeight();
     const auto rbi = rb.getBuffer().data();
     auto outputi = output.getBuffer().data();
 
@@ -393,16 +393,16 @@ rowsBilinearInterpolation(
 {
     const auto id = input.getDimensions();
     const auto od = output.getDimensions();
-    const auto xScale = (od.width() > 1)
-                      ? (id.width() - 1.0f) / (od.width() - 1.0f)
+    const auto xScale = (od.getWidth() > 1)
+                      ? (id.getWidth() - 1.0f) / (od.getWidth() - 1.0f)
                       : 0.0f;
-    const auto yScale = (od.height() > 1)
-                      ? (id.height() - 1.0f) / (od.height() - 1.0f)
+    const auto yScale = (od.getHeight() > 1)
+                      ? (id.getHeight() - 1.0f) / (od.getHeight() - 1.0f)
                       : 0.0f;
 
     for (int j = jStart; j < jEnd; ++j)
     {
-        for (int i = 0; i < od.width(); ++i)
+        for (int i = 0; i < od.getWidth(); ++i)
         {
             int xLow = static_cast<int>(std::floor(xScale * i));
             int yLow = static_cast<int>(std::floor(yScale * j));
@@ -519,24 +519,24 @@ rowsLanczos3Interpolation(
     const auto id = input.getDimensions();
     const auto od = output.getDimensions();
     constexpr int a{3};
-    const auto xScale = (od.width() > 1)
-                      ? (id.width() - 1.0f) / (od.width() - 1.0f)
+    const auto xScale = (od.getWidth() > 1)
+                      ? (id.getWidth() - 1.0f) / (od.getWidth() - 1.0f)
                       : 0.0f;
-    const auto yScale = (od.height() > 1)
-                      ? (id.height() - 1.0f) / (od.height() - 1.0f)
+    const auto yScale = (od.getHeight() > 1)
+                      ? (id.getHeight() - 1.0f) / (od.getHeight() - 1.0f)
                       : 0.0f;
 
     for (int j = jStart; j < jEnd; ++j)
     {
-        for (int i = 0; i < od.width(); ++i)
+        for (int i = 0; i < od.getWidth(); ++i)
         {
             const auto xMid = i * xScale;
             const auto yMid = j * yScale;
 
             const auto xLow = std::max(0, static_cast<int>(std::floor(xMid)) - a + 1);
-            const auto xHigh = std::min(id.width() - 1, static_cast<int>(std::floor(xMid)) + a);
+            const auto xHigh = std::min(id.getWidth() - 1, static_cast<int>(std::floor(xMid)) + a);
             const auto yLow = std::max(0, static_cast<int>(std::floor(yMid)) - a + 1);
-            const auto yHigh = std::min(id.height() - 1, static_cast<int>(std::floor(yMid)) + a);
+            const auto yHigh = std::min(id.getHeight() - 1, static_cast<int>(std::floor(yMid)) + a);
 
             float weightsSum{};
             float redSum{};
@@ -586,15 +586,15 @@ rowsNearestNeighbour(
 {
     const auto id = input.getDimensions();
     const auto od = output.getDimensions();
-    const int a = (od.width() > id.width()) ? 0 : 1;
-    const int b = (od.height() > id.height()) ? 0 : 1;
+    const int a = (od.getWidth() > id.getWidth()) ? 0 : 1;
+    const int b = (od.getHeight() > id.getHeight()) ? 0 : 1;
 
     for (int j = jStart ; j < jEnd ; ++j)
     {
-        const int y = (j * (id.height() - b)) / (od.height() - b);
-        for (int i = 0 ; i < od.width() ; ++i)
+        const int y = (j * (id.getHeight() - b)) / (od.getHeight() - b);
+        for (int i = 0 ; i < od.getWidth() ; ++i)
         {
-            const int x = (i * (id.width() - a)) / (od.width() - a);
+            const int x = (i * (id.getWidth() - a)) / (od.getWidth() - a);
             auto pixel{input.getPixel(Point{x, y})};
 
             if (pixel.has_value())
@@ -616,11 +616,11 @@ rowsScaleUp(
     int jEnd)
 {
     const auto id = input.getDimensions();
-    auto inputi = input.getBuffer().data() + (jStart * id.width());
+    auto inputi = input.getBuffer().data() + (jStart * id.getWidth());
 
     for (auto j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < id.width() ; ++i)
+        for (int i = 0 ; i < id.getWidth() ; ++i)
         {
             auto pixel = *(inputi++);
             for (int b = 0 ; b < scale ; ++b)
@@ -649,7 +649,7 @@ rowsRotate(
     const auto id = image.getDimensions();
     const auto od = output.getDimensions();
 
-    const auto y00 = id.height() * cosAngle;
+    const auto y00 = id.getHeight() * cosAngle;
 
     for (int j = jStart ; j < jEnd ; ++j)
     {
@@ -657,7 +657,7 @@ rowsRotate(
         const auto bSinAngle = b * sinAngle;
         const auto bCosAngle = b * cosAngle;
 
-        for (int i = 0 ; i < od.width() ; ++i)
+        for (int i = 0 ; i < od.getWidth() ; ++i)
         {
             const auto x = (i * cosAngle) - bSinAngle;
             const auto y = (i * sinAngle) + bCosAngle;
@@ -668,10 +668,10 @@ rowsRotate(
             const auto x1 = static_cast<int>(ceil(x));
             const auto y1 = static_cast<int>(ceil(y));
 
-            const auto pixel00 = image.getPixel(Point{x0, id.height() - 1 - y0});
-            const auto pixel01 = image.getPixel(Point{x0, id.height() - 1 - y1});
-            const auto pixel10 = image.getPixel(Point{x1, id.height() - 1 - y0});
-            const auto pixel11 = image.getPixel(Point{x1, id.height() - 1 - y1});
+            const auto pixel00 = image.getPixel(Point{x0, id.getHeight() - 1 - y0});
+            const auto pixel01 = image.getPixel(Point{x0, id.getHeight() - 1 - y1});
+            const auto pixel10 = image.getPixel(Point{x1, id.getHeight() - 1 - y0});
+            const auto pixel11 = image.getPixel(Point{x1, id.getHeight() - 1 - y1});
 
             if (pixel00.has_value() and
                 pixel01.has_value() and
@@ -716,11 +716,11 @@ rowsToGrey(
     int jEnd)
 {
     const auto id = input.getDimensions();
-    auto inputi = input.getBuffer().data() + (jStart * id.width());
+    auto inputi = input.getBuffer().data() + (jStart * id.getWidth());
 
     for (auto j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < id.width() ; ++i)
+        for (int i = 0 ; i < id.getWidth() ; ++i)
         {
             auto pixel = *(inputi++);
             const Point p{i, j};
@@ -740,11 +740,11 @@ rowsToGreen(
     int jEnd)
 {
     const auto id = input.getDimensions();
-    auto inputi = input.getBuffer().data() + (jStart * id.width());
+    auto inputi = input.getBuffer().data() + (jStart * id.getWidth());
 
     for (auto j = jStart ; j < jEnd ; ++j)
     {
-        for (int i = 0 ; i < id.width() ; ++i)
+        for (int i = 0 ; i < id.getWidth() ; ++i)
         {
             auto pixel = *(inputi++);
             const Point p{i, j};
@@ -776,11 +776,11 @@ CountIntensity::count(
         add(localCount);
     };
 
-    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.detach_blocks<int>(0, d.getHeight(), iterateRows);
     tPool.wait();
 #else
     CountIntensity localCount;
-    rowsCountIntensity(input, localCount, 0, d.height());
+    rowsCountIntensity(input, localCount, 0, d.getHeight());
     add(localCount);
 #endif
 }
@@ -804,11 +804,11 @@ CountRGB::count(
         add(localCount);
     };
 
-    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.detach_blocks<int>(0, d.getHeight(), iterateRows);
     tPool.wait();
 #else
     CountRGB localCount;
-    rowsCountRGB(input, localCount, 0, d.height());
+    rowsCountRGB(input, localCount, 0, d.getHeight());
     add(localCount);
 #endif
 }
@@ -837,7 +837,7 @@ fb32::boxBlur(
         boxBlurRows(input, rb, radius, start, end);
     };
 
-    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.detach_blocks<int>(0, d.getHeight(), iterateRows);
     tPool.wait();
 
     auto iterateColumns = [&rb, &output, radius](int start, int end)
@@ -845,13 +845,13 @@ fb32::boxBlur(
         boxBlurColumns(rb, output, radius, start, end);
     };
 
-    tPool.detach_blocks<int>(0, d.width(), iterateColumns);
+    tPool.detach_blocks<int>(0, d.getWidth(), iterateColumns);
     tPool.wait();
 
 #else
 
-    boxBlurRows(input, rb, radius, 0, d.height());
-    boxBlurColumns(rb, output, radius, 0, d.width());
+    boxBlurRows(input, rb, radius, 0, d.getHeight());
+    boxBlurColumns(rb, output, radius, 0, d.getWidth());
 
 #endif
 
@@ -945,7 +945,7 @@ fb32::histogramStretch(
     count.count(input);
 
     const auto d = input.getDimensions();
-    const auto totalPixels = d.width() * d.height();
+    const auto totalPixels = d.getWidth() * d.getHeight();
     const auto threshold = (totalPixels * percent) / (100 * 256);
 
     int low{};
@@ -995,10 +995,10 @@ fb32::histogramStretch(
         rowsHistogramStretch(low, high, input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, d.height(), iterateRows);
+    tPool.detach_blocks<int>(0, d.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsHistogramStretch(low, high, input, output, 0, d.height());
+    rowsHistogramStretch(low, high, input, output, 0, d.getHeight());
 #endif
 
     return output;
@@ -1031,7 +1031,7 @@ fb32::resizeBilinearInterpolation(
     const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
-    if ((d.width() <= 0) or (d.height() <= 0))
+    if ((d.getWidth() <= 0) or (d.getHeight() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
@@ -1049,7 +1049,7 @@ fb32::resizeLanczos3Interpolation(
     const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
-    if ((d.width() <= 0) or (d.height() <= 0))
+    if ((d.getWidth() <= 0) or (d.getHeight() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
@@ -1067,7 +1067,7 @@ fb32::resizeNearestNeighbour(
     const fb32::Interface8880Base& input,
     fb32::Dimensions8880 d)
 {
-    if ((d.width() <= 0) or (d.height() <= 0))
+    if ((d.getWidth() <= 0) or (d.getHeight() <= 0))
     {
         throw std::invalid_argument("width and height must be greater than zero");
     }
@@ -1093,10 +1093,10 @@ fb32::resizeToBilinearInterpolation(
         rowsBilinearInterpolation(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, od.height(), iterateRows);
+    tPool.detach_blocks<int>(0, od.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsBilinearInterpolation(input, output, 0, od.height());
+    rowsBilinearInterpolation(input, output, 0, od.getHeight());
 #endif
     return output;
 }
@@ -1116,10 +1116,10 @@ fb32::resizeToLanczos3Interpolation(
         rowsLanczos3Interpolation(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, od.height(), iterateRows);
+    tPool.detach_blocks<int>(0, od.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsLanczos3Interpolation(input, output, 0, od.height());
+    rowsLanczos3Interpolation(input, output, 0, od.getHeight());
 #endif
     return output;
 }
@@ -1139,10 +1139,10 @@ fb32::resizeToNearestNeighbour(
         rowsNearestNeighbour(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, od.height(), iterateRows);
+    tPool.detach_blocks<int>(0, od.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsNearestNeighbour(input, output, 0, od.height());
+    rowsNearestNeighbour(input, output, 0, od.getHeight());
 #endif
 
     return output;
@@ -1217,9 +1217,9 @@ fb32::rotate(
 
     const auto id = image.getDimensions();
 
-    const auto x10 = (id.width() * cosAngle) + (id.height() * sinAngle);
-    const auto y00 = id.height() * cosAngle;
-    const auto y11 = -(id.width() * sinAngle);
+    const auto x10 = (id.getWidth() * cosAngle) + (id.getHeight() * sinAngle);
+    const auto y00 = id.getHeight() * cosAngle;
+    const auto y11 = -(id.getWidth() * sinAngle);
 
     const Dimensions8880 od{ static_cast<int>(std::ceil(x10)),
                              static_cast<int>(std::ceil(y00 - y11 + 1.0))};
@@ -1234,10 +1234,10 @@ fb32::rotate(
         rowsRotate(image, output, sinAngle, cosAngle, start, end);
     };
 
-    tPool.detach_blocks<int>(0, od.height(), iterateRows);
+    tPool.detach_blocks<int>(0, od.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsRotate(image, output, sinAngle, cosAngle, 0, od.height());
+    rowsRotate(image, output, sinAngle, cosAngle, 0, od.getHeight());
 #endif
 
     return output;
@@ -1250,12 +1250,12 @@ fb32::rotate90(
     const fb32::Interface8880Base& input)
 {
     const auto id = input.getDimensions();
-    const Dimensions8880 od{id.height(), id.width()};
+    const Dimensions8880 od{id.getHeight(), id.getWidth()};
     Image8880 output{od};
 
-    for (auto j = 0 ; j < id.height() ; ++j)
+    for (auto j = 0 ; j < id.getHeight() ; ++j)
     {
-        for (auto i = 0 ; i < id.width() ; ++i)
+        for (auto i = 0 ; i < id.getWidth() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
@@ -1264,7 +1264,7 @@ fb32::rotate90(
                 continue;
             }
 
-            output.setPixel(Point{id.height() - j - 1, i}, pixel.value());
+            output.setPixel(Point{id.getHeight() - j - 1, i}, pixel.value());
         }
     }
 
@@ -1280,9 +1280,9 @@ fb32::rotate180(
     const auto d = input.getDimensions();
     Image8880 output{d};
 
-    for (auto j = 0 ; j < d.height() ; ++j)
+    for (auto j = 0 ; j < d.getHeight() ; ++j)
     {
-        for (auto i = 0 ; i < d.width() ; ++i)
+        for (auto i = 0 ; i < d.getWidth() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
@@ -1291,7 +1291,7 @@ fb32::rotate180(
                 continue;
             }
 
-            output.setPixel(Point{d.width() - i - 1, d.height() - j - 1}, pixel.value());
+            output.setPixel(Point{d.getWidth() - i - 1, d.getHeight() - j - 1}, pixel.value());
         }
     }
 
@@ -1305,12 +1305,12 @@ fb32::rotate270(
     const fb32::Interface8880Base& input)
 {
     const auto id = input.getDimensions();
-    const Dimensions8880 od{ id.height(), id.width() };
+    const Dimensions8880 od{ id.getHeight(), id.getWidth() };
     Image8880 output{od};
 
-    for (auto j = 0 ; j < id.height() ; ++j)
+    for (auto j = 0 ; j < id.getHeight() ; ++j)
     {
-        for (auto i = 0 ; i < id.width() ; ++i)
+        for (auto i = 0 ; i < id.getWidth() ; ++i)
         {
             const auto pixel{input.getPixel(Point{i, j})};
 
@@ -1319,7 +1319,7 @@ fb32::rotate270(
                 continue;
             }
 
-            output.setPixel(Point{j, id.width() - i - 1}, pixel.value());
+            output.setPixel(Point{j, id.getWidth() - i - 1}, pixel.value());
         }
     }
 
@@ -1334,7 +1334,7 @@ fb32::scaleUp(
     uint8_t scale)
 {
     const auto id = input.getDimensions();
-    const Dimensions8880 od { id.width() * scale, id.height() * scale };
+    const Dimensions8880 od { id.getWidth() * scale, id.getHeight() * scale };
     Image8880 output{od};
 
 #ifdef WITH_BS_THREAD_POOL
@@ -1344,10 +1344,10 @@ fb32::scaleUp(
         rowsScaleUp(input, output, scale, start, end);
     };
 
-    tPool.detach_blocks<int>(0, id.height(), iterateRows);
+    tPool.detach_blocks<int>(0, id.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsScaleUp(input, output, scale, 0, id.height());
+    rowsScaleUp(input, output, scale, 0, id.getHeight());
 #endif
 
     return output;
@@ -1369,10 +1369,10 @@ fb32::toGrey(
         rowsToGrey(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, id.height(), iterateRows);
+    tPool.detach_blocks<int>(0, id.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsToGrey(input, output, 0, id.height());
+    rowsToGrey(input, output, 0, id.getHeight());
 #endif
 
     return output;
@@ -1394,10 +1394,10 @@ fb32::toGreen(
         rowsToGreen(input, output, start, end);
     };
 
-    tPool.detach_blocks<int>(0, id.height(), iterateRows);
+    tPool.detach_blocks<int>(0, id.getHeight(), iterateRows);
     tPool.wait();
 #else
-    rowsToGreen(input, output, 0, id.height());
+    rowsToGreen(input, output, 0, id.getHeight());
 #endif
 
     return output;

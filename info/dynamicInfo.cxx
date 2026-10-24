@@ -50,8 +50,8 @@ namespace
 
 struct IpAddress
 {
-    std::string address;
-    char interface;
+    std::string address{};
+    char interface{};
 };
 
 //-------------------------------------------------------------------------

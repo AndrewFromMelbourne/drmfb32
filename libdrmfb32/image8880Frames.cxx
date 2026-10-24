@@ -47,7 +47,7 @@ fb32::Image8880Frames::Image8880Frames(
     m_dimensions{d},
     m_frame{0},
     m_numberOfFrames{numberOfFrames},
-    m_buffer(d.width() * d.height() * numberOfFrames)
+    m_buffer(d.getWidth() * d.getHeight() * numberOfFrames)
 {
 }
 
@@ -131,6 +131,6 @@ fb32::Image8880Frames::offset(
     uint8_t frame) const noexcept
 {
     const auto size = m_dimensions.area();
-    return p.x() + (p.y() * m_dimensions.width()) + (size * frame);
+    return p.getX() + (p.getY() * m_dimensions.getWidth()) + (size * frame);
 }
 

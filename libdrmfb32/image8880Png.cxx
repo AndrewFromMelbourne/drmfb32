@@ -225,8 +225,8 @@ PngDecode::decodeIntoImage(
 
         const auto d = image.getDimensions();
 
-        if ((d.width() != static_cast<int>(width)) or
-            (d.height() != static_cast<int>(height)))
+        if ((d.getWidth() != static_cast<int>(width)) or
+            (d.getHeight() != static_cast<int>(height)))
         {
             throw std::runtime_error{"PNG image size mismatch"};
         }

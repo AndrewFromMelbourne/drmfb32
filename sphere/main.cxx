@@ -161,7 +161,7 @@ main(
     try
     {
         FrameBuffer8880 fb(device, connector);
-        Sphere sphere(fb.getDimensions().height() - 10);
+        Sphere sphere(fb.getDimensions().getHeight() - 10);
         sphere.setAmbient(0.1);
 
         //-----------------------------------------------------------------

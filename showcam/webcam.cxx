@@ -370,18 +370,18 @@ fb32::Webcam::chooseBestFit(
     {
         auto reverseSort = [](const fb32::Dimensions8880& a, const fb32::Dimensions8880& b) -> bool
         {
-            return (a.height() > b.height()) or
-                    ((a.height() == b.height()) and (a.width() > b.width()));
+            return (a.getHeight() > b.getHeight()) or
+                    ((a.getHeight() == b.getHeight()) and (a.getWidth() > b.getWidth()));
         };
 
         std::ranges::sort(dim, reverseSort);
 
         auto best = [this, &id](const auto& d) -> bool
         {
-            if ((d.width() <= id.width()) and
-                (d.height() <= id.height()) and
-                (d.width() > m_dimensions.width()) and
-                (d.height() > m_dimensions.height()))
+            if ((d.getWidth() <= id.getWidth()) and
+                (d.getHeight() <= id.getHeight()) and
+                (d.getWidth() > m_dimensions.getWidth()) and
+                (d.getHeight() > m_dimensions.getHeight()))
             {
                 return true;
             }
@@ -407,21 +407,21 @@ fb32::Webcam::chooseBestFit(
     {
         const auto& sw = frmsize.stepwise;
 
-        if ((id.width() < static_cast<int>(sw.min_width)) or
-            (id.height() < static_cast<int>(sw.min_height)))
+        if ((id.getWidth() < static_cast<int>(sw.min_width)) or
+            (id.getHeight() < static_cast<int>(sw.min_height)))
         {
             m_dimensions.set(sw.min_width, sw.min_height);
         }
-        else if ((id.width() > static_cast<int>(sw.max_width)) or
-                 (id.height() > static_cast<int>(sw.max_height)))
+        else if ((id.getWidth() > static_cast<int>(sw.max_width)) or
+                 (id.getHeight() > static_cast<int>(sw.max_height)))
         {
             m_dimensions.set(sw.max_width, sw.max_height);
         }
         else
         {
             m_dimensions.set(
-                id.width() - (id.width() % sw.step_width),
-                id.height() - (id.height() % sw.step_height));
+                id.getWidth() - (id.getWidth() % sw.step_width),
+                id.getHeight() - (id.getHeight() % sw.step_height));
         }
 
         result = true;
@@ -522,6 +522,11 @@ fb32::Webcam::convertYuyvToGrey(
     const uint8_t* data,
     std::size_t length)
 {
+    if (data == nullptr)
+    {
+        return false;
+    }
+
 #if WITH_BS_THREAD_POOL
 
     auto& tPool = threadPool();
@@ -571,6 +576,11 @@ fb32::Webcam::convertYuyvToRGB(
     const uint8_t* data,
     std::size_t length)
 {
+    if (data == nullptr)
+    {
+        return false;
+    }
+
 #if WITH_BS_THREAD_POOL
 
     auto& tPool = threadPool();
@@ -688,21 +698,21 @@ fb32::Webcam::initResizedImage(
 {
     const auto id = interface.getDimensions();
 
-    if ((m_dimensions.width() == id.width()) and (m_dimensions.height() == id.height()))
+    if ((m_dimensions.getWidth() == id.getWidth()) and (m_dimensions.getHeight() == id.getHeight()))
     {
         m_fitToScreen = false;
         return;
     }
 
-    auto width = (m_dimensions.width() * id.height()) /
-                  m_dimensions.height();
-    auto height = id.height();
+    auto width = (m_dimensions.getWidth() * id.getHeight()) /
+                  m_dimensions.getHeight();
+    auto height = id.getHeight();
 
-    if (width > id.width())
+    if (width > id.getWidth())
     {
-        width = id.width();
-        height = (m_dimensions.height() * id.width()) /
-                  m_dimensions.width();
+        width = id.getWidth();
+        height = (m_dimensions.getHeight() * id.getWidth()) /
+                  m_dimensions.getWidth();
     }
 
     const fb32::Dimensions8880 d{width, height};
@@ -717,8 +727,8 @@ fb32::Webcam::initVideo() noexcept
     v4l2_format fmt{};
 
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-    fmt.fmt.pix.width = m_dimensions.width(),
-    fmt.fmt.pix.height = m_dimensions.height(),
+    fmt.fmt.pix.width = m_dimensions.getWidth(),
+    fmt.fmt.pix.height = m_dimensions.getHeight(),
     fmt.fmt.pix.field = V4L2_FIELD_ANY;
     fmt.fmt.pix.pixelformat = m_format;
 

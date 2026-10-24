@@ -55,7 +55,7 @@ public:
                 int fontHeight,
                 int yPosition);
 
-    void init(fb32::Interface8880Font& font) final;
+    void init(fb32::Interface8880Font&) final;
     void update(time_t now, fb32::Interface8880Font& font) final;
 
 private:

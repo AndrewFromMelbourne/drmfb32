@@ -182,7 +182,7 @@ std::size_t
 fb32::FrameBuffer8880::getBufferSize() const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
-    return static_cast<std::size_t>(dbb.m_lineLengthPixels) * m_dimensions.height();
+    return static_cast<std::size_t>(dbb.m_lineLengthPixels) * m_dimensions.getHeight();
 }
 
 //-------------------------------------------------------------------------
@@ -216,7 +216,7 @@ fb32::FrameBuffer8880::offset(
     Point8880 p) const noexcept
 {
     const auto& dbb = m_dbs[m_dbBack];
-    return p.x() + p.y() * dbb.m_lineLengthPixels;
+    return p.getX() + p.getY() * dbb.m_lineLengthPixels;
 }
 
 //-------------------------------------------------------------------------

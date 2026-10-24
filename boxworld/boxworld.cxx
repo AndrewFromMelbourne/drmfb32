@@ -177,23 +177,23 @@ Boxworld::draw(
     const auto id = m_image.getDimensions();
     const auto fbd = fb.getDimensions();
 
-    const auto zoom = std::min(fbd.width() / id.width(), fbd.height() / id.height());
+    const auto zoom = std::min(fbd.getWidth() / id.getWidth(), fbd.getHeight() / id.getHeight());
 
     if ((zoom > 1) and m_fitToScreen)
     {
         const auto zoomed = scaleUp(m_image, zoom);
         const auto zd = zoomed.getDimensions();
 
-        const int xOffset = (fbd.width() - zd.width()) / 2;
-        const int yOffset = (fbd.height() - zd.height()) / 2;
+        const int xOffset = (fbd.getWidth() - zd.getWidth()) / 2;
+        const int yOffset = (fbd.getHeight() - zd.getHeight()) / 2;
 
         const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, zoomed);
     }
     else
     {
-        const int xOffset = (fbd.width() - id.width()) / 2;
-        const int yOffset = (fbd.height() - id.height()) / 2;
+        const int xOffset = (fbd.getWidth() - id.getWidth()) / 2;
+        const int yOffset = (fbd.getHeight() - id.getHeight()) / 2;
 
         const Point8880 p{ xOffset, yOffset };
         fb.putImage(p, m_image);
@@ -272,7 +272,7 @@ Boxworld::drawText(
     position = font.drawString(position, "(Y): ", m_boldRGB, m_bottomTextImage);
     position = font.drawString(position, "restart level", m_textRGB, m_bottomTextImage);
 
-    int halfWidth = 2 + (m_bottomTextImage.getDimensions().width() / 2);
+    int halfWidth = 2 + (m_bottomTextImage.getDimensions().getWidth() / 2);
 
     position = Point8880{ halfWidth, 2 };
     const auto& nextRGB = ((m_level < (Level::c_levelCount - 1))
