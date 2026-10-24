@@ -82,6 +82,7 @@ if (CPPCHECK_EXECUTABLE)
         "--std=c++23"
         "--quiet"
         "--suppress=*:${CMAKE_SOURCE_DIR}/thread-pool/*"
+        "--suppress=*:/usr/*"
         "--suppress=checkersReport"
         "--suppress=functionStatic"
         "--suppress=missingIncludeSystem"
